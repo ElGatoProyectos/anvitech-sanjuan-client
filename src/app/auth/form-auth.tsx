@@ -1,10 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 function FormAuth() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -15,10 +19,32 @@ function FormAuth() {
       setIsLoading(false);
     }, 2000);
 
-    setTimeout(() => {
-      router.push("system");
-    }, 2200);
+    showToast();
+
+    // setTimeout(() => {
+    //   router.push("system");
+    // }, 2200);
   }
+
+  function showToast() {
+    toast({
+      variant: "destructive",
+      title: "Uh oh! Something went wrong.",
+      description: "There was a problem with your request.",
+      action: <ToastAction altText="Try again">Try again</ToastAction>,
+    });
+  }
+
+  async function getData() {
+    try {
+      const response = await axios.get("/api/data");
+      console.log(response);
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <form className="flex flex-col pt-3 md:pt-8" onSubmit={handleSubmit}>

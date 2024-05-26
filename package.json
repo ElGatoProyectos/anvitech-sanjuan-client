@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@types/bcrypt": "^5.0.2",
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.379.0",
     "next": "14.2.3",
+    "next-auth": "^4.24.7",
     "next-reveal": "^1.0.6",
     "prisma": "^5.14.0",
     "react": "^18",
@@ -21,7 +26,8 @@
     "serverless-mysql": "^1.5.5",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "tailwindcss-animated": "^1.0.1"
+    "tailwindcss-animated": "^1.0.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
