@@ -43,7 +43,7 @@ function Page() {
   return (
     <div className="w-full bg-white p-8 rounded-lg">
       <CardHeaderReport></CardHeaderReport>
-      <div className="mt-12 relative h-max overflow-auto">
+      <div className="mt-8 relative h-max overflow-auto">
         <table className="w-full table-auto text-sm text-left">
           <thead className="text-gray-600 font-medium border-b">
             <tr>
@@ -78,7 +78,7 @@ function Page() {
                     href={"/system/reportes/" + idx}
                     className="py-1.5 px-3 text-gray-600 hover:text-gray-500 duration-150 hover:bg-gray-50 border rounded-lg"
                   >
-                    Manage
+                    Detalle
                   </Link>
                 </td>
               </tr>

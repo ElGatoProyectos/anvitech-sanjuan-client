@@ -10,7 +10,7 @@ class ErrorService {
         validationErrors
       );
     } else {
-      return httpResponse.http404("Error in server");
+      return httpResponse.http500("Error in server", error);
     }
   }
 }

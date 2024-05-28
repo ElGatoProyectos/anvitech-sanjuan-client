@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { toast } from "@/components/ui/use-toast";
 
-function CardHeaderReport() {
+function CardHeaderUser() {
   // define states
 
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ function CardHeaderReport() {
       useToastDefault(
         "Ok",
         <div className="w-fit">
-          <span className="animate-pulse">Generando reporte</span>
+          <span className="animate-pulse">Registrando</span>
         </div>
       );
 
@@ -60,35 +60,50 @@ function CardHeaderReport() {
       <div className="items-start justify-between flex ">
         <div className="max-w-lg">
           <h3 className="text-gray-800 text-lg font-semibold">
-            Reportes Generales
+            Lista de usuarios
           </h3>
         </div>
         <div className="mt-3 md:mt-0">
           <DialogTrigger asChild>
-            <Button className=" ">Generar reporte</Button>
+            <Button className=" ">Registrar</Button>
           </DialogTrigger>
         </div>
       </div>
 
       <DialogContent className="">
         <DialogHeader>
-          <DialogTitle>Generare reporte</DialogTitle>
+          <DialogTitle>Registrar usuario</DialogTitle>
           <DialogDescription className="mt-2">
-            Recuerde que la generacion de reporte es semanal, se recomienda
-            hacerlo los viernes o sabados
+            Recuerde que las credenciales por defecto no son seguras, se
+            recomienda modificarlas.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-2 mt-4">
-          <Label>Contrasena</Label>
-          <Input
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="************"
-          />
+        <div className="flex flex-col gap-4 mt-4">
+          <div className="gap-2">
+            <Label>Nombres completos</Label>
+            <Input
+              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              required
+            />
+          </div>
+          <div className="gap-2">
+            <Label>DNI</Label>
+            <Input
+              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              required
+            />
+          </div>
+          <div className="gap-2">
+            <Label>Email</Label>
+            <Input onChange={(e) => setPassword(e.target.value)} type="email" />
+          </div>
         </div>
         <DialogFooter className="mt-4">
           <DialogClose asChild>
             <Button onClick={handleGenerateReport} type="submit">
-              Generar reporte
+              Registrar ahora
             </Button>
           </DialogClose>
         </DialogFooter>
@@ -97,4 +112,4 @@ function CardHeaderReport() {
   );
 }
 
-export default CardHeaderReport;
+export default CardHeaderUser;

@@ -17,7 +17,12 @@ export const authOptions: AuthOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials: any, req) {
-        const user = await authenticate(credentials);
+        const user = await authenticate({
+          username: credentials.username,
+          password: credentials.password,
+        });
+
+        console.log(user);
         return user;
       },
     }),
@@ -36,12 +41,16 @@ export const authOptions: AuthOptions = {
       }
       if (user) {
         token.user.id = user.id;
-        token.user.client_id = user.client_id;
+        token.user.username = user.username;
         token.user.role = user.role;
       }
       return token;
     },
   },
+  // pages: {
+  //   signIn: "/",
+  //   error: "/",
+  // },
 };
 
 export const handler = NextAuth(authOptions);

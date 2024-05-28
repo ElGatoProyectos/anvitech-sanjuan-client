@@ -9,7 +9,7 @@ class AuthService {
       const responseUser = await userService.findUserByUsername(data.username);
       if (!responseUser.ok) return responseUser;
       if (bcrypt.compareSync(data.password, responseUser.content.password))
-        return httpResponse.http200("Login correct");
+        return httpResponse.http200("Login correct", responseUser.content);
       return httpResponse.http401("Error in Auth");
     } catch (error) {
       return errorService.handleErrorSchema(error);

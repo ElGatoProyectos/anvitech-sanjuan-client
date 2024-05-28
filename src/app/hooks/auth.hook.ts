@@ -5,14 +5,15 @@ export async function authenticate(data: {
   password: string;
 }) {
   const response = await authService.login(data);
-
   if (response.ok) {
     const user = {
       id: response.content.id,
       role: response.content.role,
-      client_id: response.content.company ? response.content.company : "",
+      username: response.content.username,
     };
 
     return user;
-  } else return null;
+  } else {
+    return null;
+  }
 }
