@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useToastDestructive } from "../hooks/toast.hook";
+import { getExcelFromApi } from "@/lib/core/functions/convert-to-excel";
 
 function FormAuth() {
   const router = useRouter();
@@ -38,15 +39,15 @@ function FormAuth() {
 
   async function getData() {
     try {
-      const response = await axios.get("/api/data");
-      const res = await axios.get("/api/users");
-
+      // const response = await axios.get("/api/data");
+      const res = await axios.get("/api/test-date");
       console.log(res);
+      // getExcelFromApi();
     } catch (error) {}
   }
 
   useEffect(() => {
-    // getData();
+    getData();
   }, []);
 
   return (

@@ -13,48 +13,38 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { toast } from "@/components/ui/use-toast";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { post } from "@/app/http/api.http";
 
 function CardHeaderUser() {
   // define states
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [password, setPassword] = useState("");
+  const session = useSession();
+
+  const [data, setData] = useState({
+    full_name: "",
+    dni: "",
+    email: "",
+  });
 
   // define functions
 
-  async function fetchGenerateReport() {
+  async function handleSubmit() {
     try {
-      setIsLoading(!isLoading);
-
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-      }, 2000);
-    } catch (error) {}
-  }
-
-  async function handleGenerateReport() {
-    if (password !== "admin") {
-      console.log("error");
-      useToastDestructive("Error", "Credenciales incorrectas");
-    } else {
-      useToastDefault(
-        "Ok",
-        <div className="w-fit">
-          <span className="animate-pulse">Registrando</span>
-        </div>
-      );
-
-      setTimeout(() => {
-        useToastDefault("Ok", "Reporte generado con exito");
-      }, 2000);
-
-      await fetchGenerateReport();
+      if (session.status === "authenticated") {
+        const response = await post("users", data, session.data);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
+
   return (
     <Dialog>
       <div className="items-start justify-between flex ">
@@ -82,7 +72,7 @@ function CardHeaderUser() {
           <div className="gap-2">
             <Label>Nombres completos</Label>
             <Input
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setData({ ...data, full_name: e.target.value })}
               type="text"
               required
             />
@@ -90,19 +80,22 @@ function CardHeaderUser() {
           <div className="gap-2">
             <Label>DNI</Label>
             <Input
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setData({ ...data, dni: e.target.value })}
               type="text"
               required
             />
           </div>
           <div className="gap-2">
             <Label>Email</Label>
-            <Input onChange={(e) => setPassword(e.target.value)} type="email" />
+            <Input
+              onChange={(e) => setData({ ...data, email: e.target.value })}
+              type="email"
+            />
           </div>
         </div>
         <DialogFooter className="mt-4">
           <DialogClose asChild>
-            <Button onClick={handleGenerateReport} type="submit">
+            <Button onClick={handleSubmit} type="submit">
               Registrar ahora
             </Button>
           </DialogClose>

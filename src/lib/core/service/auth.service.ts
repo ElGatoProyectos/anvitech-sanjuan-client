@@ -15,6 +15,30 @@ class AuthService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async validationAdmin(session: any) {
+    try {
+      const { user } = session;
+
+      if (user.role === "admin") {
+        return httpResponse.http200("Authentication ok");
+      } else return httpResponse.http401("Error in authentication");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async validationUser(session: any) {
+    try {
+      const { user } = session;
+
+      if (user.role === "user" || user.role === "admin") {
+        return httpResponse.http200("Authentication ok");
+      } else return httpResponse.http401("Error in authentication");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const authService = new AuthService();

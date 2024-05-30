@@ -1,9 +1,13 @@
-import { userService } from "@/lib/core/service/user.service";
-import { NextRequest, NextResponse } from "next/server";
 import { authService } from "@/lib/core/service/auth.service";
-import { validationAuth } from "../utils/handleValidation";
+import { userService } from "@/lib/core/service/user.service";
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { validationAuth } from "../../utils/handleValidation";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: number } }
+) {
   try {
     const session = await validationAuth(request);
 
@@ -24,20 +28,21 @@ export async function GET(request: NextRequest) {
       });
 
     // todo proccess logic
-    const responseUser = await userService.findAll();
-
+    const responseUser = await userService.findById(context.params.id);
     return NextResponse.json(responseUser.content, {
       status: responseUser.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: number } }
+) {
   try {
     const session = await validationAuth(request);
 
@@ -60,13 +65,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // todo proccess logic
-    const responseUser = await userService.createUser(body);
-
+    const responseUser = await userService.updateUser(body, context.params.id);
     return NextResponse.json(responseUser.content, {
       status: responseUser.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

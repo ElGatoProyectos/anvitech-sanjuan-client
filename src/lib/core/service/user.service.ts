@@ -15,6 +15,16 @@ class UserService {
     }
   }
 
+  async findById(id: number) {
+    try {
+      const user = await prisma.user.findFirst({ where: { id } });
+      if (!user) return httpResponse.http404("User not found");
+      return httpResponse.http200("User found", user);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async findUserByUsername(username: string) {
     try {
       const user = await prisma.user.findFirst({
@@ -30,8 +40,20 @@ class UserService {
   async createUser(data: any) {
     try {
       createUserDTO.parse(data);
-      await prisma.user.create(data);
-      return httpResponse.http201("User created ok!");
+
+      const password = bcrypt.hashSync(data.dni, 11);
+
+      const dataSet = {
+        full_name: data.full_name,
+        dni: data.dni,
+        email: data.email,
+        password,
+        username: data.dni,
+        enabled: true,
+        role: "user",
+      };
+      const created = await prisma.user.create({ data: dataSet });
+      return httpResponse.http201("User created ok!", created);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
@@ -52,10 +74,10 @@ class UserService {
 
   async deleteUser(userId: number) {
     try {
-      const updatedUser = await prisma.user.delete({
+      const deleted = await prisma.user.delete({
         where: { id: userId },
       });
-      return httpResponse.http200("User updated ok!", updatedUser);
+      return httpResponse.http200("User updated ok!", deleted);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
