@@ -35,6 +35,7 @@ model Report {
 model DetailReport {
   id                     Int    @id @default(autoincrement())
   report_id              Int
+  dia                    String
   fecha_reporte          String
   dni                    String
   nombre                 String

@@ -23,6 +23,31 @@ class ReportService {
     }
   }
 
+  async createReportDetail(dataDetail: any, reportId: number, day: string) {
+    try {
+      const dataTemporal = {
+        uuid: "65638685461972376eb766c4261406cfc5f320272dee536c7c0ee8fc94768d71",
+        checktype: 0,
+        checktime: "2024-02-07T18:51:46+00:00",
+        device: {
+          serial_number: "0300100024030014",
+          name: "014-MARIACOBOS-LIMANORTE",
+        },
+        employee: {
+          first_name: "ANDERSON ",
+          last_name: "GALVEZ TICLLACURI",
+          workno: "70976827",
+          department: "INTEGRAL PRO SAC - SEDE LIMA NORTE",
+          job_title: "ASESOR DE VENTAS CAMPO",
+        },
+      };
+
+      await prisma.detailReport.create({ data: dataDetail });
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async generateReportDetail(dataGeneralAniz: any[], reportId: number) {
     // todo mapeo de la informacion y registro de la misma en base al id del reporte
   }

@@ -28,6 +28,8 @@ class DataService {
 
       const responseReport = await reportService.generateReport();
 
+      const responseDetail = await this.instanceDetailData();
+
       if (!responseReport.ok) return responseReport;
 
       // todo pending define
@@ -43,6 +45,52 @@ class DataService {
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
+  }
+
+  async instanceDetailData(
+    minDay?: number,
+    maxDay?: number,
+    selectedYear?: number,
+    seletedMonth?: number
+  ) {
+    try {
+      const { monday, saturday } = await this.getMondayAndSaturday();
+      const { year: dataYear, month: dataMonth } = await this.getDate();
+
+      // todo define data time
+      const min = 5;
+      const max = 10;
+      const year = !selectedYear && dataYear;
+      const month = !seletedMonth && dataMonth;
+
+      // todo define time intervals
+      const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
+      const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
+      const response = dataResponseAnviz;
+      const dataReport = response.payload.list;
+      const days = [
+        "lunes",
+        "martes",
+        "miercoles",
+        "jueves",
+        "viernes",
+        "sabado",
+      ];
+
+      // for (let index = min; index < max; index++) {
+      //   const response = await anvizService.getData(begin_time,end_time,);
+      // }
+
+      let pos = 0;
+
+      for (let index = min; index < max; index++) {
+        const response = dataReport.filter((item) => {
+          const fecha = new Date(item.checktime);
+          const dia = fecha.getDate();
+          return dia === 3;
+        });
+      }
+    } catch (error) {}
   }
 
   async getDate() {
