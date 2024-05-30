@@ -10,7 +10,9 @@ class AuthService {
       if (!responseUser.ok) return responseUser;
       if (bcrypt.compareSync(data.password, responseUser.content.password))
         return httpResponse.http200("Login correct", responseUser.content);
-      return httpResponse.http401("Error in Auth");
+      return httpResponse.http401("Error in Auth", {
+        message: "Error in auth",
+      });
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
@@ -21,7 +23,7 @@ class AuthService {
       const { user } = session;
 
       if (user.role === "admin") {
-        return httpResponse.http200("Authentication ok");
+        return httpResponse.http200("Authentication ok", null);
       } else return httpResponse.http401("Error in authentication");
     } catch (error) {
       return errorService.handleErrorSchema(error);

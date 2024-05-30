@@ -60,6 +60,7 @@ class UserService {
   }
 
   async updateUser(data: any, userId: number) {
+    console.log("In modification==================================");
     try {
       updateUserDTO.parse(data);
       const updatedUser = await prisma.user.update({
@@ -68,6 +69,7 @@ class UserService {
       });
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -77,7 +79,7 @@ class UserService {
       const deleted = await prisma.user.delete({
         where: { id: userId },
       });
-      return httpResponse.http200("User updated ok!", deleted);
+      return httpResponse.http200("User deleted ok!", deleted);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }

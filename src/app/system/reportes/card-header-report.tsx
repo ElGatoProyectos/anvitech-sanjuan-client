@@ -16,10 +16,12 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { toast } from "@/components/ui/use-toast";
+import { get, post } from "@/app/http/api.http";
+import { useSession } from "next-auth/react";
 
 function CardHeaderReport() {
   // define states
-
+  const session = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const [password, setPassword] = useState("");
@@ -37,22 +39,16 @@ function CardHeaderReport() {
   }
 
   async function handleGenerateReport() {
-    if (password !== "admin") {
-      console.log("error");
-      useToastDestructive("Error", "Credenciales incorrectas");
-    } else {
-      useToastDefault(
-        "Ok",
-        <div className="w-fit">
-          <span className="animate-pulse">Generando reporte</span>
-        </div>
+    try {
+      const response = await post(
+        "reports",
+        { username: session.data?.user.username, password },
+        session.data
       );
 
-      setTimeout(() => {
-        useToastDefault("Ok", "Reporte generado con exito");
-      }, 2000);
-
-      await fetchGenerateReport();
+      console.log(response);
+    } catch (error) {
+      useToastDestructive("Error", "Error al ejecutar la accion");
     }
   }
   return (
@@ -81,6 +77,7 @@ function CardHeaderReport() {
         <div className="flex flex-col gap-2 mt-4">
           <Label>Contrasena</Label>
           <Input
+            type="password"
             onChange={(e) => setPassword(e.target.value)}
             placeholder="************"
           />

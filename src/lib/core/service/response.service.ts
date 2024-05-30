@@ -1,5 +1,5 @@
 class Response {
-  http200(message: string = "Fetch ok!", content: any = undefined) {
+  http200(message: string = "Fetch ok!", content: any = null) {
     return {
       ok: true,
       message,
@@ -7,7 +7,7 @@ class Response {
       content,
     };
   }
-  http201(message: string = "Fetch created ok!", content: any = undefined) {
+  http201(message: string = "Fetch created ok!", content: any = null) {
     return {
       ok: true,
       message,
@@ -15,7 +15,7 @@ class Response {
       content,
     };
   }
-  http400(message: string = "Error bad request!", content: any = undefined) {
+  http400(message: string = "Error bad request!", content: any = null) {
     return {
       ok: false,
       message,
@@ -24,10 +24,7 @@ class Response {
     };
   }
 
-  http401(
-    message: string = "Error no authorization!",
-    content: any = undefined
-  ) {
+  http401(message: string = "Error no authorization!", content: any = null) {
     return {
       ok: false,
       message,
@@ -35,7 +32,7 @@ class Response {
       content,
     };
   }
-  http404(message: string = "Error not found", content: any = undefined) {
+  http404(message: string = "Error not found", content: any = null) {
     return {
       ok: false,
       message,
@@ -43,7 +40,7 @@ class Response {
       content,
     };
   }
-  http500(message: string = "Error server", content: any = undefined) {
+  http500(message: string = "Error server", content: any = null) {
     return {
       ok: false,
       message,

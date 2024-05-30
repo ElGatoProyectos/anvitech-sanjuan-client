@@ -1,6 +1,5 @@
 import { authService } from "@/lib/core/service/auth.service";
 import { userService } from "@/lib/core/service/user.service";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { validationAuth } from "../../utils/handleValidation";
 
@@ -53,10 +52,12 @@ export async function PUT(
           status: 401,
         }
       );
+
     // todo return error validation role
     const responseValidations = await authService.validationAdmin(
       session.payload
     );
+
     if (!responseValidations.ok)
       return NextResponse.json(responseValidations.content, {
         status: responseValidations.statusCode,
@@ -65,11 +66,15 @@ export async function PUT(
     const body = await request.json();
 
     // todo proccess logic
-    const responseUser = await userService.updateUser(body, context.params.id);
+    const responseUser = await userService.updateUser(
+      body,
+      Number(context.params.id)
+    );
     return NextResponse.json(responseUser.content, {
       status: responseUser.statusCode,
     });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

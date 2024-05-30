@@ -1,8 +1,10 @@
 import { anvizService } from "./anviz.service";
 import { errorService } from "./errors.service";
+import { reportService } from "./report.service";
+import { httpResponse } from "./response.service";
 
 class DataService {
-  async InstanceFilters(
+  async instanceDataInit(
     minDay?: number,
     maxDay?: number,
     selectedYear?: number,
@@ -22,8 +24,22 @@ class DataService {
       const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
       const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
 
-      const responseData = await anvizService.getData(begin_time, end_time);
-      return responseData;
+      // const responseData = await anvizService.getData(begin_time, end_time);
+
+      const responseReport = await reportService.generateReport();
+
+      if (!responseReport.ok) return responseReport;
+
+      // todo pending define
+      // const detail = await reportService.generateReportDetail(
+      //   responseData.content,
+      //   report.id
+      // );
+
+      return httpResponse.http200(
+        "Reporte creado con exito",
+        responseReport.content
+      );
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }

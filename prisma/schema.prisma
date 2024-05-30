@@ -23,3 +23,26 @@ model User {
   role      String
   enabled   Boolean
 }
+
+model Report {
+  id            Int            @id @default(autoincrement())
+  date_created  DateTime       @default(now())
+  name          String
+  state         String
+  detailReports DetailReport[]
+}
+
+model DetailReport {
+  id                     Int    @id @default(autoincrement())
+  report_id              Int
+  fecha_reporte          String
+  dni                    String
+  nombre                 String
+  sede                   String
+  hora_entrada           String
+  hora_inicio            String
+  hora_inicio_refrigerio String
+  hora_fin_refrigerio    String
+  hora_salida            String
+  report                 Report @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}

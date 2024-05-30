@@ -19,6 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { post } from "@/app/http/api.http";
+import { createUserSchema } from "@/app/form-schemas/create-user.schema";
 
 function CardHeaderUser() {
   // define states
@@ -37,11 +38,13 @@ function CardHeaderUser() {
 
   async function handleSubmit() {
     try {
+      createUserSchema.parse(data);
       if (session.status === "authenticated") {
-        const response = await post("users", data, session.data);
+        await post("users", data, session.data);
+        useToastDefault("Ok", "Registro realizado con exito");
       }
     } catch (error) {
-      console.log(error);
+      useToastDestructive("Error", "Error al procesar el formulario");
     }
   }
 
