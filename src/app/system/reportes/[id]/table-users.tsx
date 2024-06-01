@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { FormEvent, useState } from "react";
+import ModalDetailReport from "./modal-detail";
 
 const users = [
   {
@@ -80,11 +81,11 @@ const users = [
 ];
 
 function TableUser() {
-  const [daySelected, setDaySelected] = useState("");
+  // const [daySelected, setDaySelected] = useState("");
 
-  function handleSelectDay(e: string) {
-    setDaySelected(e);
-  }
+  // function handleSelectDay(e: string) {
+  //   setDaySelected(e);
+  // }
 
   return (
     <Dialog>
@@ -149,7 +150,9 @@ function TableUser() {
         </div>
       </div>
 
-      <DialogContent className="sm:max-w-xl">
+      <ModalDetailReport></ModalDetailReport>
+
+      {/* <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Modificar registros</DialogTitle>
           <DialogDescription>
@@ -214,7 +217,7 @@ function TableUser() {
             Guardar cambios
           </Button>
         </DialogFooter>
-      </DialogContent>
+      </DialogContent> */}
     </Dialog>
   );
 }

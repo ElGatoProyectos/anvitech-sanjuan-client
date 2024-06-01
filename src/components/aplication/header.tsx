@@ -21,7 +21,7 @@ function Header() {
   const { data: session } = useSession();
 
   return (
-    <header className="w-full bg-white py-2 px-2">
+    <header className="w-full bg-white py-2 px-2 min-h-16">
       <Dialog>
         <nav className="w-full flex justify-end">
           <div className="flex items-center gap-4">

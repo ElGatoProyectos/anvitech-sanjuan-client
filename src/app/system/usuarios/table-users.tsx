@@ -27,9 +27,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useUpdatedStore } from "@/app/store/zustand";
 
 function TableUser() {
+  const { updatedAction } = useUpdatedStore();
+
   const [users, setUsers] = useState<any[]>([]);
+
   const session = useSession();
 
   const [userSelected, setUserSelected] = useState({
@@ -78,7 +82,7 @@ function TableUser() {
     if (session.status === "authenticated") {
       fetchDataUsers();
     }
-  }, [session.status]);
+  }, [session.status, updatedAction]);
 
   return (
     <>

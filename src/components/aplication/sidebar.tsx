@@ -1,6 +1,13 @@
 "use client";
 
-import { Home, ListTodo, LogOut, Users } from "lucide-react";
+import {
+  ContactRound,
+  Home,
+  ListMinusIcon,
+  ListTodo,
+  LogOut,
+  Users,
+} from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -73,6 +80,7 @@ function Sidebar() {
               </span>
             </Link>
           </li>
+
           {session.data?.user.role === "admin" && (
             <li>
               <Link
@@ -92,6 +100,38 @@ function Sidebar() {
               </Link>
             </li>
           )}
+
+          <li>
+            <Link
+              href={"/system/trabajadores"}
+              className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
+                pathname === "/system/trabajadores" ? activePath : inactivePath
+              } transition-all`}
+            >
+              <span className="inline-flex justify-center items-center ml-4">
+                <ContactRound size={20} />
+              </span>
+              <span className="ml-2 text-sm tracking-wide truncate">
+                Trabajadores
+              </span>
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href={"/system/incidentes"}
+              className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
+                pathname === "/system/incidentes" ? activePath : inactivePath
+              } transition-all`}
+            >
+              <span className="inline-flex justify-center items-center ml-4">
+                <ListMinusIcon size={20} />
+              </span>
+              <span className="ml-2 text-sm tracking-wide truncate">
+                Incidentes
+              </span>
+            </Link>
+          </li>
 
           <li role="button" onClick={handleLogout}>
             <div

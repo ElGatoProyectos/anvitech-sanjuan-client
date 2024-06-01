@@ -33,8 +33,11 @@ model Report {
 }
 
 model DetailReport {
-  id                     Int    @id @default(autoincrement())
+  id                     Int       @id @default(autoincrement())
   report_id              Int
+  incident_id            Int?
+  tardanza               String
+  falta                  String
   dia                    String
   fecha_reporte          String
   dni                    String
@@ -45,5 +48,33 @@ model DetailReport {
   hora_inicio_refrigerio String
   hora_fin_refrigerio    String
   hora_salida            String
-  report                 Report @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  report                 Report    @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  incident               Incident? @relation(fields: [incident_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Worker {
+  id        Int        @id @default(autoincrement())
+  full_name String
+  dni       String
+  schedule  Schedule[]
+}
+
+model Schedule {
+  id        Int    @id @default(autoincrement())
+  worker_id Int
+  lunes     String //08:00-17:00 -> de esta forma separamos la informacion y guardamos como string
+  martes    String
+  miercoles String
+  jueves    String
+  viernes   String
+  sabado    String
+  comments  String
+  worker    Worker @relation(fields: [worker_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Incident {
+  id            Int            @id @default(autoincrement())
+  title         String
+  description   String
+  detailReports DetailReport[]
 }

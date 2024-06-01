@@ -60,7 +60,6 @@ class UserService {
   }
 
   async updateUser(data: any, userId: number) {
-    console.log("In modification==================================");
     try {
       updateUserDTO.parse(data);
       const updatedUser = await prisma.user.update({
