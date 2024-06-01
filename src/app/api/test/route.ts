@@ -1,13 +1,20 @@
-import { pool } from "@/lib/database/config";
+import { dataService } from "@/lib/core/service/data.service";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const result = (await pool.query("SELECT *from dam")) as any;
-    console.log(result);
-    return NextResponse.json({ data: result[0] });
+    const response = await dataService.captureDataForDay("", 31, 12, 2024);
+
+    return NextResponse.json(
+      { message: "ok" },
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     console.log(error);
-    return NextResponse.json({ message: "error" });
+    return NextResponse.json(error, {
+      status: 500,
+    });
   }
 }

@@ -29,6 +29,7 @@ class AnvizService {
   }
 
   async getData(
+    token:string,
     begin_time: string,
     end_time: string,
     order = "asc",
@@ -38,7 +39,7 @@ class AnvizService {
     // begin_time: "2022-06-01T12:46:43+00:00",
     //       end_time: "2024-05-24T12:46:43+00:00",
     try {
-      const responeToken = await this.getToken();
+      
       const response = await axios.post("https://api.us.crosschexcloud.com/", {
         header: {
           nameSpace: "attendance.record",
@@ -49,14 +50,14 @@ class AnvizService {
         },
         authorize: {
           type: "token",
-          token: responeToken.content.token,
+          token,
         },
         payload: {
           begin_time,
           end_time,
           order,
-          page: "1",
-          per_page: "100",
+          page,
+          per_page,
         },
       });
       return httpResponse.http200("Fetch ok!", response);

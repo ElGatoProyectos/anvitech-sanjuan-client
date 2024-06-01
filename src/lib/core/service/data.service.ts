@@ -11,22 +11,29 @@ class DataService {
     seletedMonth?: number
   ) {
     try {
+      /// obtener fecha y hora actual
       const { monday, saturday } = await this.getMondayAndSaturday();
       const { year: dataYear, month: dataMonth } = await this.getDate();
 
-      // todo define data time
       const min = !minDay && monday;
       const max = !maxDay && saturday;
       const year = !selectedYear && dataYear;
       const month = !seletedMonth && dataMonth;
 
-      // todo define time intervals
+      /// transformar a fecha y hora estranjera
       const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
       const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
 
       // const responseData = await anvizService.getData(begin_time, end_time);
 
+      /// capturar el id del reporte
       const responseReport = await reportService.generateReport();
+
+      /// obtener el token para hacer la peticiion post
+
+      const responseToken = await anvizService.getToken();
+
+      /// toda la logica de
 
       const responseDetail = await this.instanceDetailData();
 
@@ -93,7 +100,72 @@ class DataService {
     } catch (error) {}
   }
 
-  async getDate() {
+  // async captureDataForDay(
+  //   token: string,
+  //   day: number,
+  //   month: number,
+  //   year: number
+  // ) {
+  //   try {
+  //     /// la diferencia horaria es de 5 horas hacia delante
+  //     const begin_time = `${year}-${month}-${day}T05:00:00+00:00`;
+  //     /// validamos si el siguiente dia es el mes siguiente o no
+  //     let endDate = new Date(year, month - 1, day + 1, 5, 0, 0);
+
+  //     let end_time;
+
+  //     if (endDate.getDate() === 1) {
+  //       end_time = `${year}-${month + 1}-01T05:00:00+00:00`;
+  //     } else {
+  //       end_time = `${year}-${month}-${day + 1}T05:00:00+00:00`;
+  //     }
+  //     // await anvizService.getData(token, begin_time, end_time);
+
+  //     console.log(begin_time);
+  //     console.log(end_time);
+  //   } catch (error) {
+  //     return error;
+  //   }
+  // }
+  async captureDataForDay(
+    token: string,
+    day: number,
+    month: number,
+    year: number
+  ) {
+    try {
+      const begin_time = `${year}-${String(month).padStart(2, "0")}-${String(
+        day
+      ).padStart(2, "0")}T05:00:00+00:00`;
+
+      // Crear una fecha a partir de los parámetros
+      let endDate = new Date(year, month - 1, day + 1, 5, 0, 0);
+
+      let end_time;
+      if (endDate.getDate() === 1) {
+        // Si es el siguiente mes
+        const newMonth = month === 12 ? 1 : month + 1; // Manejar la transición de diciembre a enero
+        const newYear = month === 12 ? year + 1 : year; // Incrementar el año si el mes es diciembre
+        end_time = `${newYear}-${String(newMonth).padStart(
+          2,
+          "0"
+        )}-01T05:00:00+00:00`;
+      } else {
+        end_time = `${year}-${String(month).padStart(2, "0")}-${String(
+          day + 1
+        ).padStart(2, "0")}T05:00:00+00:00`;
+      }
+
+      // await anvizService.getData(token, begin_time, end_time);
+
+      console.log(begin_time);
+      console.log(end_time);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  private async getDate() {
     const limaTime = new Date().toLocaleString("en-US", {
       timeZone: "America/Lima",
     });
@@ -107,7 +179,7 @@ class DataService {
     return { day, month, year };
   }
 
-  async getMondayAndSaturday() {
+  private async getMondayAndSaturday() {
     const limaTime = new Date().toLocaleString("en-US", {
       timeZone: "America/Lima",
     });
