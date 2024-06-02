@@ -1,9 +1,11 @@
 import { dataService } from "@/lib/core/service/data.service";
+import axios from "axios";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = await dataService.captureDataForDay("", 31, 12, 2024);
+    const res = await axios.get("https://pokeapi.co/api/v2/pokemon/ditto");
+    console.log(res);
 
     return NextResponse.json(
       { message: "ok" },

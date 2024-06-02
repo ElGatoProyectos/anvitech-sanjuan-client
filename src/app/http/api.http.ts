@@ -24,6 +24,15 @@ export async function post(module: string, data: any, session: any) {
   });
 }
 
+export async function postImage(module: string, data: any, session: any) {
+  return await axios.post(`/api/${module}`, data, {
+    headers: {
+      session: JSON.stringify(session),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export async function putId(
   module: string,
   data: any,

@@ -53,10 +53,13 @@ model DetailReport {
 }
 
 model Worker {
-  id        Int        @id @default(autoincrement())
-  full_name String
-  dni       String
-  schedule  Schedule[]
+  id         Int        @id @default(autoincrement())
+  full_name  String
+  dni        String
+  department String
+  position   String
+  hire_date  DateTime
+  schedule   Schedule[]
 }
 
 model Schedule {

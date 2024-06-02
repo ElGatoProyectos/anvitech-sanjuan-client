@@ -8,7 +8,7 @@ class DataService {
     minDay?: number,
     maxDay?: number,
     selectedYear?: number,
-    seletedMonth?: number
+    selectedMonth?: number
   ) {
     try {
       /// obtener fecha y hora actual
@@ -18,26 +18,32 @@ class DataService {
       const min = !minDay && monday;
       const max = !maxDay && saturday;
       const year = !selectedYear && dataYear;
-      const month = !seletedMonth && dataMonth;
+      const month = !selectedMonth && dataMonth;
 
       /// transformar a fecha y hora estranjera
-      const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
-      const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
+      // const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
+      // const end_time = `${year}-${month}-${max}T:59:59+00:00`;
 
       // const responseData = await anvizService.getData(begin_time, end_time);
 
       /// capturar el id del reporte
       const responseReport = await reportService.generateReport();
+      if (!responseReport.ok) return responseReport;
 
       /// obtener el token para hacer la peticiion post
 
       const responseToken = await anvizService.getToken();
+      if (!responseToken.ok) return responseToken;
 
-      /// toda la logica de
+      /// toda la logica de insercion en la base de datos
 
-      const responseDetail = await this.instanceDetailData();
-
-      if (!responseReport.ok) return responseReport;
+      const responseDetail = await this.instanceDetailData(
+        responseToken.content.token,
+        Number(min),
+        Number(max),
+        Number(selectedYear),
+        Number(selectedMonth)
+      );
 
       // todo pending define
       // const detail = await reportService.generateReportDetail(
@@ -55,26 +61,28 @@ class DataService {
   }
 
   async instanceDetailData(
-    minDay?: number,
-    maxDay?: number,
-    selectedYear?: number,
-    seletedMonth?: number
+    token: string,
+    minDay: number,
+    maxDay: number,
+    selectedYear: number,
+    seletedMonth: number
   ) {
     try {
-      const { monday, saturday } = await this.getMondayAndSaturday();
-      const { year: dataYear, month: dataMonth } = await this.getDate();
+      // const { monday, saturday } = await this.getMondayAndSaturday();
+      // const { year: dataYear, month: dataMonth } = await this.getDate();
 
-      // todo define data time
-      const min = 5;
-      const max = 10;
-      const year = !selectedYear && dataYear;
-      const month = !seletedMonth && dataMonth;
+      // // todo define data time
+      // const min = 5;
+      // const max = 10;
+      // const year = !selectedYear && dataYear;
+      // const month = !seletedMonth && dataMonth;
 
-      // todo define time intervals
-      const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
-      const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
-      const response = dataResponseAnviz;
-      const dataReport = response.payload.list;
+      // // todo define time intervals
+      // const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
+      // const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
+      // const response = dataResponseAnviz;
+      // const dataReport = response.payload.list;
+
       const days = [
         "lunes",
         "martes",
@@ -84,49 +92,40 @@ class DataService {
         "sabado",
       ];
 
+      let pos = 0;
+
+      for (let day = minDay; day < maxDay; day++) {
+        const dayString = days[pos];
+        ///capturacion de data por dia
+        const response = await this.captureDataForDay(
+          token,
+          day,
+          seletedMonth,
+          selectedYear
+        );
+        /// registrar toda la data que llego del dia en base al usuario
+        const users = ["", ""];
+
+        /// bucle para registrar
+
+        pos++;
+      }
+
       // for (let index = min; index < max; index++) {
       //   const response = await anvizService.getData(begin_time,end_time,);
       // }
-
-      let pos = 0;
-
-      for (let index = min; index < max; index++) {
-        const response = dataReport.filter((item) => {
-          const fecha = new Date(item.checktime);
-          const dia = fecha.getDate();
-          return dia === 3;
-        });
-      }
     } catch (error) {}
   }
 
-  // async captureDataForDay(
-  //   token: string,
-  //   day: number,
-  //   month: number,
-  //   year: number
-  // ) {
-  //   try {
-  //     /// la diferencia horaria es de 5 horas hacia delante
-  //     const begin_time = `${year}-${month}-${day}T05:00:00+00:00`;
-  //     /// validamos si el siguiente dia es el mes siguiente o no
-  //     let endDate = new Date(year, month - 1, day + 1, 5, 0, 0);
+  async filterAndRegisterForUser(dataGeneralDay: any[], worker: any) {
+    try {
+      const dataFiltered = dataGeneralDay.filter(
+        (item) => item.payload.list.employe.workno === worker.dni
+      );
+      /// no se cuantos objetos haya dentro del array, pero se que tengo que ordenarlos en base a la fecha
+    } catch (error) {}
+  }
 
-  //     let end_time;
-
-  //     if (endDate.getDate() === 1) {
-  //       end_time = `${year}-${month + 1}-01T05:00:00+00:00`;
-  //     } else {
-  //       end_time = `${year}-${month}-${day + 1}T05:00:00+00:00`;
-  //     }
-  //     // await anvizService.getData(token, begin_time, end_time);
-
-  //     console.log(begin_time);
-  //     console.log(end_time);
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
   async captureDataForDay(
     token: string,
     day: number,
@@ -138,14 +137,12 @@ class DataService {
         day
       ).padStart(2, "0")}T05:00:00+00:00`;
 
-      // Crear una fecha a partir de los parámetros
       let endDate = new Date(year, month - 1, day + 1, 5, 0, 0);
 
       let end_time;
       if (endDate.getDate() === 1) {
-        // Si es el siguiente mes
-        const newMonth = month === 12 ? 1 : month + 1; // Manejar la transición de diciembre a enero
-        const newYear = month === 12 ? year + 1 : year; // Incrementar el año si el mes es diciembre
+        const newMonth = month === 12 ? 1 : month + 1;
+        const newYear = month === 12 ? year + 1 : year;
         end_time = `${newYear}-${String(newMonth).padStart(
           2,
           "0"
@@ -156,12 +153,26 @@ class DataService {
         ).padStart(2, "0")}T05:00:00+00:00`;
       }
 
-      // await anvizService.getData(token, begin_time, end_time);
+      let dataList = [];
+      let pos = 1;
+      while (true) {
+        const response = await anvizService.getData(
+          token,
+          begin_time,
+          end_time,
+          "asc",
+          pos
+        );
+        if (response.content.data.payload.list.length) {
+          dataList.push(...response.content.payload.list);
+        } else {
+          break;
+        }
+      }
 
-      console.log(begin_time);
-      console.log(end_time);
+      return httpResponse.http200("Data for day", dataList);
     } catch (error) {
-      console.error(error);
+      return errorService.handleErrorSchema(error);
     }
   }
 

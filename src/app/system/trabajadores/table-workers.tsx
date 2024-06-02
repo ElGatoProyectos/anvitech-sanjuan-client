@@ -45,8 +45,8 @@ function TableWorkers() {
   }, [session.status, updatedAction]);
 
   return (
-    <div className=" flex flex-col">
-      <div className="flex p-2 gap-4">
+    <div className=" flex flex-col mt-4">
+      <div className="flex gap-4">
         <Input></Input>
         <Select>
           <SelectTrigger className="w-[180px]">
