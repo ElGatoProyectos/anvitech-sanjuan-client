@@ -1,7 +1,10 @@
+import prisma from "@/lib/prisma";
 import { anvizService } from "./anviz.service";
 import { errorService } from "./errors.service";
 import { reportService } from "./report.service";
 import { httpResponse } from "./response.service";
+import { workerService } from "./worker.service";
+import { formatDateForPrisma } from "../functions/date-transform";
 
 class DataService {
   async instanceDataInit(
@@ -15,22 +18,16 @@ class DataService {
       const { monday, saturday } = await this.getMondayAndSaturday();
       const { year: dataYear, month: dataMonth } = await this.getDate();
 
-      const min = !minDay && monday;
-      const max = !maxDay && saturday;
-      const year = !selectedYear && dataYear;
-      const month = !selectedMonth && dataMonth;
-
-      /// transformar a fecha y hora estranjera
-      // const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
-      // const end_time = `${year}-${month}-${max}T:59:59+00:00`;
-
-      // const responseData = await anvizService.getData(begin_time, end_time);
+      const min = minDay ?? monday;
+      const max = maxDay ?? saturday;
+      const year = selectedYear ?? dataYear;
+      const month = selectedMonth ?? dataMonth;
 
       /// capturar el id del reporte
       const responseReport = await reportService.generateReport();
       if (!responseReport.ok) return responseReport;
 
-      /// obtener el token para hacer la peticiion post
+      /// obtener el token para hacer la peticion post
 
       const responseToken = await anvizService.getToken();
       if (!responseToken.ok) return responseToken;
@@ -41,19 +38,14 @@ class DataService {
         responseToken.content.token,
         Number(min),
         Number(max),
-        Number(selectedYear),
-        Number(selectedMonth)
+        Number(year),
+        Number(month),
+        responseReport.content
       );
 
-      // todo pending define
-      // const detail = await reportService.generateReportDetail(
-      //   responseData.content,
-      //   report.id
-      // );
-
       return httpResponse.http200(
-        "Reporte creado con exito",
-        responseReport.content
+        "Report generado satisfactoriamente",
+        responseDetail.content
       );
     } catch (error) {
       return errorService.handleErrorSchema(error);
@@ -65,24 +57,11 @@ class DataService {
     minDay: number,
     maxDay: number,
     selectedYear: number,
-    seletedMonth: number
+    selectedMonth: number,
+    report: any
   ) {
     try {
-      // const { monday, saturday } = await this.getMondayAndSaturday();
-      // const { year: dataYear, month: dataMonth } = await this.getDate();
-
-      // // todo define data time
-      // const min = 5;
-      // const max = 10;
-      // const year = !selectedYear && dataYear;
-      // const month = !seletedMonth && dataMonth;
-
-      // // todo define time intervals
-      // const begin_time = `${year}-${month}-${min}T00:00:00+00:00`;
-      // const end_time = `${year}-${month}-${max}T23:59:59+00:00`;
-      // const response = dataResponseAnviz;
-      // const dataReport = response.payload.list;
-
+      console.log("instance detail data");
       const days = [
         "lunes",
         "martes",
@@ -94,36 +73,122 @@ class DataService {
 
       let pos = 0;
 
-      for (let day = minDay; day < maxDay; day++) {
+      for (let day = minDay; day <= maxDay; day++) {
+        /// definimos el dia donde estamos para poder hacer el registro a la bd 📅
         const dayString = days[pos];
-        ///capturacion de data por dia
-        const response = await this.captureDataForDay(
+        console.log(dayString);
+
+        ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
+        // todo todo ok
+        const responseDataForDay = await this.captureDataForDay(
           token,
           day,
-          seletedMonth,
+          selectedMonth,
           selectedYear
         );
-        /// registrar toda la data que llego del dia en base al usuario
-        const users = ["", ""];
 
-        /// bucle para registrar
+        /// filtrar la data para que se registre por usuario
+        const workers = await workerService.findAll();
+
+        /// iteración de trabajadores para obtener sus datos y analizar en base a eso
+        const responseMap = workers.content.map(async (worker: any) => {
+          await this.filterAndRegisterForUser(
+            responseDataForDay.content,
+            worker,
+            dayString,
+            report
+          );
+        });
 
         pos++;
       }
 
-      // for (let index = min; index < max; index++) {
-      //   const response = await anvizService.getData(begin_time,end_time,);
-      // }
-    } catch (error) {}
+      return httpResponse.http200("Report created", "Report created");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
   }
-
-  async filterAndRegisterForUser(dataGeneralDay: any[], worker: any) {
+  /// este método registra en base al formato de entrada y trabajador
+  async filterAndRegisterForUser(
+    dataGeneralDay: any[],
+    worker: any,
+    day: string,
+    report: any
+  ) {
     try {
+      console.log("filter and register!!!!!");
+      ///devuelve un array de posiblemente 4 objetos que contienen la fecha de inicio a fin
       const dataFiltered = dataGeneralDay.filter(
-        (item) => item.payload.list.employe.workno === worker.dni
+        (item) => item.employee.workno === worker.dni
       );
+
+      console.log(dataFiltered);
+
+      const formatData = {
+        report_id: report.id,
+        tardanza: "no",
+        falta: "no",
+        dia: day,
+        fecha_reporte: report.date_created.toISOString(),
+        dni: worker.dni,
+        nombre: worker.full_name,
+        sede: dataFiltered[0].device.name,
+        hora_entrada: "",
+        hora_inicio: "",
+        hora_inicio_refrigerio: "",
+        hora_fin_refrigerio: "",
+        hora_salida: "",
+      };
+      /// dataFiltered
+      // [
+      //   {
+      //     uuid: '340f015e3ad26009bde802192b4023244f889ffd2cbb8adf3c514c6dc2ad7252',
+      //     checktype: 0,
+      //     checktime: '2024-05-30T13:52:42+00:00',
+      //     device: {
+      //       serial_number: '0300100024120050',
+      //       name: '20050-ERIKALAVADO-SEDEHUANCAYO'
+      //     },
+      //     employee: {
+      //       first_name: 'ANDREE GUILLERMO',
+      //       last_name: 'ROJAS MANTARI',
+      //       workno: '76964896',
+      //       department: 'INTEGRAL ORIENTE SAC - SEDE HUANCAYO',
+      //       job_title: 'ASESOR DE VENTAS CAMPO'
+      //     }
+      //   }
+      // ]
+
+      dataFiltered.map((item, index) => {
+        const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+        const [hour, minutes] = horaCompleta.split(":");
+
+        if (hour + 5 <= 9) {
+          formatData.hora_inicio = hour + ":" + minutes;
+          if (hour > 8) {
+            formatData.tardanza = "si";
+          }
+        } else if (hour >= 12 && hour <= 15) {
+          if (formatData.hora_inicio_refrigerio === "") {
+            formatData.hora_inicio_refrigerio = hour + ":" + minutes;
+          } else {
+            formatData.hora_fin_refrigerio = hour + ":" + minutes;
+          }
+        } else {
+          formatData.hora_salida = hour + ":" + minutes;
+        }
+      });
+      console.log(formatData);
+
+      const created = await prisma.detailReport.create({ data: formatData });
+
+      console.log(created);
+
       /// no se cuantos objetos haya dentro del array, pero se que tengo que ordenarlos en base a la fecha
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
   }
 
   async captureDataForDay(
@@ -163,8 +228,10 @@ class DataService {
           "asc",
           pos
         );
-        if (response.content.data.payload.list.length) {
+        console.log(response.content.payload.list.length);
+        if (response.content.payload.list.length) {
           dataList.push(...response.content.payload.list);
+          pos++;
         } else {
           break;
         }

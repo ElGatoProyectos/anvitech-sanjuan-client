@@ -1,6 +1,8 @@
 "use client";
 
-import { post, postImage } from "@/app/http/api.http";
+import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { get, post, postImage } from "@/app/http/api.http";
+import { useUpdatedStore } from "@/app/store/zustand";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,10 +19,13 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { Sheet, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 function CardHeaderWorker() {
   /// define states
+  const { setUpdatedAction } = useUpdatedStore();
+
+  const [loading, setLoading] = useState(false);
   const session = useSession();
   const [isUnitaryModalOpen, setUnitaryModalOpen] = useState(false);
   const [isMassiveModalOpen, setMassiveModalOpen] = useState(false);
@@ -31,35 +36,53 @@ function CardHeaderWorker() {
     dni: "",
     department: "",
     position: "",
-    phone: "",
     hire_date: "",
   });
 
   /// define functions
+
   async function handleRegistrarDataMassive() {
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("password", password);
       await postImage("workers/file", formData, session.data);
       setPassword("");
-    } catch (error) {}
+      setLoading(false);
+    } catch (error) {
+      useToastDestructive("Error", "Error al procesar el archivo excel");
+      setLoading(false);
+    }
   }
 
-  async function handleRegistrerData() {
+  async function handleRegisterData() {
     try {
+      setLoading(true);
+      await post("workers", { dataWorker, password }, session.data);
       setPassword("");
-    } catch (error) {}
+      setLoading(false);
+      setUpdatedAction();
+    } catch (error) {
+      useToastDestructive("Error", "Error al procesar el registro");
+      setLoading(false);
+    }
   }
 
-  console.log(file);
+  // async function test() {
+  //   const res = await get("test", session.data);
+  //   console.log(res);
+  // }
+  // useEffect(() => {
+  //   test();
+  // }, []);
 
   return (
     <>
       <div className="items-start justify-between flex ">
         <div className="max-w-lg">
           <h3 className="text-gray-800 text-lg font-semibold">
-            Reportes Generales
+            Lista de trabajadores
           </h3>
         </div>
         <div className="flex mt-3 md:mt-0 gap-4">
@@ -86,8 +109,8 @@ function CardHeaderWorker() {
           <DialogHeader>
             <DialogTitle>Generar reporte unitario</DialogTitle>
             <DialogDescription className="mt-2">
-              Recuerde que la generacion de reporte es semanal, se recomienda
-              hacerlo los viernes o sabados
+              Recuerde que la generación de reporte es semanal, se recomienda
+              hacerlo los viernes o sábados
             </DialogDescription>
           </DialogHeader>
           <div className="w-full grid grid-cols-2 mt-4 gap-4">
@@ -96,11 +119,14 @@ function CardHeaderWorker() {
               <Input
                 type="text"
                 onChange={(e) =>
-                  setDataWorker({ ...dataWorker, full_name: e.target.value })
+                  setDataWorker({
+                    ...dataWorker,
+                    full_name: e.target.value.toUpperCase(),
+                  })
                 }
               />
             </div>
-            <div className="flex flex-col gap-2  col-span-1">
+            <div className="flex flex-col gap-2  col-span-2">
               <Label>DNI</Label>
               <Input
                 onChange={(e) =>
@@ -108,35 +134,34 @@ function CardHeaderWorker() {
                 }
               />
             </div>
-            <div className="flex flex-col gap-2  col-span-1">
-              <Label>Celular</Label>
-              <Input
-                onChange={(e) =>
-                  setDataWorker({ ...dataWorker, phone: e.target.value })
-                }
-              />
-            </div>
+
             <div className="flex flex-col gap-2  col-span-2">
               <Label>Departamento</Label>
               <Input
                 type="text"
                 onChange={(e) =>
-                  setDataWorker({ ...dataWorker, department: e.target.value })
+                  setDataWorker({
+                    ...dataWorker,
+                    department: e.target.value.toUpperCase(),
+                  })
                 }
               />
             </div>
             <div className="flex flex-col gap-2  col-span-2">
-              <Label>Posicion</Label>
+              <Label>Posición</Label>
               <Input
                 type="text"
                 onChange={(e) =>
-                  setDataWorker({ ...dataWorker, position: e.target.value })
+                  setDataWorker({
+                    ...dataWorker,
+                    position: e.target.value.toUpperCase(),
+                  })
                 }
               />
             </div>
 
             <div className="flex flex-col gap-2  col-span-2">
-              <Label>Fecha de inscripcion</Label>
+              <Label>Fecha de contratación</Label>
               <Input
                 type="date"
                 onChange={(e) =>
@@ -146,7 +171,7 @@ function CardHeaderWorker() {
             </div>
             <hr className="col-span-2" />
             <div className="flex flex-col gap-2  col-span-2">
-              <Label>Contrasena administrador</Label>
+              <Label>Contraseña administrador</Label>
               <Input
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
@@ -157,7 +182,9 @@ function CardHeaderWorker() {
 
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type="submit">Generar reporte</Button>
+              <Button disabled={loading} onClick={handleRegisterData}>
+                Registrar trabajador
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
@@ -168,8 +195,8 @@ function CardHeaderWorker() {
           <DialogHeader>
             <DialogTitle>Generar reporte masivo</DialogTitle>
             <DialogDescription className="mt-2">
-              Recuerde que el archivo debe tener un formato unico, los usuarios
-              que ya existan no se registraran.{" "}
+              Recuerde que el archivo debe tener un formato único, los usuarios
+              que ya existan lanzaran un error.
               <Link
                 download={"formato_datos"}
                 href={"/files/modelo.xlsx"}
@@ -188,7 +215,7 @@ function CardHeaderWorker() {
             />
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <Label>Contrasena</Label>
+            <Label>Contraseña</Label>
             <Input
               type="password"
               onChange={(e) => setPassword(e.target.value)}
@@ -197,8 +224,8 @@ function CardHeaderWorker() {
           </div>
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button onClick={handleRegistrarDataMassive}>
-                Generar reporte
+              <Button disabled={loading} onClick={handleRegistrarDataMassive}>
+                Registrar trabajadores
               </Button>
             </DialogClose>
           </DialogFooter>

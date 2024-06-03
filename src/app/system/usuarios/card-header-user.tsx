@@ -27,7 +27,7 @@ function CardHeaderUser() {
 
   const { setUpdatedAction } = useUpdatedStore();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const session = useSession();
 
@@ -41,15 +41,18 @@ function CardHeaderUser() {
 
   async function handleSubmit() {
     try {
+      setLoading(true);
       createUserSchema.parse(data);
       if (session.status === "authenticated") {
         await post("users", data, session.data);
-        useToastDefault("Ok", "Registro realizado con exito");
+        useToastDefault("Ok", "Registro realizado con éxito");
       }
 
       setUpdatedAction();
+      setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
+      setLoading(false);
     }
   }
 
@@ -103,7 +106,7 @@ function CardHeaderUser() {
         </div>
         <DialogFooter className="mt-4">
           <DialogClose asChild>
-            <Button onClick={handleSubmit} type="submit">
+            <Button disabled={loading} onClick={handleSubmit} type="submit">
               Registrar ahora
             </Button>
           </DialogClose>

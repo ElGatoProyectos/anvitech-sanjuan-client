@@ -2,6 +2,11 @@ import prisma from "@/lib/prisma";
 import { errorService } from "./errors.service";
 import { httpResponse } from "./response.service";
 import * as xlsx from "xlsx";
+import {
+  excelSerialDateToJSDate,
+  formatDateForPrisma,
+} from "../functions/date-transform";
+import { createWorkerDTO } from "../schemas/worker.dto";
 
 class WorkerService {
   async findAll() {
@@ -23,6 +28,7 @@ class WorkerService {
     }
   }
 
+  /// registros masivos ok, deben evitarse ingresar registros duplicados en el excel si no ninguno se registrara
   async fileToRegisterMassive(file: File) {
     try {
       const bytes = await file.arrayBuffer();
@@ -46,8 +52,25 @@ class WorkerService {
         };
       });
 
-      await prisma.worker.createMany({ data: convertedArray });
-    } catch (error) {}
+      const created = await prisma.worker.createMany({ data: convertedArray });
+      return httpResponse.http201("Workers created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async create(data: any) {
+    try {
+      createWorkerDTO.parse(data);
+      const formatData = {
+        ...data,
+        hire_date: formatDateForPrisma(data.hire_date),
+      };
+      const created = await prisma.worker.create({ data: formatData });
+      return httpResponse.http201("Worker created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
   }
 }
 

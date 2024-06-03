@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
           status: 401,
         }
       );
-    // todo return error validation role
+    /// return error validation role
     const responseValidations = await authService.validationAdmin(
       session.payload
     );
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         status: responseValidations.statusCode,
       });
 
-    // todo proccess logic ===================================
+    /// process logic ===================================
     const body = await request.json();
 
     console.log("body==================", body);
@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
         status: responseAuth.statusCode,
       });
 
-    // todo generate report ==================================
-    // todo this method is slow
+    /// generate report ==================================
+    /// this method is slow
     const responseData = await dataService.instanceDataInit();
     return NextResponse.json(responseData, {
       status: responseData.statusCode,

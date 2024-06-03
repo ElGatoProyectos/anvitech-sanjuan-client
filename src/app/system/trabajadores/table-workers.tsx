@@ -19,14 +19,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function TableWorkers() {
-  // todo -> define states
+  /// define states
   const { updatedAction } = useUpdatedStore();
 
   const [workers, setWorkers] = useState<any[]>([]);
 
   const session = useSession();
 
-  // todo -> define functions
+  /// define functions
 
   async function fetchDataWorkers() {
     try {
@@ -34,7 +34,7 @@ function TableWorkers() {
 
       setWorkers(response.data);
     } catch (error) {
-      useToastDestructive("Error", "Hubo un error al traer la informacion");
+      useToastDestructive("Error", "Hubo un error al traer la información");
     }
   }
 
@@ -68,7 +68,7 @@ function TableWorkers() {
             <tr>
               <th className="py-3 pr-6">Nombres</th>
               <th className="py-3 pr-6">DNI</th>
-              <th className="py-3 pr-6">Configuracion</th>
+              <th className="py-3 pr-6">Configuración</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">

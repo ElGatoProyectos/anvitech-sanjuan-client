@@ -5,8 +5,6 @@ import { httpResponse } from "./response.service";
 class AnvizService {
   async getToken() {
     try {
-      // console.log(process.env.CROSSCHEXCLOUD_API_KEY);
-      // console.log(process.env.CROSSCHEXCLOUD_API_SECRET);
       const response = await axios.post("https://api.us.crosschexcloud.com/", {
         header: {
           nameSpace: "authorize.token",

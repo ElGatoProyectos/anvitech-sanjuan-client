@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
 
     const response = await workerService.fileToRegisterMassive(file);
 
+    console.log(response);
+
     return NextResponse.json(
       { message: "ok" },
       {
