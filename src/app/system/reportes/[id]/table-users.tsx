@@ -73,8 +73,14 @@ function TableUser({ id }: { id: string }) {
     }
   }, [session.status]);
 
+  const [isClosing, setIsClosing] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={() => {
+        setIsClosing(!isClosing);
+      }}
+    >
       <div className=" flex flex-col">
         <div className="flex p-2 gap-4">
           <Input></Input>
@@ -150,7 +156,11 @@ function TableUser({ id }: { id: string }) {
       </div>
 
       {worker && (
-        <ModalDetailReport worker={worker} reportId={id}></ModalDetailReport>
+        <ModalDetailReport
+          worker={worker}
+          reportId={id}
+          isClosing={isClosing}
+        ></ModalDetailReport>
       )}
     </Dialog>
   );

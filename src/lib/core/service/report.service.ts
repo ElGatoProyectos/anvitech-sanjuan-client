@@ -69,6 +69,7 @@ class ReportService {
     });
   }
 
+  /// not used
   async findDetailReport(id: number) {
     try {
       const details = await prisma.detailReport.findMany({
@@ -88,6 +89,39 @@ class ReportService {
       });
       return httpResponse.http200("All details report", detail);
     } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  /// ok
+  async updateHours(detailReportId: number, dataHours: any) {
+    try {
+      const updated = await prisma.detailReport.update({
+        where: { id: detailReportId },
+        data: {
+          hora_inicio: { set: dataHours.hora_inicio },
+          hora_inicio_refrigerio: { set: dataHours.hora_inicio_refrigerio },
+          hora_fin_refrigerio: { set: dataHours.hora_fin_refrigerio },
+          hora_salida: { set: dataHours.hora_salida },
+        },
+      });
+      return httpResponse.http200("Detail updated", updated);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async addIncident(detailReportId: number, incidentId: number) {
+    try {
+      const updated = await prisma.detailReport.update({
+        where: { id: detailReportId },
+        data: {
+          incident_id: { set: incidentId },
+        },
+      });
+      return httpResponse.http200("Detail updated", updated);
+    } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

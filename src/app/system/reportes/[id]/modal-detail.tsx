@@ -1,7 +1,7 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, getByDNI, getId, post } from "@/app/http/api.http";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
+import { get, getByDNI, getId, post, putId } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -22,23 +22,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CircleParking } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 function ModalDetailReport({
   worker,
   reportId,
+  isClosing,
 }: {
   worker: any;
   reportId: string;
+  isClosing: boolean;
 }) {
   /// define states
 
-  // console.log("workermodal-----", worker);
   const session = useSession();
   const [daySelected, setDaySelected] = useState("");
   const [incidents, setIncidents] = useState<any[]>([]);
   const [falta, setFalta] = useState(false);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loadingUpdateIncident, setLoadingUpdateIncident] = useState(false);
+  const [detailSelected, setDetailSelected] = useState<any>({});
+  const [incidentSelected, setIncidentSelected] = useState("");
 
   const [dataDetail, setDataDetail] = useState<any[]>([]);
 
@@ -51,12 +57,15 @@ function ModalDetailReport({
 
   /// define functions
 
+  /// si en caso el dia no exista para el registro debería bloquear la muestra
   function handleSelectDay(e: string) {
     setDaySelected(e);
 
     const detailFiltered = dataDetail.find((item) => item.dia === e);
 
     if (detailFiltered) {
+      setDetailSelected(detailFiltered);
+      setFalta(false);
       setHours({
         ...hours,
         hora_inicio: detailFiltered?.hora_inicio || "",
@@ -65,6 +74,7 @@ function ModalDetailReport({
         hora_salida: detailFiltered?.hora_salida || "",
       });
     } else {
+      setFalta(true);
       setHours({
         hora_inicio: "",
         hora_inicio_refrigerio: "",
@@ -98,16 +108,44 @@ function ModalDetailReport({
 
   async function handleUpdateHours() {
     try {
+      ///petición
+      setLoadingUpdate(true);
+      await putId("reports/detail", hours, detailSelected.id, session.data);
+      useToastDefault("Ok", "Modificación realizada con éxito");
+
+      setLoadingUpdate(false);
     } catch (error) {
       useToastDestructive("Error", "Hubo un error al modificar las horas");
+      setLoadingUpdate(false);
     }
   }
 
   async function handleAddIncident() {
     try {
+      setLoadingUpdate(true);
+      await post(
+        "reports/incident",
+        { detailReportId: detailSelected.id, incidentId: incidentSelected },
+
+        session.data
+      );
+      setLoadingUpdate(false);
     } catch (error) {
+      setLoadingUpdate(false);
+
       useToastDestructive("Error", "Hubo un error al registrar la incidencia");
     }
+  }
+
+  function handleCloseModal() {
+    setHours({
+      hora_inicio: "",
+      hora_inicio_refrigerio: "",
+      hora_fin_refrigerio: "",
+      hora_salida: "",
+    });
+
+    setDaySelected("");
   }
 
   /// run handlers
@@ -118,6 +156,10 @@ function ModalDetailReport({
       fetchDetailReport(worker.dni, reportId);
     }
   }, [worker]);
+
+  useEffect(() => {
+    handleCloseModal();
+  }, [isClosing]);
 
   return (
     <DialogContent className="sm:max-w-xl">
@@ -150,22 +192,42 @@ function ModalDetailReport({
           <div className="grid grid-cols-2 w-full mt-8 gap-4">
             <div className="flex flex-col gap-2">
               <Label>Ingreso</Label>
-              <Input defaultValue={hours.hora_inicio}></Input>
+              <Input
+                defaultValue={hours.hora_inicio}
+                onChange={(e) =>
+                  setHours({ ...hours, hora_inicio: e.target.value })
+                }
+              ></Input>
             </div>
 
             <div className="flex flex-col gap-2">
               <Label>Salida</Label>
-              <Input defaultValue={hours.hora_salida}></Input>
+              <Input
+                defaultValue={hours.hora_salida}
+                onChange={(e) =>
+                  setHours({ ...hours, hora_salida: e.target.value })
+                }
+              ></Input>
             </div>
 
             <div className="flex flex-col gap-2">
               <Label>Salida refrigerio</Label>
-              <Input defaultValue={hours.hora_inicio_refrigerio}></Input>
+              <Input
+                defaultValue={hours.hora_inicio_refrigerio}
+                onChange={(e) =>
+                  setHours({ ...hours, hora_inicio_refrigerio: e.target.value })
+                }
+              ></Input>
             </div>
 
             <div className="flex flex-col gap-2">
               <Label>Retorno refrigerio</Label>
-              <Input defaultValue={hours.hora_fin_refrigerio}></Input>
+              <Input
+                defaultValue={hours.hora_fin_refrigerio}
+                onChange={(e) =>
+                  setHours({ ...hours, hora_fin_refrigerio: e.target.value })
+                }
+              ></Input>
             </div>
           </div>
         ) : (
@@ -175,9 +237,20 @@ function ModalDetailReport({
         )}
 
         <div className="flex justify-end mt-4 w-full">
-          <Button type="button" variant="default">
-            Guardar cambios de horas
-          </Button>
+          {daySelected === "" ? (
+            <Button disabled type="button" variant="default">
+              Dia no seleccionado
+            </Button>
+          ) : (
+            <Button
+              disabled={loadingUpdate}
+              type="button"
+              variant="default"
+              onClick={handleUpdateHours}
+            >
+              Guardar cambios de horas
+            </Button>
+          )}
         </div>
       </div>
 
@@ -185,25 +258,33 @@ function ModalDetailReport({
 
       <div className="mb-4">
         <span className="font-semibold">Ingreso de incidentes</span>
+        <br />
 
         {falta ? (
           <>
             <div className="w-full mt-4">
-              <Select>
+              <Select onValueChange={(e) => setIncidentSelected(e)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona un incidente" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {incidents.map((item, index) => (
-                      <SelectItem value={item.id}>{item.title}</SelectItem>
+                      <SelectItem value={item.id} key={index}>
+                        {item.title}
+                      </SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex justify-end mt-4">
-              <Button type="button" variant="default">
+              <Button
+                type="button"
+                variant="default"
+                onClick={handleAddIncident}
+                disabled={loadingUpdateIncident || incidentSelected === ""}
+              >
                 Guardar cambios de incidentes
               </Button>
             </div>
@@ -211,7 +292,7 @@ function ModalDetailReport({
         ) : (
           <div>
             <span className="text-sm text-gray-600">
-              El usuario no tiene faltas, si desea puede activar la opcion de
+              El usuario no tiene faltas, si desea puede activar la opción de
               agregar incidentes
             </span>
 
