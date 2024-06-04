@@ -80,6 +80,17 @@ class ReportService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async findReportByWorker(reportId: number, workerDNI: string) {
+    try {
+      const detail = await prisma.detailReport.findMany({
+        where: { report_id: reportId, dni: workerDNI },
+      });
+      return httpResponse.http200("All details report", detail);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const reportService = new ReportService();

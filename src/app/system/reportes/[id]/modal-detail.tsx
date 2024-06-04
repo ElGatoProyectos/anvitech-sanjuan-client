@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDestructive } from "@/app/hooks/toast.hook";
-import { get } from "@/app/http/api.http";
+import { get, getByDNI, getId, post } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -25,23 +25,72 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-function ModalDetailReport({ detail }: { detail: any }) {
+function ModalDetailReport({
+  worker,
+  reportId,
+}: {
+  worker: any;
+  reportId: string;
+}) {
   /// define states
+
+  // console.log("workermodal-----", worker);
   const session = useSession();
   const [daySelected, setDaySelected] = useState("");
   const [incidents, setIncidents] = useState<any[]>([]);
   const [falta, setFalta] = useState(false);
 
+  const [dataDetail, setDataDetail] = useState<any[]>([]);
+
+  const [hours, setHours] = useState({
+    hora_inicio: "",
+    hora_inicio_refrigerio: "",
+    hora_fin_refrigerio: "",
+    hora_salida: "",
+  });
+
   /// define functions
 
   function handleSelectDay(e: string) {
     setDaySelected(e);
+
+    const detailFiltered = dataDetail.find((item) => item.dia === e);
+
+    if (detailFiltered) {
+      setHours({
+        ...hours,
+        hora_inicio: detailFiltered?.hora_inicio || "",
+        hora_inicio_refrigerio: detailFiltered?.hora_inicio_refrigerio || "",
+        hora_fin_refrigerio: detailFiltered?.hora_fin_refrigerio || "",
+        hora_salida: detailFiltered?.hora_salida || "",
+      });
+    } else {
+      setHours({
+        hora_inicio: "",
+        hora_inicio_refrigerio: "",
+        hora_fin_refrigerio: "",
+        hora_salida: "",
+      });
+    }
   }
 
   async function fetchIncidents() {
     try {
       const response = await get("incidents", session.data);
       setIncidents(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer la información");
+    }
+  }
+
+  async function fetchDetailReport(dni: string, reportId: string) {
+    try {
+      const response = await post(
+        "reports/detail",
+        { dni, reportId },
+        session.data
+      );
+      setDataDetail(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer la información");
     }
@@ -64,17 +113,19 @@ function ModalDetailReport({ detail }: { detail: any }) {
   /// run handlers
 
   useEffect(() => {
-    if (session.status === "authenticated") {
+    if (worker.dni) {
       fetchIncidents();
+      fetchDetailReport(worker.dni, reportId);
     }
-  }, [session.status]);
+  }, [worker]);
 
   return (
     <DialogContent className="sm:max-w-xl">
       <DialogHeader>
         <DialogTitle>Modificar registros</DialogTitle>
         <DialogDescription>
-          Recuerde que esta modifcacion afectara directamente a la base de datos
+          Recuerde que esta modificación afectara directamente a la base de
+          datos
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col items-center w-full mb-4">
@@ -85,12 +136,12 @@ function ModalDetailReport({ detail }: { detail: any }) {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Seleccione un dia</SelectLabel>
-              <SelectItem value="Lunes">Lunes</SelectItem>
-              <SelectItem value="Martes">Martes</SelectItem>
-              <SelectItem value="Miercoles">Miercoles</SelectItem>
-              <SelectItem value="Jueves">Jueves</SelectItem>
-              <SelectItem value="Viernes">Viernes</SelectItem>
-              <SelectItem value="Sabado">Sabado</SelectItem>
+              <SelectItem value="lunes">Lunes</SelectItem>
+              <SelectItem value="martes">Martes</SelectItem>
+              <SelectItem value="miercoles">Miercoles</SelectItem>
+              <SelectItem value="jueves">Jueves</SelectItem>
+              <SelectItem value="viernes">Viernes</SelectItem>
+              <SelectItem value="sabado">Sabado</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -99,22 +150,22 @@ function ModalDetailReport({ detail }: { detail: any }) {
           <div className="grid grid-cols-2 w-full mt-8 gap-4">
             <div className="flex flex-col gap-2">
               <Label>Ingreso</Label>
-              <Input></Input>
+              <Input defaultValue={hours.hora_inicio}></Input>
             </div>
 
             <div className="flex flex-col gap-2">
               <Label>Salida</Label>
-              <Input></Input>
+              <Input defaultValue={hours.hora_salida}></Input>
             </div>
 
             <div className="flex flex-col gap-2">
               <Label>Salida refrigerio</Label>
-              <Input></Input>
+              <Input defaultValue={hours.hora_inicio_refrigerio}></Input>
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label>Retorno refirgerio</Label>
-              <Input></Input>
+              <Label>Retorno refrigerio</Label>
+              <Input defaultValue={hours.hora_fin_refrigerio}></Input>
             </div>
           </div>
         ) : (

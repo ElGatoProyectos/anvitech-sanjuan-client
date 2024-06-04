@@ -9,14 +9,14 @@ export async function GET(
   try {
     const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
+    console.log(context.params.id);
+    // const responseDetail = await reportService.findReportByWorker(
+    //   String(context.params.id)
+    // );
 
-    const responseDetail = await reportService.findDetailReport(
-      Number(context.params.id)
-    );
-
-    return NextResponse.json(responseDetail.content, {
-      status: responseDetail.statusCode,
-    });
+    // return NextResponse.json(responseDetail.content, {
+    //   status: responseDetail.statusCode,
+    // });
   } catch (error) {
     return NextResponse.json(error, {
       status: 500,

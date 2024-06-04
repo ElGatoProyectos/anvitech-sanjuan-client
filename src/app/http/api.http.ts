@@ -16,6 +16,14 @@ export async function getId(module: string, id: number, session: any) {
   });
 }
 
+export async function getByDNI(module: string, dni: string, session: any) {
+  return await axios.get(`/api/${module}/${dni}`, {
+    headers: {
+      session: JSON.stringify(session),
+    },
+  });
+}
+
 export async function post(module: string, data: any, session: any) {
   return await axios.post(`/api/${module}`, data, {
     headers: {

@@ -31,70 +31,12 @@ import { get, getId } from "@/app/http/api.http";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const users = [
-  {
-    id: 1,
-    fullName: "Usuario 1",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 2,
-    fullName: "Usuario 2",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 3,
-    fullName: "Usuario 3",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 4,
-    fullName: "Usuario 4",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 5,
-    fullName: "Usuario 5",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 6,
-    fullName: "Usuario 6",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 7,
-    fullName: "Usuario 7",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 8,
-    fullName: "Usuario 8",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 9,
-    fullName: "Usuario 9",
-    reporte: "Reporte 1",
-  },
-  {
-    id: 10,
-    fullName: "Usuario 10",
-    reporte: "Reporte 1",
-  },
-];
-
+/// esto debería iterar todos los trabajadores
 function TableUser({ id }: { id: string }) {
-  // const [daySelected, setDaySelected] = useState("");
-
-  // function handleSelectDay(e: string) {
-  //   setDaySelected(e);
-  // }
-
   /// define states
   const session = useSession();
   const [workers, setWorkers] = useState([]);
-  const [detail, setDetail] = useState<any>({});
+  const [worker, setWorker] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
   async function fetchDetailReport() {
@@ -109,13 +51,25 @@ function TableUser({ id }: { id: string }) {
     }
   }
 
+  async function fetchWorkers() {
+    try {
+      setLoading(true);
+      const response = await get("workers", session.data);
+      setWorkers(response.data);
+      setLoading(false);
+    } catch (error) {
+      useToastDestructive("Error", "Error al capturar la información");
+      setLoading(false);
+    }
+  }
+
   function handleSelectDetail(item: any) {
-    setDetail(item);
+    setWorker(item);
   }
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      fetchDetailReport();
+      fetchWorkers();
     }
   }, [session.status]);
 
@@ -144,7 +98,7 @@ function TableUser({ id }: { id: string }) {
               <tr>
                 <th className="py-3 pr-6">DNI</th>
                 <th className="py-3 pr-6">Nombres</th>
-                <th className="py-3 pr-6">Sede</th>
+
                 <th className="py-3 pr-6">Acción</th>
               </tr>
             </thead>
@@ -174,9 +128,8 @@ function TableUser({ id }: { id: string }) {
                   <tr key={idx}>
                     <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="pr-6 py-4 whitespace-nowrap">
-                      {item.nombre}
+                      {item.full_name}
                     </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">{item.sede}</td>
 
                     <td className=" whitespace-nowrap">
                       <DialogTrigger asChild>
@@ -196,7 +149,9 @@ function TableUser({ id }: { id: string }) {
         </div>
       </div>
 
-      <ModalDetailReport detail={detail}></ModalDetailReport>
+      {worker && (
+        <ModalDetailReport worker={worker} reportId={id}></ModalDetailReport>
+      )}
     </Dialog>
   );
 }

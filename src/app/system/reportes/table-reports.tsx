@@ -1,5 +1,6 @@
 "use client";
 
+import { useToastDestructive } from "@/app/hooks/toast.hook";
 import { get } from "@/app/http/api.http";
 import {
   Dialog,
@@ -31,7 +32,9 @@ function TableReports() {
     try {
       const response = await get("reports", session.data);
       setReports(response.data);
-    } catch (error) {}
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer los datos");
+    }
   }
 
   useEffect(() => {
