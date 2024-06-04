@@ -61,7 +61,6 @@ class DataService {
     report: any
   ) {
     try {
-      console.log("instance detail data");
       const days = [
         "lunes",
         "martes",
@@ -140,42 +139,27 @@ class DataService {
         hora_salida: "",
       };
       /// dataFiltered
-      // [
-      //   {
-      //     uuid: '340f015e3ad26009bde802192b4023244f889ffd2cbb8adf3c514c6dc2ad7252',
-      //     checktype: 0,
-      //     checktime: '2024-05-30T13:52:42+00:00',
-      //     device: {
-      //       serial_number: '0300100024120050',
-      //       name: '20050-ERIKALAVADO-SEDEHUANCAYO'
-      //     },
-      //     employee: {
-      //       first_name: 'ANDREE GUILLERMO',
-      //       last_name: 'ROJAS MANTARI',
-      //       workno: '76964896',
-      //       department: 'INTEGRAL ORIENTE SAC - SEDE HUANCAYO',
-      //       job_title: 'ASESOR DE VENTAS CAMPO'
-      //     }
-      //   }
-      // ]
 
       dataFiltered.map((item, index) => {
         const horaCompleta = item.checktime.split("T")[1].split("+")[0];
         const [hour, minutes] = horaCompleta.split(":");
+        const newHour = Number(hour) - 5;
 
-        if (hour + 5 <= 9) {
-          formatData.hora_inicio = hour + ":" + minutes;
-          if (hour > 8) {
+        if (newHour <= 9) {
+          formatData.hora_inicio = newHour + ":" + minutes;
+          if (newHour > 8) {
             formatData.tardanza = "si";
-          }
-        } else if (hour >= 12 && hour <= 15) {
-          if (formatData.hora_inicio_refrigerio === "") {
-            formatData.hora_inicio_refrigerio = hour + ":" + minutes;
           } else {
-            formatData.hora_fin_refrigerio = hour + ":" + minutes;
+            formatData.tardanza = "no";
+          }
+        } else if (newHour >= 12 && newHour <= 15) {
+          if (formatData.hora_inicio_refrigerio === "") {
+            formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+          } else {
+            formatData.hora_fin_refrigerio = newHour + ":" + minutes;
           }
         } else {
-          formatData.hora_salida = hour + ":" + minutes;
+          formatData.hora_salida = newHour + ":" + minutes;
         }
       });
       console.log(formatData);

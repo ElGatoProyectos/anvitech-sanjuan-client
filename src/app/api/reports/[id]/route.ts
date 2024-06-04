@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validationAuthV2 } from "../../utils/handleValidation";
-
-import { workerService } from "@/lib/core/service/worker.service";
+import { validationAuth, validationAuthV2 } from "../../utils/handleValidation";
+import { reportService } from "@/lib/core/service/report.service";
 
 export async function GET(
   request: NextRequest,
@@ -11,10 +10,12 @@ export async function GET(
     const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
 
-    const response = await workerService.findById(Number(context.params.id));
+    const responseDetail = await reportService.findDetailReport(
+      Number(context.params.id)
+    );
 
-    return NextResponse.json(response.content, {
-      status: response.statusCode,
+    return NextResponse.json(responseDetail.content, {
+      status: responseDetail.statusCode,
     });
   } catch (error) {
     return NextResponse.json(error, {

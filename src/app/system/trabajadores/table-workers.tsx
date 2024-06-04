@@ -14,27 +14,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function TableWorkers() {
   /// define states
+  const [loading, setLoading] = useState(false);
   const { updatedAction } = useUpdatedStore();
-
   const [workers, setWorkers] = useState<any[]>([]);
-
   const session = useSession();
 
   /// define functions
 
   async function fetchDataWorkers() {
     try {
+      setLoading(true);
       const response = await get("workers", session.data);
-
       setWorkers(response.data);
+      setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Hubo un error al traer la información");
+      setLoading(false);
     }
   }
 
@@ -72,22 +74,60 @@ function TableWorkers() {
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">
-            {workers.map((item, idx) => (
-              <tr key={idx}>
-                <td className="pr-6 py-4 whitespace-nowrap">
-                  {item.full_name}
-                </td>
-                <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
-                <td className="pr-6 py-4 whitespace-nowrap">
-                  <Link
-                    className="bg-black rounded-md px-4 py-2 outline-none text-white "
-                    href={`/system/trabajadores/` + item.id}
-                  >
-                    Detalle
-                  </Link>
-                </td>
-              </tr>
-            ))}
+            {loading || session.status !== "authenticated" ? (
+              <>
+                <tr>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-8" />
+                  </td>
+                </tr>
+              </>
+            ) : (
+              workers.map((item, idx) => (
+                <tr key={idx}>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    {item.full_name}
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    <Link
+                      className="bg-black rounded-md px-4 py-2 outline-none text-white "
+                      href={`/system/trabajadores/` + item.id}
+                    >
+                      Detalle
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validationAuth } from "../../utils/handleValidation";
+import { validationAuth, validationAuthV2 } from "../../utils/handleValidation";
 import { authService } from "@/lib/core/service/auth.service";
 import { workerService } from "@/lib/core/service/worker.service";
 import { incidentService } from "@/lib/core/service/incident.service";
@@ -9,29 +9,10 @@ export async function GET(
   context: { params: { id: number } }
 ) {
   try {
-    const session = await validationAuth(request);
-
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-
-    const responseValidations = await authService.validationUser(
-      session.payload
-    );
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    // todo logic
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
 
     const response = await incidentService.findById(Number(context.params.id));
-
-    console.log(response);
 
     return NextResponse.json(response.content, {
       status: response.statusCode,
@@ -48,40 +29,11 @@ export async function PUT(
   context: { params: { id: number } }
 ) {
   try {
-    const session = await validationAuth(request);
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
 
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
+    const incident = await request.json();
 
-    // todo return error validation role
-    const responseValidations = await authService.validationAdmin(
-      session.payload
-    );
-
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    const { incident, password } = await request.json();
-
-    // todo validation admin=============================================================
-
-    const responseLogin = await authService.login({
-      username: session.payload.user.username,
-      password,
-    });
-    if (!responseLogin.ok)
-      return NextResponse.json(responseLogin.content, {
-        status: responseLogin.statusCode,
-      });
-
-    // todo proccess logic
     const responseUpdated = await incidentService.update(
       incident,
       Number(context.params.id)

@@ -59,6 +59,7 @@ model Worker {
   department String
   position   String
   hire_date  DateTime
+  enabled    String?    @default("si")
   schedule   Schedule[]
 }
 

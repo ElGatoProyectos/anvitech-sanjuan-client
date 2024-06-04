@@ -14,9 +14,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { scheduleFullTime, schedulePartTime } from "./schedule.examples";
+import { post } from "@/app/http/api.http";
+import { useSession } from "next-auth/react";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 
 function ScheduleWorker() {
   /// define states
+
+  const session = useSession();
 
   const [schedule, setSchedule] = useState([
     {
@@ -62,7 +68,6 @@ function ScheduleWorker() {
       },
     },
   ]);
-
   const [scheduleDay, setScheduleDay] = useState({
     name: "",
     hours: {
@@ -70,6 +75,9 @@ function ScheduleWorker() {
       end: "",
     },
   });
+  const [custom, setCustom] = useState("custom");
+
+  const [loading, setLoading] = useState(false);
 
   /// define function
   function handleSelectDay(e: any) {
@@ -119,13 +127,33 @@ function ScheduleWorker() {
     }));
   }
 
+  function handleChangeTypeSchedule(value: string) {
+    setCustom(value);
+    if (value === "full-time") {
+      setSchedule(scheduleFullTime);
+    } else if (value === "part-time") {
+      setSchedule(schedulePartTime);
+    }
+  }
+
+  async function handleSubmit() {
+    try {
+      setLoading(true);
+      await post("schedule", schedule, session.data);
+      useToastDefault("Ok", "Modificación realizada con éxito");
+      setLoading(false);
+    } catch (error) {
+      useToastDestructive("Error", "Fallo al modificar");
+    }
+  }
+
   /// setup handlers
 
   return (
     <div className="bg-white p-8 rounded-lg">
       <div className=" flex justify-between">
         <span className="font-semibold">Horario del trabajador</span>
-        <Select onValueChange={handleSelectDay}>
+        <Select onValueChange={handleSelectDay} disabled={custom !== "custom"}>
           <SelectTrigger className="min-w-56 max-w-56">
             <SelectValue placeholder="Seleccione el dia" />
           </SelectTrigger>
@@ -147,6 +175,7 @@ function ScheduleWorker() {
             <div className="flex flex-col gap-2">
               <Label>Hora de entrada</Label>
               <Input
+                disabled={custom !== "custom"}
                 value={scheduleDay.hours.start}
                 onChange={handleChangeInputHourStart}
               />
@@ -155,9 +184,25 @@ function ScheduleWorker() {
             <div className="flex flex-col gap-2">
               <Label>Hora de salida</Label>
               <Input
+                disabled={custom !== "custom"}
                 value={scheduleDay.hours.end}
                 onChange={handleChangeInputHourEnd}
               />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Horarios por defecto</Label>
+              <Select onValueChange={handleChangeTypeSchedule}>
+                <SelectTrigger className="w-full ">
+                  <SelectValue placeholder="Seleccione el modo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="custom">Personalizado</SelectItem>
+                    <SelectItem value="full-time">Full time</SelectItem>
+                    <SelectItem value="part-time">Part time</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="col-span-2 grid grid-cols-2 grid-rows-3 pt-5">
@@ -182,14 +227,6 @@ function ScheduleWorker() {
             <Textarea className="w-full" />
           </div>
 
-          <div className="flex flex-col gap-2 col-span-3">
-            <Label>Contrasena de administrador</Label>
-            <Input type="password" />
-            <span className="text-gray-600 mt-2">
-              Si en caso el trabajador no tiene un horario se le asiganara el
-              que escribio
-            </span>
-          </div>
           <div>
             <Button onClick={() => console.log(schedule)}>
               Guardar cambios

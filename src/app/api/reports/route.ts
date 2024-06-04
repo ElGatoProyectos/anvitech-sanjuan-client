@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validationAuth } from "../utils/handleValidation";
+import { validationAuth, validationAuthV2 } from "../utils/handleValidation";
 import { authService } from "@/lib/core/service/auth.service";
 import { anvizService } from "@/lib/core/service/anviz.service";
 import { dataService } from "@/lib/core/service/data.service";
@@ -7,39 +7,11 @@ import { reportService } from "@/lib/core/service/report.service";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await validationAuth(request);
+    const responseAuth = await validationAuthV2(request, "admin");
+    if (responseAuth.status !== 200) return responseAuth;
 
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-    /// return error validation role
-    const responseValidations = await authService.validationAdmin(
-      session.payload
-    );
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    /// process logic ===================================
-    const body = await request.json();
-
-    console.log("body==================", body);
-
-    const responseAuth = await authService.login(body);
-
-    if (!responseAuth.ok)
-      return NextResponse.json(responseAuth.content, {
-        status: responseAuth.statusCode,
-      });
-
-    /// generate report ==================================
-    /// this method is slow
     const responseData = await dataService.instanceDataInit();
+
     return NextResponse.json(responseData, {
       status: responseData.statusCode,
     });
@@ -52,23 +24,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await validationAuth(request);
-
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-    // todo return error validation role
-    const responseValidations = await authService.validationUser(
-      session.payload
-    );
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
 
     const responseReports = await reportService.findAll();
 

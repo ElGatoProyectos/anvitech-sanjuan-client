@@ -24,8 +24,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import ModalDetailReport from "./modal-detail";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
+import { get, getId } from "@/app/http/api.http";
+import { useSession } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const users = [
   {
@@ -80,12 +84,40 @@ const users = [
   },
 ];
 
-function TableUser() {
+function TableUser({ id }: { id: string }) {
   // const [daySelected, setDaySelected] = useState("");
 
   // function handleSelectDay(e: string) {
   //   setDaySelected(e);
   // }
+
+  /// define states
+  const session = useSession();
+  const [workers, setWorkers] = useState([]);
+  const [detail, setDetail] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+
+  async function fetchDetailReport() {
+    try {
+      setLoading(true);
+      const response = await getId("reports", Number(id), session.data);
+      setWorkers(response.data);
+      setLoading(false);
+    } catch (error) {
+      useToastDestructive("Error", "Error al capturar la información");
+      setLoading(false);
+    }
+  }
+
+  function handleSelectDetail(item: any) {
+    setDetail(item);
+  }
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      fetchDetailReport();
+    }
+  }, [session.status]);
 
   return (
     <Dialog>
@@ -99,9 +131,9 @@ function TableUser() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Seleccione uno</SelectLabel>
-                <SelectItem value="apple">Corregir</SelectItem>
-                <SelectItem value="banana">Verificado</SelectItem>
-                <SelectItem value="blueberry">Corregido</SelectItem>
+                <SelectItem value="Corregir">Corregir</SelectItem>
+                <SelectItem value="Verificado">Verificado</SelectItem>
+                <SelectItem value="Corregido">Corregido</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -110,114 +142,61 @@ function TableUser() {
           <table className="w-full table-auto text-sm text-left ">
             <thead className="text-gray-600 font-medium border-b">
               <tr>
+                <th className="py-3 pr-6">DNI</th>
                 <th className="py-3 pr-6">Nombres</th>
-                <th className="py-3 pr-6">Reporte</th>
-                <th className="py-3 pr-6">Estado</th>
-
-                <th className="py-3 pr-6"></th>
+                <th className="py-3 pr-6">Sede</th>
+                <th className="py-3 pr-6">Acción</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
-              {users.map((item, idx) => (
-                <tr key={idx}>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    {item.fullName}
-                  </td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    {item.reporte}
-                  </td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-3 py-2 rounded-full font-semibold text-xs ${
-                        item.id % 2 === 0
-                          ? "text-green-600 bg-green-50"
-                          : "text-blue-600 bg-blue-50"
-                      }`}
-                    >
-                      {item.id % 2 === 0 ? "Verificado" : "Corregir"}
-                    </span>
-                  </td>
+              {loading || session.status !== "authenticated" ? (
+                <>
+                  <tr>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      <Skeleton className="h-8" />
+                    </td>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      <Skeleton className="h-8" />
+                    </td>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      <Skeleton className="h-8" />
+                    </td>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      <Skeleton className="h-8" />
+                    </td>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      <Skeleton className="h-8" />
+                    </td>
+                  </tr>
+                </>
+              ) : (
+                workers.map((item: any, idx) => (
+                  <tr key={idx}>
+                    <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      {item.nombre}
+                    </td>
+                    <td className="pr-6 py-4 whitespace-nowrap">{item.sede}</td>
 
-                  <td className="text-right whitespace-nowrap">
-                    <DialogTrigger asChild>
-                      <Button variant="secondary">Detalle</Button>
-                    </DialogTrigger>
-                  </td>
-                </tr>
-              ))}
+                    <td className=" whitespace-nowrap">
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleSelectDetail(item)}
+                        >
+                          Detalle
+                        </Button>
+                      </DialogTrigger>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      <ModalDetailReport></ModalDetailReport>
-
-      {/* <DialogContent className="sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>Modificar registros</DialogTitle>
-          <DialogDescription>
-            Recuerde que esta modifcacion afectara directamente a la base de
-            datos
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col items-center w-full">
-          <Select onValueChange={(e) => handleSelectDay(e)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Seleccione un dia" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Seleccione un dia</SelectLabel>
-                <SelectItem value="Lunes">Lunes</SelectItem>
-                <SelectItem value="Martes">Martes</SelectItem>
-                <SelectItem value="Miercoles">Miercoles</SelectItem>
-                <SelectItem value="Jueves">Jueves</SelectItem>
-                <SelectItem value="Viernes">Viernes</SelectItem>
-                <SelectItem value="Sabado">Sabado</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          {daySelected !== "" ? (
-            <div className="grid grid-cols-2 w-full mt-8 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>Ingreso</Label>
-                <Input></Input>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Salida</Label>
-                <Input></Input>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Salida refrigerio</Label>
-                <Input></Input>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Retorno refirgerio</Label>
-                <Input></Input>
-              </div>
-            </div>
-          ) : (
-            <div className="w-full mt-8 text-slate-600 h-36">
-              <span>No ha seleccionado un dia</span>
-            </div>
-          )}
-        </div>
-        <DialogFooter className="sm:justify-end mt-8">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Cerrar
-            </Button>
-          </DialogClose>
-
-          <Button type="button" variant="default">
-            Guardar cambios
-          </Button>
-        </DialogFooter>
-      </DialogContent> */}
+      <ModalDetailReport detail={detail}></ModalDetailReport>
     </Dialog>
   );
 }

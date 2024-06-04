@@ -14,7 +14,7 @@ function Page({ params }: { params: { id: string } }) {
       </div>
       <hr />
       <div className="mt-8 relative h-max overflow-auto">
-        <TableUser></TableUser>
+        <TableUser id={id}></TableUser>
       </div>
     </div>
   );

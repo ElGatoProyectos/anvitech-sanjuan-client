@@ -1,29 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validationAuth } from "../utils/handleValidation";
-import { authService } from "@/lib/core/service/auth.service";
+import { validationAuth, validationAuthV2 } from "../utils/handleValidation";
+
 import { workerService } from "@/lib/core/service/worker.service";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await validationAuth(request);
-
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-
-    const responseValidations = await authService.validationUser(
-      session.payload
-    );
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    // todo logic
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
 
     const response = await workerService.findAll();
 
@@ -31,7 +14,6 @@ export async function GET(request: NextRequest) {
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });
@@ -40,44 +22,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    /// validation auth
-    const session = await validationAuth(request);
-
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-
-    /// todo return error validation role
-    const responseValidations = await authService.validationAdmin(
-      session.payload
-    );
-
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    /// capture data from body
+    const responseAuth = await validationAuthV2(request, "admin");
+    if (responseAuth.status !== 200) return responseAuth;
 
     const body = await request.json();
 
-    /// validation for password
-    const responseLogin = await authService.login({
-      username: session.payload.user.username,
-      password: body.password,
-    });
-    if (!responseLogin.ok)
-      return NextResponse.json(responseLogin.content, {
-        status: responseLogin.statusCode,
-      });
-
-    /// upload file
-
-    const response = await workerService.create(body.dataWorker);
+    const response = await workerService.create(body);
 
     return NextResponse.json(response.content, {
       status: response.statusCode,

@@ -1,32 +1,16 @@
-import { authService } from "@/lib/core/service/auth.service";
 import { userService } from "@/lib/core/service/user.service";
 import { NextRequest, NextResponse } from "next/server";
-import { validationAuth } from "../../utils/handleValidation";
+import { validationAuthV2 } from "../../utils/handleValidation";
 
 export async function GET(
   request: NextRequest,
   context: { params: { id: number } }
 ) {
   try {
-    const session = await validationAuth(request);
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
 
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-    // todo return error validation role
-    const responseValidations = await authService.validationAdmin(
-      session.payload
-    );
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
-    // todo proccess logic
+    /// call service action
     const responseUser = await userService.findById(context.params.id);
     return NextResponse.json(responseUser.content, {
       status: responseUser.statusCode,
@@ -43,29 +27,11 @@ export async function PUT(
   context: { params: { id: number } }
 ) {
   try {
-    const session = await validationAuth(request);
-
-    if (!session.auth)
-      return NextResponse.json(
-        { message: "Error in authentication" },
-        {
-          status: 401,
-        }
-      );
-
-    // todo return error validation role
-    const responseValidations = await authService.validationAdmin(
-      session.payload
-    );
-
-    if (!responseValidations.ok)
-      return NextResponse.json(responseValidations.content, {
-        status: responseValidations.statusCode,
-      });
-
+    const responseAuth = await validationAuthV2(request, "admin");
+    if (responseAuth.status !== 200) return responseAuth;
     const body = await request.json();
 
-    // todo proccess logic
+    /// call service action
     const responseUser = await userService.updateUser(
       body,
       Number(context.params.id)
@@ -74,7 +40,6 @@ export async function PUT(
       status: responseUser.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

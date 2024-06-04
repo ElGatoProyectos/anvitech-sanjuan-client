@@ -119,16 +119,16 @@ function Sidebar() {
 
           <li>
             <Link
-              href={"/system/incidentes"}
+              href={"/system/incidencias"}
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                pathname === "/system/incidentes" ? activePath : inactivePath
+                pathname === "/system/incidencias" ? activePath : inactivePath
               } transition-all`}
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <ListMinusIcon size={20} />
               </span>
               <span className="ml-2 text-sm tracking-wide truncate">
-                Incidentes
+                Incidencias
               </span>
             </Link>
           </li>

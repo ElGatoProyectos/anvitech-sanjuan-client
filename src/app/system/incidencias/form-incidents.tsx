@@ -10,21 +10,25 @@ import { useSession } from "next-auth/react";
 import React, { FormEvent, useState } from "react";
 
 function FormIncidents() {
+  /// define states
   const session = useSession();
-
   const { setUpdatedAction, updatedAction } = useUpdatedStore();
-
   const [incident, setIncident] = useState({ title: "", description: "" });
+  const [loading, setLoading] = useState(false);
 
-  const [password, setPassword] = useState("");
+  /// define functions
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      await post("incidents", { incident, password }, session.data);
+      setLoading(true);
+      await post("incidents", incident, session.data);
       setUpdatedAction();
+      setIncident({ title: "", description: "" });
+      setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
+      setLoading(false);
     }
   }
 
@@ -40,7 +44,7 @@ function FormIncidents() {
           ></Input>
         </div>
         <div className="flex flex-col gap-2">
-          <Label>Descripcion</Label>
+          <Label>Descripción</Label>
           <Textarea
             className="w-full"
             onChange={(e) =>
@@ -50,11 +54,7 @@ function FormIncidents() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Contrasena administrador</Label>
-          <Input onChange={(e) => setPassword(e.target.value)}></Input>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button>Registrar incidente</Button>
+          <Button disabled={loading}>Registrar incidente</Button>
         </div>
       </form>
     </div>

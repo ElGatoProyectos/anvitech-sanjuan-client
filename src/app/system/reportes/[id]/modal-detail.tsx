@@ -25,14 +25,12 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-function ModalDetailReport() {
+function ModalDetailReport({ detail }: { detail: any }) {
   /// define states
   const session = useSession();
   const [daySelected, setDaySelected] = useState("");
   const [incidents, setIncidents] = useState<any[]>([]);
   const [falta, setFalta] = useState(false);
-
-  useState;
 
   /// define functions
 
@@ -45,7 +43,7 @@ function ModalDetailReport() {
       const response = await get("incidents", session.data);
       setIncidents(response.data);
     } catch (error) {
-      useToastDestructive("Error", "Error al traer la informacion");
+      useToastDestructive("Error", "Error al traer la información");
     }
   }
 

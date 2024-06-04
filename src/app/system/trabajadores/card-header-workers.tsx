@@ -19,7 +19,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { Sheet, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 
 function CardHeaderWorker() {
   /// define states
@@ -30,7 +30,6 @@ function CardHeaderWorker() {
   const [isUnitaryModalOpen, setUnitaryModalOpen] = useState(false);
   const [isMassiveModalOpen, setMassiveModalOpen] = useState(false);
   const [file, setFile] = useState<any>();
-  const [password, setPassword] = useState("");
   const [dataWorker, setDataWorker] = useState({
     full_name: "",
     dni: "",
@@ -46,9 +45,7 @@ function CardHeaderWorker() {
       setLoading(true);
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("password", password);
       await postImage("workers/file", formData, session.data);
-      setPassword("");
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
@@ -59,8 +56,7 @@ function CardHeaderWorker() {
   async function handleRegisterData() {
     try {
       setLoading(true);
-      await post("workers", { dataWorker, password }, session.data);
-      setPassword("");
+      await post("workers", dataWorker, session.data);
       setLoading(false);
       setUpdatedAction();
     } catch (error) {
@@ -68,14 +64,6 @@ function CardHeaderWorker() {
       setLoading(false);
     }
   }
-
-  // async function test() {
-  //   const res = await get("test", session.data);
-  //   console.log(res);
-  // }
-  // useEffect(() => {
-  //   test();
-  // }, []);
 
   return (
     <>
@@ -169,15 +157,6 @@ function CardHeaderWorker() {
                 }
               />
             </div>
-            <hr className="col-span-2" />
-            <div className="flex flex-col gap-2  col-span-2">
-              <Label>Contraseña administrador</Label>
-              <Input
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="************"
-              />
-            </div>
           </div>
 
           <DialogFooter className="mt-4">
@@ -214,14 +193,7 @@ function CardHeaderWorker() {
               onChange={(e: any) => setFile(e.target.files[0])}
             />
           </div>
-          <div className="flex flex-col gap-2 mt-4">
-            <Label>Contraseña</Label>
-            <Input
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="************"
-            />
-          </div>
+
           <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button disabled={loading} onClick={handleRegistrarDataMassive}>
