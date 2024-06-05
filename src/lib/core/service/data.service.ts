@@ -171,6 +171,9 @@ class DataService {
             formatData.hora_fin_refrigerio = newHour + ":" + minutes;
           }
         } else {
+          if (newHour < hourEnd) {
+            formatData.falta = "si";
+          }
           formatData.hora_salida = newHour + ":" + minutes;
         }
       });

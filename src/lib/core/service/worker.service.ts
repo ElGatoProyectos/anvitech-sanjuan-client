@@ -72,6 +72,23 @@ class WorkerService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async findDepartmentDistinct() {
+    try {
+      const departments = await prisma.worker.findMany({
+        distinct: ["department"],
+        select: {
+          department: true,
+        },
+      });
+
+      console.log(departments);
+
+      return httpResponse.http200("Departments distinct", departments);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const workerService = new WorkerService();

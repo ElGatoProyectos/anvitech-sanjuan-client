@@ -32,11 +32,7 @@ function Sidebar() {
     <div className="fixed min-h-screen flex flex-col top-0 left-0 w-64 bg-white h-full border-r ">
       <div className="flex items-center justify-center h-14 ">
         <div className="w-full flex gap-4  pt-8  items-center">
-          <img
-            className="w-full rounded-lg "
-            src="https://anvitechperu.com/wp-content/uploads/2024/05/imagen29.png"
-            alt=""
-          />
+          <img className="w-full rounded-lg " src="/digimax.jpeg" alt="" />
           {/* <span className="font-semibold">Anvitech</span> */}
         </div>
       </div>
