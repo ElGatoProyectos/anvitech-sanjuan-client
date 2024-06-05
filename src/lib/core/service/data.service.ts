@@ -5,6 +5,7 @@ import { reportService } from "./report.service";
 import { httpResponse } from "./response.service";
 import { workerService } from "./worker.service";
 import { formatDateForPrisma } from "../functions/date-transform";
+import { scheduleService } from "./schedule.service";
 
 class DataService {
   async instanceDataInit(
@@ -108,6 +109,7 @@ class DataService {
     }
   }
   /// este método registra en base al formato de entrada y trabajador
+  /// validar con el horario del trabajador
   async filterAndRegisterForUser(
     dataGeneralDay: any[],
     worker: any,
@@ -116,6 +118,16 @@ class DataService {
   ) {
     try {
       console.log("filter and register!!!!!");
+
+      /// con este horario validamos las horas, ya tenemos el day
+      const responseSchedule = await scheduleService.findScheduleForWorker(
+        worker.id
+      );
+      const schedule = responseSchedule.content;
+
+      const [lunesStart, lunesEnd] = schedule.lunes.split("-");
+      const [hourStart, hourEnd] = lunesStart.split(":");
+
       ///devuelve un array de posiblemente 4 objetos que contienen la fecha de inicio a fin
       const dataFiltered = dataGeneralDay.filter(
         (item) => item.employee.workno === worker.dni
@@ -145,14 +157,14 @@ class DataService {
         const [hour, minutes] = horaCompleta.split(":");
         const newHour = Number(hour) - 5;
 
-        if (newHour <= 9) {
+        if (newHour <= hourStart) {
           formatData.hora_inicio = newHour + ":" + minutes;
-          if (newHour > 8) {
+          if (newHour > hourStart) {
             formatData.tardanza = "si";
           } else {
             formatData.tardanza = "no";
           }
-        } else if (newHour >= 12 && newHour <= 15) {
+        } else if (newHour >= 12 && newHour <= 16) {
           if (formatData.hora_inicio_refrigerio === "") {
             formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
           } else {

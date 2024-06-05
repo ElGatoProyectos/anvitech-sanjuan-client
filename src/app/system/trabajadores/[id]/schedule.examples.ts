@@ -1,86 +1,86 @@
 export const scheduleFullTime = [
   {
-    name: "Lunes",
+    name: "LUNES",
     hours: {
-      start: "08:00",
-      end: "17:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
   {
-    name: "Martes",
+    name: "MARTES",
     hours: {
-      start: "08:00",
-      end: "17:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
   {
-    name: "Miércoles",
+    name: "MIERCOLES",
     hours: {
-      start: "08:00",
-      end: "17:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
   {
-    name: "Jueves",
+    name: "JUEVES",
     hours: {
-      start: "08:00",
-      end: "17:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
   {
-    name: "Viernes",
+    name: "VIERNES",
     hours: {
-      start: "08:00",
-      end: "17:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
   {
-    name: "Sábado",
+    name: "SABADO",
     hours: {
-      start: "08:00",
-      end: "13:00",
+      start: "09:00",
+      end: "18:00",
     },
   },
 ];
 
 export const schedulePartTime = [
   {
-    name: "Lunes",
+    name: "LUNES",
     hours: {
       start: "08:00",
       end: "13:00",
     },
   },
   {
-    name: "Martes",
+    name: "MARTES",
     hours: {
       start: "08:00",
       end: "13:00",
     },
   },
   {
-    name: "Miércoles",
+    name: "MIERCOLES",
     hours: {
       start: "08:00",
       end: "13:00",
     },
   },
   {
-    name: "Jueves",
+    name: "JUEVES",
     hours: {
       start: "08:00",
       end: "13:00",
     },
   },
   {
-    name: "Viernes",
+    name: "VIERNES",
     hours: {
       start: "08:00",
       end: "13:00",
     },
   },
   {
-    name: "Sábado",
+    name: "SABADO",
     hours: {
       start: "00:00",
       end: "00:00",

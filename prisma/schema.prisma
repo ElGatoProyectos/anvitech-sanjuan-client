@@ -65,7 +65,7 @@ model Worker {
 
 model Schedule {
   id        Int    @id @default(autoincrement())
-  worker_id Int
+  worker_id Int    @unique
   lunes     String //08:00-17:00 -> de esta forma separamos la informacion y guardamos como string
   martes    String
   miercoles String
