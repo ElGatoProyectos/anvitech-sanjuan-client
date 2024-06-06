@@ -1,6 +1,6 @@
 import Link from "next/link";
 import CardHeaderReport from "./card-header-report";
-import TableReports from "./table-reports";
+import TableReports from "./deletedtable-reports";
 
 function Page() {
   const tableItems = [

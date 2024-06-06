@@ -242,13 +242,12 @@ const Pagination: React.FC<PaginationProps> = ({
               number === currentPage ? "font-bold" : ""
             }`}
           >
-            <a
+            <button
               onClick={() => paginate(number)}
-              href="#!"
               className="page-link px-2 py-1 border rounded cursor-pointer"
             >
               {number}
-            </a>
+            </button>
           </li>
         ))}
       </ul>

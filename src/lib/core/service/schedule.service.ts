@@ -16,6 +16,15 @@ class ScheduleService {
     }
   }
 
+  async createScheduleMassive(data: any) {
+    try {
+      const created = await prisma.schedule.create({ data });
+      return httpResponse.http200("Schedule created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async createScheduleForWorker(data: any) {
     try {
       const dataSet = {
@@ -48,7 +57,6 @@ class ScheduleService {
         return httpResponse.http201("Schedule updated", updated);
       }
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

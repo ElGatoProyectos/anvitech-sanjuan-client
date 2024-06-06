@@ -7,6 +7,7 @@ import {
   formatDateForPrisma,
 } from "../functions/date-transform";
 import { createWorkerDTO } from "../schemas/worker.dto";
+import { scheduleService } from "./schedule.service";
 
 class WorkerService {
   async findAll() {
@@ -53,6 +54,26 @@ class WorkerService {
       });
 
       const created = await prisma.worker.createMany({ data: convertedArray });
+
+      /// registrar los horarios por defecto
+      const formatSchedule = {
+        lunes: "09:00-18:00",
+        martes: "09:00-18:00",
+        miercoles: "09:00-18:00",
+        jueves: "09:00-18:00",
+        viernes: "09:00-18:00",
+        sabado: "09:00-18:00",
+        type: "default",
+      };
+
+      const { content: workers } = await this.findAll();
+      workers.map(async (w: any) => {
+        const wFormat = {
+          ...formatSchedule,
+          worker_id: w.id,
+        };
+        await scheduleService.createScheduleMassive(wFormat);
+      });
       return httpResponse.http201("Workers created", created);
     } catch (error) {
       return errorService.handleErrorSchema(error);

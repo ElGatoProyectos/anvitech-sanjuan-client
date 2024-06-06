@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ChevronDown,
+  ChevronUp,
   ContactRound,
   Home,
   ListMinusIcon,
@@ -11,6 +13,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 function Sidebar() {
   const pathname = usePathname();
@@ -18,6 +21,8 @@ function Sidebar() {
   const session = useSession();
 
   const nav = pathname.split("/");
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const activePath =
     "bg-gray-50 text-gray-800 border-l-4  border-l-indigo-500 ";
@@ -63,22 +68,77 @@ function Sidebar() {
           {/* ---------------------------- */}
           <li>
             <Link
-              href={"/system/reportes"}
+              onClick={() => setIsExpanded(!isExpanded)}
+              href={"#"}
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                pathname === "/system/reportes" ? activePath : inactivePath
+                pathname.includes("/system/reportes")
+                  ? activePath
+                  : inactivePath
               } transition-all`}
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <ListTodo size={20} />
               </span>
-              <span className="ml-2 text-sm tracking-wide truncate">
-                Reportes
+              <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                Reportes{" "}
+                {isExpanded ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
               </span>
             </Link>
+
+            {isExpanded && (
+              <ul className="ml-10 mt-2">
+                <li>
+                  <Link
+                    href={"/system/reportes/reporte-diario"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/reportes/reporte-diario"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Reporte diario
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/reportes/reporte-semanal"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/reportes/reporte-semanal"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Reporte Semanal
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/reportes/exportar-datos"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/reportes/exportar-datos"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Exportar datos
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
 
           {session.data?.user.role === "admin" && (
-            <li>
+            <li className="transition-all">
               <Link
                 href={"/system/usuarios"}
                 className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
