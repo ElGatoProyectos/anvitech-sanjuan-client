@@ -144,6 +144,8 @@ class ReportService {
           falta: item.falta,
         };
       });
+
+      console.log(dataGeneral);
       const worksheet = xlsx.utils.json_to_sheet(dataGeneral, {
         header: [
           "DNI",

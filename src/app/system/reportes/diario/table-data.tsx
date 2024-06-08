@@ -34,6 +34,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { format } from "date-fns";
 import { headers } from "next/headers";
+import { downloadExcel } from "./test";
 
 function TableData() {
   const [workers, setWorkers] = useState<any[]>([]);
@@ -126,21 +127,26 @@ function TableData() {
 
   async function exportToExcel() {
     try {
-      const response = (await postExcel(
-        "reports/export",
-        workers,
-        session.data
-      )) as any;
-      const blob = new Blob([response.content], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "report.xlsx";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      // const response = (await postExcel(
+      //   "reports/export",
+      //   workers,
+      //   session.data
+      // )) as any;
+
+      // console.log(response.data);
+      // const blob = new Blob([workers], {
+      //   type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      // });
+      // console.log(blob);
+      // const url = URL.createObjectURL(workers as any);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = "report.xls";
+      // document.body.appendChild(a);
+      // a.click();
+      // a.remove();
+
+      downloadExcel(workers);
     } catch (error) {
       console.log(error);
       useToastDestructive("Error", "Error al crear el archivo");
