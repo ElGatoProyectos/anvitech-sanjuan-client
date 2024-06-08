@@ -14,7 +14,7 @@ function Layout({
         <Sidebar></Sidebar>
         <main className="flex flex-col w-full  ml-64 ">
           <Header></Header>
-          <div className="flex w-full px-8 py-8 ">{children}</div>
+          <div className="flex min-w-full px-8 py-8 ">{children}</div>
         </main>
       </div>
       <Toaster />

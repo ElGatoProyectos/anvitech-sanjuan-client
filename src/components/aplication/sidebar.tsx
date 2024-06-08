@@ -34,7 +34,7 @@ function Sidebar() {
   }
 
   return (
-    <div className="fixed min-h-screen flex flex-col top-0 left-0 w-64 bg-white h-full border-r ">
+    <div className="fixed min-h-screen flex flex-col top-0 left-0 w-64 bg-white h-full border-r z-50">
       <div className="flex items-center justify-center h-14 ">
         <div className="w-full flex gap-4  pt-8  items-center">
           <img className="w-full rounded-lg " src="/digimax.jpeg" alt="" />
@@ -93,9 +93,9 @@ function Sidebar() {
               <ul className="ml-10 mt-2">
                 <li>
                   <Link
-                    href={"/system/reportes/reporte-diario"}
+                    href={"/system/reportes/diario"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                      pathname === "/system/reportes/reporte-diario"
+                      pathname === "/system/reportes/diario"
                         ? activePath
                         : inactivePath
                     } transition-all`}
@@ -107,9 +107,9 @@ function Sidebar() {
                 </li>
                 <li>
                   <Link
-                    href={"/system/reportes/reporte-semanal"}
+                    href={"/system/reportes/semanal"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                      pathname === "/system/reportes/reporte-semanal"
+                      pathname === "/system/reportes/semanal"
                         ? activePath
                         : inactivePath
                     } transition-all`}
@@ -123,7 +123,7 @@ function Sidebar() {
                   <Link
                     href={"/system/reportes/exportar-datos"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                      pathname === "/system/reportes/exportar-datos"
+                      pathname === "/system/reportes/exportar"
                         ? activePath
                         : inactivePath
                     } transition-all`}

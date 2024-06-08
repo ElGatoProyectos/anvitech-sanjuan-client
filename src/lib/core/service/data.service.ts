@@ -24,6 +24,7 @@ class DataService {
       const max = maxDay ?? saturday;
       const year = selectedYear ?? dataYear;
       const month = selectedMonth ?? dataMonth;
+      console.log("============", min, max, year, month);
 
       /// obtener el token para hacer la peticion post
 
@@ -210,7 +211,7 @@ class DataService {
     const dayOfWeekNumber = date.getDay();
 
     const daysOfWeek = [
-      "domino",
+      "domingo",
       "lunes",
       "martes",
       "miercoles",
@@ -265,9 +266,7 @@ class DataService {
         totalData.push(...reportForDay);
       }
 
-      console.log(totalData);
-
-      return httpResponse.http200("Report created", "Report created");
+      return httpResponse.http200("Report created", totalData);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
@@ -280,6 +279,14 @@ class DataService {
   ) {
     try {
       console.log("filter and register!!!!!");
+
+      const limaTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/Lima",
+      });
+
+      const limaDate = new Date(limaTime);
+
+      const dateToString = limaDate.toISOString();
 
       /// con este horario validamos las horas, ya tenemos el day
       const responseSchedule = await scheduleService.findScheduleForWorker(
@@ -300,10 +307,12 @@ class DataService {
           tardanza: "no",
           falta: "no",
           dia: day,
-          fecha_reporte: "",
+          fecha_reporte: dateToString,
           dni: worker.dni,
           nombre: worker.full_name,
-          sede: dataFiltered[0].device.name,
+          // sede: dataFiltered[0].device.name,
+          sede: worker.department,
+
           hora_entrada: "",
           hora_inicio: "",
           hora_inicio_refrigerio: "",
@@ -344,10 +353,10 @@ class DataService {
           tardanza: "si",
           falta: "si",
           dia: day,
-          fecha_reporte: "",
+          fecha_reporte: dateToString,
           dni: worker.dni,
           nombre: worker.full_name,
-          sede: "",
+          sede: worker.department,
           hora_entrada: "",
           hora_inicio: "",
           hora_inicio_refrigerio: "",

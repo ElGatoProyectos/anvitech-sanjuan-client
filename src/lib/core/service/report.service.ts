@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { errorService } from "./errors.service";
 import { httpResponse } from "./response.service";
 
+import * as xlsx from "xlsx";
+
 class ReportService {
   async generateReport() {
     try {
@@ -120,6 +122,48 @@ class ReportService {
         },
       });
       return httpResponse.http200("Detail updated", updated);
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async exportToExcel(data: any) {
+    try {
+      const dataGeneral = data.map((item: any) => {
+        return {
+          DNI: item.dni,
+          Nombres: item.nombre,
+          departamento: item.sede,
+          "Fecha reporte": item.fecha_reporte,
+          "Hora inicio": item.hora_inicio,
+          "Hora inicio refrigerio": item.hora_inicio_refrigerio,
+          "Hora fin refrigerio": item.hora_fin_refrigerio,
+          "Hora salida": item.hora_salida,
+          tadanza: item.tardanza,
+          falta: item.falta,
+        };
+      });
+      const worksheet = xlsx.utils.json_to_sheet(dataGeneral, {
+        header: [
+          "DNI",
+          "Nombres",
+          "departamento",
+          "Fecha reporte",
+          "Hora inicio",
+          "Hora inicio refrigerio",
+          "Hora fin refrigerio",
+          "Hora salida",
+          "tadanza",
+          "falta",
+        ],
+      });
+
+      const workbook = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
+      return httpResponse.http200("Excel created", buffer);
     } catch (error) {
       console.log(error);
       return errorService.handleErrorSchema(error);
