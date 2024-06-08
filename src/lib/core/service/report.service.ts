@@ -3,6 +3,7 @@ import { errorService } from "./errors.service";
 import { httpResponse } from "./response.service";
 
 import * as xlsx from "xlsx";
+import { dataService } from "./data.service";
 
 class ReportService {
   async generateReport() {
@@ -127,7 +128,7 @@ class ReportService {
       return errorService.handleErrorSchema(error);
     }
   }
-
+  /// no sirve
   async exportToExcel(data: any) {
     try {
       const dataGeneral = data.map((item: any) => {
@@ -168,6 +169,56 @@ class ReportService {
       return httpResponse.http200("Excel created", buffer);
     } catch (error) {
       console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  getMondayAndSaturdayDates() {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const startDate = new Date(now);
+    const endDate = new Date(now);
+
+    const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+    startDate.setDate(startDate.getDate() + diffToMonday);
+
+    const diffToSaturday = 6 - dayOfWeek;
+    endDate.setDate(endDate.getDate() + diffToSaturday);
+
+    return {
+      monday: startDate,
+      saturday: endDate,
+    };
+  }
+
+  async dataForStartSoft() {
+    try {
+      const { monday, saturday } = this.getMondayAndSaturdayDates();
+
+      // Consultar registros de la tabla 'report' entre las fechas de lunes y sábado
+      const reports = await prisma.report.findMany({
+        where: {
+          date_created: {
+            gte: monday,
+            lte: saturday,
+          },
+        },
+      });
+
+      // Obtener los IDs de los reportes
+      const reportIds = reports.map((report) => report.id);
+
+      // Consultar registros de la tabla 'detailReport' utilizando los IDs obtenidos
+      const detailReports = await prisma.detailReport.findMany({
+        where: {
+          report_id: {
+            in: reportIds,
+          },
+        },
+      });
+
+      return httpResponse.http200("Report success", detailReports);
+    } catch (error) {
       return errorService.handleErrorSchema(error);
     }
   }

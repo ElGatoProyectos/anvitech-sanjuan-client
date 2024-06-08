@@ -33,15 +33,13 @@ function CardHeaderReport() {
       setTimeout(() => {
         setLoading(true);
       }, 1000);
-      // await post(
-      //   "reports",
-      //   { username: session.data?.user.username, password },
-      //   session.data
-      // );
+      await post(
+        "reports",
+        { username: session.data?.user.username, password },
+        session.data
+      );
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 10000);
+      setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al ejecutar la accion");
     }

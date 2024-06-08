@@ -11,7 +11,7 @@ function GraphicBar() {
     },
   ]);
 
-  const [options, setOptions] = useState({
+  const [options, setOptions] = useState<any>({
     chart: {
       height: 350,
       type: "bar",

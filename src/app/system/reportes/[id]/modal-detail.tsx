@@ -193,7 +193,7 @@ function ModalDetailReport({
             <div className="flex flex-col gap-2">
               <Label>Ingreso</Label>
               <Input
-                defaultValue={hours.hora_inicio}
+                value={hours.hora_inicio}
                 onChange={(e) =>
                   setHours({ ...hours, hora_inicio: e.target.value })
                 }
@@ -203,7 +203,7 @@ function ModalDetailReport({
             <div className="flex flex-col gap-2">
               <Label>Salida</Label>
               <Input
-                defaultValue={hours.hora_salida}
+                value={hours.hora_salida}
                 onChange={(e) =>
                   setHours({ ...hours, hora_salida: e.target.value })
                 }
@@ -213,7 +213,7 @@ function ModalDetailReport({
             <div className="flex flex-col gap-2">
               <Label>Salida refrigerio</Label>
               <Input
-                defaultValue={hours.hora_inicio_refrigerio}
+                value={hours.hora_inicio_refrigerio}
                 onChange={(e) =>
                   setHours({ ...hours, hora_inicio_refrigerio: e.target.value })
                 }
@@ -223,7 +223,7 @@ function ModalDetailReport({
             <div className="flex flex-col gap-2">
               <Label>Retorno refrigerio</Label>
               <Input
-                defaultValue={hours.hora_fin_refrigerio}
+                value={hours.hora_fin_refrigerio}
                 onChange={(e) =>
                   setHours({ ...hours, hora_fin_refrigerio: e.target.value })
                 }

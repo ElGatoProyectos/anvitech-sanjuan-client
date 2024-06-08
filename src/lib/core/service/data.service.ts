@@ -172,7 +172,7 @@ class DataService {
         const [hour, minutes] = horaCompleta.split(":");
         const newHour = Number(hour) - 5;
 
-        if (newHour <= hourStart) {
+        if (newHour <= 11) {
           formatData.hora_inicio = newHour + ":" + minutes;
           if (newHour > hourStart) {
             formatData.tardanza = "si";
@@ -185,12 +185,13 @@ class DataService {
           } else {
             formatData.hora_fin_refrigerio = newHour + ":" + minutes;
           }
-        } else {
-          if (newHour < hourEnd) {
-            formatData.falta = "si";
-          }
-          formatData.hora_salida = newHour + ":" + minutes;
         }
+        // else {
+        //   if (newHour < hourEnd) {
+        //     formatData.falta = "si";
+        //   }
+        //   formatData.hora_salida = newHour + ":" + minutes;
+        // }
       });
       console.log(formatData);
 
@@ -278,8 +279,6 @@ class DataService {
     day: string
   ) {
     try {
-      console.log("filter and register!!!!!");
-
       const limaTime = new Date().toLocaleString("en-US", {
         timeZone: "America/Lima",
       });
@@ -324,9 +323,12 @@ class DataService {
         dataFiltered.map((item, index) => {
           const horaCompleta = item.checktime.split("T")[1].split("+")[0];
           const [hour, minutes] = horaCompleta.split(":");
-          const newHour = Number(hour) - 5;
+          let newHour = Number(hour) - 5;
+          if (Number(hour) >= 0 && Number(hour) <= 4) {
+            newHour = 23 - 4 + Number(hour);
+          }
 
-          if (newHour <= hourStart) {
+          if (newHour <= 11) {
             formatData.hora_inicio = newHour + ":" + minutes;
             if (newHour > hourStart) {
               formatData.tardanza = "si";
@@ -340,11 +342,14 @@ class DataService {
               formatData.hora_fin_refrigerio = newHour + ":" + minutes;
             }
           } else {
-            if (newHour < hourEnd) {
-              formatData.falta = "si";
-            }
             formatData.hora_salida = newHour + ":" + minutes;
           }
+          // else {
+          //   if (newHour < hourEnd) {
+          //     formatData.falta = "si";
+          //   }
+          //   formatData.hora_salida = newHour + ":" + minutes;
+          // }
         });
         return formatData;
       } else {
@@ -435,7 +440,7 @@ class DataService {
     return { day, month, year };
   }
 
-  private async getMondayAndSaturday() {
+  async getMondayAndSaturday() {
     const limaTime = new Date().toLocaleString("en-US", {
       timeZone: "America/Lima",
     });
