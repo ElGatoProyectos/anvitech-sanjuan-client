@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { validationAuthV2 } from "../../utils/handleValidation";
+import { validationAuthV2 } from "@/app/api/utils/handleValidation";
 import { reportService } from "@/lib/core/service/report.service";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: number } }
+) {
   try {
     const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
-    const body = await request.json();
-    const responseDetail = await reportService.findReportByWorker(
-      Number(body.reportId),
-      String(body.dni)
+    const responseDetail = await reportService.findIncidentsForDetail(
+      Number(context.params.id)
     );
 
     return NextResponse.json(responseDetail.content, {

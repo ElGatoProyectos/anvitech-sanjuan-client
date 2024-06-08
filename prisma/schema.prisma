@@ -33,9 +33,9 @@ model Report {
 }
 
 model DetailReport {
-  id                     Int       @id @default(autoincrement())
-  report_id              Int
-  incident_id            Int?
+  id        Int @id @default(autoincrement())
+  report_id Int
+
   tardanza               String
   falta                  String
   dia                    String
@@ -48,8 +48,10 @@ model DetailReport {
   hora_inicio_refrigerio String?
   hora_fin_refrigerio    String?
   hora_salida            String?
-  report                 Report    @relation(fields: [report_id], references: [id])
-  incident               Incident? @relation(fields: [incident_id], references: [id])
+  report                 Report                 @relation(fields: [report_id], references: [id])
+  DetailReportIncident   DetailReportIncident[]
+  Incident               Incident?              @relation(fields: [incidentId], references: [id])
+  incidentId             Int?
 }
 
 model Worker {
@@ -78,8 +80,17 @@ model Schedule {
 }
 
 model Incident {
-  id            Int            @id @default(autoincrement())
-  title         String
-  description   String
-  detailReports DetailReport[]
+  id                   Int                    @id @default(autoincrement())
+  title                String
+  description          String
+  detailReports        DetailReport[]
+  DetailReportIncident DetailReportIncident[]
+}
+
+model DetailReportIncident {
+  id               Int          @id @default(autoincrement())
+  detail_report_id Int
+  incident_id      Int
+  incident         Incident     @relation(fields: [incident_id], references: [id])
+  detailReport     DetailReport @relation(fields: [detail_report_id], references: [id])
 }

@@ -92,7 +92,7 @@ class DataService {
       for (let day = minDay; day <= maxDay; day++) {
         /// definimos el dia donde estamos para poder hacer el registro a la bd 📅
         const dayString = days[pos];
-        console.log(dayString);
+        console.log("=================" + dayString + "======================");
 
         ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
         // todo todo ok
@@ -153,12 +153,13 @@ class DataService {
       const formatData = {
         report_id: report.id,
         tardanza: "no",
-        falta: "no",
+        falta: "si",
         dia: day,
         fecha_reporte: report.date_created.toISOString(),
         dni: worker.dni,
         nombre: worker.full_name,
-        sede: dataFiltered[0].device.name,
+
+        sede: worker.department,
         hora_entrada: "",
         hora_inicio: "",
         hora_inicio_refrigerio: "",
@@ -167,35 +168,37 @@ class DataService {
       };
       /// dataFiltered
 
-      dataFiltered.map((item, index) => {
-        const horaCompleta = item.checktime.split("T")[1].split("+")[0];
-        const [hour, minutes] = horaCompleta.split(":");
-        const newHour = Number(hour) - 5;
+      if (dataFiltered.length) {
+        // formatData.sede=dataFiltered[0].device.name,
+        dataFiltered.map((item, index) => {
+          const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+          const [hour, minutes] = horaCompleta.split(":");
+          let newHour = Number(hour) - 5;
+          if (Number(hour) >= 0 && Number(hour) <= 4) {
+            newHour = 23 - 4 + Number(hour);
+          }
 
-        if (newHour <= 11) {
-          formatData.hora_inicio = newHour + ":" + minutes;
-          if (newHour > hourStart) {
-            formatData.tardanza = "si";
+          if (newHour <= 11) {
+            formatData.hora_inicio = newHour + ":" + minutes;
+            if (newHour > hourStart) {
+              formatData.tardanza = "si";
+            } else {
+              formatData.tardanza = "no";
+            }
+          } else if (newHour >= 12 && newHour <= 16) {
+            if (formatData.hora_inicio_refrigerio === "") {
+              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+            } else {
+              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+            }
           } else {
-            formatData.tardanza = "no";
+            formatData.hora_salida = newHour + ":" + minutes;
           }
-        } else if (newHour >= 12 && newHour <= 16) {
-          if (formatData.hora_inicio_refrigerio === "") {
-            formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
-          } else {
-            formatData.hora_fin_refrigerio = newHour + ":" + minutes;
-          }
-        }
-        // else {
-        //   if (newHour < hourEnd) {
-        //     formatData.falta = "si";
-        //   }
-        //   formatData.hora_salida = newHour + ":" + minutes;
-        // }
-      });
+        });
+      }
       console.log(formatData);
 
-      const created = await prisma.detailReport.create({ data: formatData });
+      await prisma.detailReport.create({ data: formatData });
 
       /// no se cuantos objetos haya dentro del array, pero se que tengo que ordenarlos en base a la fecha
     } catch (error) {
@@ -344,12 +347,6 @@ class DataService {
           } else {
             formatData.hora_salida = newHour + ":" + minutes;
           }
-          // else {
-          //   if (newHour < hourEnd) {
-          //     formatData.falta = "si";
-          //   }
-          //   formatData.hora_salida = newHour + ":" + minutes;
-          // }
         });
         return formatData;
       } else {

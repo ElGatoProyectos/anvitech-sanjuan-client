@@ -45,6 +45,9 @@ function ModalDetailReport({
   const [loadingUpdateIncident, setLoadingUpdateIncident] = useState(false);
   const [detailSelected, setDetailSelected] = useState<any>({});
   const [incidentSelected, setIncidentSelected] = useState("");
+  const [incidentsForDetail, setincidentsForDetail] = useState<any[]>([]);
+
+  const [loadingDetailIncidents, setLoadingDetailIncidents] = useState(false);
 
   const [dataDetail, setDataDetail] = useState<any[]>([]);
 
@@ -63,25 +66,17 @@ function ModalDetailReport({
 
     const detailFiltered = dataDetail.find((item) => item.dia === e);
 
-    if (detailFiltered) {
-      setDetailSelected(detailFiltered);
-      setFalta(false);
-      setHours({
-        ...hours,
-        hora_inicio: detailFiltered?.hora_inicio || "",
-        hora_inicio_refrigerio: detailFiltered?.hora_inicio_refrigerio || "",
-        hora_fin_refrigerio: detailFiltered?.hora_fin_refrigerio || "",
-        hora_salida: detailFiltered?.hora_salida || "",
-      });
-    } else {
-      setFalta(true);
-      setHours({
-        hora_inicio: "",
-        hora_inicio_refrigerio: "",
-        hora_fin_refrigerio: "",
-        hora_salida: "",
-      });
-    }
+    setDetailSelected(detailFiltered);
+    setFalta(detailFiltered.falta);
+    setHours({
+      ...hours,
+      hora_inicio: detailFiltered?.hora_inicio || "",
+      hora_inicio_refrigerio: detailFiltered?.hora_inicio_refrigerio || "",
+      hora_fin_refrigerio: detailFiltered?.hora_fin_refrigerio || "",
+      hora_salida: detailFiltered?.hora_salida || "",
+    });
+
+    fetchIncidentsDetail(detailFiltered.id);
   }
 
   async function fetchIncidents() {
@@ -93,14 +88,28 @@ function ModalDetailReport({
     }
   }
 
+  async function fetchIncidentsDetail(detailId: number) {
+    try {
+      const response = await getId("reports/incident/", detailId, session.data);
+      console.log(response);
+      setincidentsForDetail(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer la información");
+    }
+  }
+
   async function fetchDetailReport(dni: string, reportId: string) {
     try {
+      setLoadingDetailIncidents(true);
       const response = await post(
         "reports/detail",
         { dni, reportId },
         session.data
       );
+
+      console.log(response.data);
       setDataDetail(response.data);
+      setLoadingDetailIncidents(false);
     } catch (error) {
       useToastDestructive("Error", "Error al traer la información");
     }
@@ -120,6 +129,7 @@ function ModalDetailReport({
     }
   }
 
+  /// ok
   async function handleAddIncident() {
     try {
       setLoadingUpdate(true);
@@ -260,6 +270,26 @@ function ModalDetailReport({
         <span className="font-semibold">Ingreso de incidentes</span>
         <br />
 
+        <table className="text-sm text-slate-700 w-full text-left mt-2">
+          <thead>
+            <tr>
+              <th>Incidencia</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {incidentsForDetail.length && !loadingDetailIncidents
+              ? incidentsForDetail.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.incident.title}</td>
+                    <td>x</td>
+                  </tr>
+                ))
+              : "No hay incidencias"}
+          </tbody>
+        </table>
+        <br />
+
         {falta ? (
           <>
             <div className="w-full mt-4">
@@ -283,7 +313,11 @@ function ModalDetailReport({
                 type="button"
                 variant="default"
                 onClick={handleAddIncident}
-                disabled={loadingUpdateIncident || incidentSelected === ""}
+                disabled={
+                  loadingUpdateIncident ||
+                  incidentSelected === "" ||
+                  loadingUpdate
+                }
               >
                 Guardar cambios de incidentes
               </Button>

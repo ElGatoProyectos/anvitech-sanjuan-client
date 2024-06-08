@@ -92,6 +92,7 @@ class ReportService {
       });
       return httpResponse.http200("All details report", detail);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -116,18 +117,34 @@ class ReportService {
 
   async addIncident(detailReportId: number, incidentId: number) {
     try {
-      const updated = await prisma.detailReport.update({
-        where: { id: detailReportId },
+      const updated = await prisma.detailReportIncident.create({
         data: {
-          incident_id: { set: incidentId },
+          detail_report_id: detailReportId,
+          incident_id: incidentId,
         },
       });
-      return httpResponse.http200("Detail updated", updated);
+      return httpResponse.http201("Incident created", updated);
     } catch (error) {
       console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async findIncidentsForDetail(detailId: number) {
+    try {
+      const incidents = await prisma.detailReportIncident.findMany({
+        where: { detail_report_id: detailId },
+        include: {
+          incident: true,
+        },
+      });
+      return httpResponse.http200("All incidents for detail", incidents);
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   /// no sirve
   async exportToExcel(data: any) {
     try {
