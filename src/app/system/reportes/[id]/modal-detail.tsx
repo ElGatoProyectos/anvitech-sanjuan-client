@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CircleParking } from "lucide-react";
+import { CircleParking, Trash } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
@@ -156,6 +156,8 @@ function ModalDetailReport({
     });
 
     setDaySelected("");
+
+    setincidentsForDetail([]);
   }
 
   /// run handlers
@@ -174,11 +176,7 @@ function ModalDetailReport({
   return (
     <DialogContent className="sm:max-w-xl">
       <DialogHeader>
-        <DialogTitle>Modificar registros</DialogTitle>
-        <DialogDescription>
-          Recuerde que esta modificación afectara directamente a la base de
-          datos
-        </DialogDescription>
+        <DialogTitle className="text-base">Detalle de dia</DialogTitle>
       </DialogHeader>
       <div className="flex flex-col items-center w-full mb-4">
         <Select onValueChange={(e) => handleSelectDay(e)}>
@@ -248,12 +246,13 @@ function ModalDetailReport({
 
         <div className="flex justify-end mt-4 w-full">
           {daySelected === "" ? (
-            <Button disabled type="button" variant="default">
+            <Button size={"sm"} disabled type="button" variant="default">
               Dia no seleccionado
             </Button>
           ) : (
             <Button
               disabled={loadingUpdate}
+              size={"sm"}
               type="button"
               variant="default"
               onClick={handleUpdateHours}
@@ -267,25 +266,28 @@ function ModalDetailReport({
       <hr />
 
       <div className="mb-4">
-        <span className="font-semibold">Ingreso de incidentes</span>
+        <span className="text-sm font-semibold">Ingreso de incidentes</span>
         <br />
 
-        <table className="text-sm text-slate-700 w-full text-left mt-2">
-          <thead>
-            <tr>
-              <th>Incidencia</th>
-              <th>Eliminar</th>
-            </tr>
-          </thead>
+        <table className="text-sm text-slate-700 w-full text-left mt-2  table-auto">
           <tbody>
-            {incidentsForDetail.length && !loadingDetailIncidents
-              ? incidentsForDetail.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.incident.title}</td>
-                    <td>x</td>
-                  </tr>
-                ))
-              : "No hay incidencias"}
+            {incidentsForDetail.length && !loadingDetailIncidents ? (
+              incidentsForDetail.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.incident.title}</td>
+                  <td>
+                    <Button size={"icon"} variant={"outline"}>
+                      <Trash size={20} />
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td></td>
+                <td></td>
+              </tr>
+            )}
           </tbody>
         </table>
         <br />
@@ -312,6 +314,7 @@ function ModalDetailReport({
               <Button
                 type="button"
                 variant="default"
+                size={"sm"}
                 onClick={handleAddIncident}
                 disabled={
                   loadingUpdateIncident ||
@@ -332,6 +335,7 @@ function ModalDetailReport({
 
             <div className="flex justify-end">
               <Button
+                size={"sm"}
                 type="button"
                 variant="default"
                 onClick={() => setFalta(!falta)}

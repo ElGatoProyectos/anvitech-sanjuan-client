@@ -64,6 +64,16 @@ class ReportService {
     }
   }
 
+  async findById(reportId: number) {
+    try {
+      const detail = await prisma.report.findFirst({ where: { id: reportId } });
+      if (!detail) return httpResponse.http404("Report not found");
+      return httpResponse.http200("Report found", detail);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   private async findLast() {
     return await prisma.report.findFirst({
       orderBy: {
