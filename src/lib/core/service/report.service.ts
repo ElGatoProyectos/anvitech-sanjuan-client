@@ -4,6 +4,8 @@ import { httpResponse } from "./response.service";
 
 import * as xlsx from "xlsx";
 import { dataService } from "./data.service";
+import { workerService } from "./worker.service";
+import { incidentService } from "./incident.service";
 
 class ReportService {
   async generateReport() {
@@ -140,6 +142,17 @@ class ReportService {
     }
   }
 
+  async deleteIncident(detailId: number) {
+    try {
+      const deleted = await prisma.detailReportIncident.delete({
+        where: { id: detailId },
+      });
+      return httpResponse.http201("Incident detail deleted", deleted);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async findIncidentsForDetail(detailId: number) {
     try {
       const incidents = await prisma.detailReportIncident.findMany({
@@ -218,33 +231,59 @@ class ReportService {
     };
   }
 
-  async dataForStartSoft() {
+  async dataForStartSoft(month: number, year: number) {
     try {
-      const { monday, saturday } = this.getMondayAndSaturdayDates();
-
-      // Consultar registros de la tabla 'report' entre las fechas de lunes y sábado
-      const reports = await prisma.report.findMany({
-        where: {
-          date_created: {
-            gte: monday,
-            lte: saturday,
-          },
-        },
-      });
-
-      // Obtener los IDs de los reportes
-      const reportIds = reports.map((report) => report.id);
-
       // Consultar registros de la tabla 'detailReport' utilizando los IDs obtenidos
+
+      // const resportResponse = await this.findById(reportId);
+      // if (!resportResponse.ok) return resportResponse;
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 1);
+
       const detailReports = await prisma.detailReport.findMany({
         where: {
-          report_id: {
-            in: reportIds,
+          fecha_reporte: {
+            gte: startDate,
+            lt: endDate,
           },
         },
       });
 
-      return httpResponse.http200("Report success", detailReports);
+      const responseWorkers = await workerService.findAll();
+
+      const incidents = await prisma.detailReportIncident.findMany({
+        where: {
+          detailReport: {
+            fecha_reporte: {
+              gte: startDate,
+              lt: endDate,
+            },
+          },
+        },
+        include: {
+          detailReport: true,
+          incident: {
+            select: {
+              title: true,
+              description: true,
+            },
+          },
+        },
+      });
+
+      return httpResponse.http200("Report success", {
+        data: detailReports,
+        workers: responseWorkers.content,
+        incidents,
+      });
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async dataForExportNormal(dateMin: Date, dateMax: Date) {
+    try {
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }

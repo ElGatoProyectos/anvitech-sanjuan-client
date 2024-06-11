@@ -1,7 +1,14 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, getByDNI, getId, post, putId } from "@/app/http/api.http";
+import {
+  deleteId,
+  get,
+  getByDNI,
+  getId,
+  post,
+  putId,
+} from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -147,6 +154,16 @@ function ModalDetailReport({
     }
   }
 
+  async function handleDeleteIncident(detailId: number) {
+    try {
+      setLoadingUpdate(true);
+      await deleteId("reports/detail", detailId, session.data);
+      setLoadingUpdate(false);
+    } catch (error) {
+      useToastDestructive("Error", "Error al intentar eliminar");
+    }
+  }
+
   function handleCloseModal() {
     setHours({
       hora_inicio: "",
@@ -172,6 +189,15 @@ function ModalDetailReport({
   useEffect(() => {
     handleCloseModal();
   }, [isClosing]);
+
+  useEffect(() => {
+    if (session.status === "authenticated" && daySelected) {
+      const detailFiltered = dataDetail.find(
+        (item) => item.dia === daySelected
+      );
+      fetchIncidentsDetail(detailFiltered.id);
+    }
+  }, [loadingUpdate]);
 
   return (
     <DialogContent className="sm:max-w-xl">
@@ -271,12 +297,16 @@ function ModalDetailReport({
 
         <table className="text-sm text-slate-700 w-full text-left mt-2  table-auto">
           <tbody>
-            {incidentsForDetail.length && !loadingDetailIncidents ? (
+            {session.status === "authenticated" ? (
               incidentsForDetail.map((item, index) => (
                 <tr key={index}>
                   <td>{item.incident.title}</td>
                   <td>
-                    <Button size={"icon"} variant={"outline"}>
+                    <Button
+                      size={"icon"}
+                      variant={"outline"}
+                      onClick={() => handleDeleteIncident(item.id)}
+                    >
                       <Trash size={20} />
                     </Button>
                   </td>

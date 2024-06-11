@@ -121,7 +121,7 @@ function Sidebar() {
                 </li>
                 <li>
                   <Link
-                    href={"/system/reportes/exportar-datos"}
+                    href={"/system/reportes/exportar"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
                       pathname === "/system/reportes/exportar"
                         ? activePath

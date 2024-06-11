@@ -112,7 +112,10 @@ class DataService {
             responseDataForDay.content,
             worker,
             dayString,
-            report
+            report,
+            day,
+            selectedMonth,
+            selectedYear
           );
         });
 
@@ -129,7 +132,10 @@ class DataService {
     dataGeneralDay: any[],
     worker: any,
     day: string,
-    report: any
+    report: any,
+    dayI: number,
+    monthI: number,
+    yearI: number
   ) {
     try {
       console.log("filter and register!!!!!");
@@ -141,7 +147,8 @@ class DataService {
       const schedule = responseSchedule.content;
 
       const [lunesStart, lunesEnd] = schedule.lunes.split("-");
-      const [hourStart, hourEnd] = lunesStart.split(":");
+      const [hourStart, minutesStart] = lunesStart.split(":");
+      const [hourEnd, minutesEnd] = lunesEnd.split(":");
 
       ///devuelve un array de posiblemente 4 objetos que contienen la fecha de inicio a fin
       const dataFiltered = dataGeneralDay.filter(
@@ -150,12 +157,14 @@ class DataService {
 
       console.log(dataFiltered);
 
-      const formatData = {
+      const formatData: any = {
         report_id: report.id,
-        tardanza: "no",
+        tardanza: "si",
         falta: "si",
         dia: day,
-        fecha_reporte: report.date_created.toISOString(),
+        // fecha_reporte: report.date_created.toISOString(),?
+        fecha_reporte: null,
+
         dni: worker.dni,
         nombre: worker.full_name,
 
@@ -166,24 +175,35 @@ class DataService {
         hora_fin_refrigerio: "",
         hora_salida: "",
       };
+
+      //- aqui vamos a crear la fecha
+
+      const dateI = new Date(yearI, monthI - 1, dayI);
+      formatData.fecha_reporte = dateI;
       /// dataFiltered
 
       if (dataFiltered.length) {
-        // formatData.sede=dataFiltered[0].device.name,
+        //! formatData.sede=dataFiltered[0].device.name,
         dataFiltered.map((item, index) => {
           const horaCompleta = item.checktime.split("T")[1].split("+")[0];
           const [hour, minutes] = horaCompleta.split(":");
-          let newHour = Number(hour) - 5;
+
+          let newHour: number = Number(hour) - 5;
+
           if (Number(hour) >= 0 && Number(hour) <= 4) {
             newHour = 23 - 4 + Number(hour);
           }
 
           if (newHour <= 11) {
             formatData.hora_inicio = newHour + ":" + minutes;
-            if (newHour > hourStart) {
+            if (newHour > Number(hourStart)) {
               formatData.tardanza = "si";
             } else {
-              formatData.tardanza = "no";
+              if (newHour >= 9 && Number(minutes) > 0) {
+                formatData.tardanza = "si";
+              } else {
+                formatData.tardanza = "no";
+              }
             }
           } else if (newHour >= 12 && newHour <= 16) {
             if (formatData.hora_inicio_refrigerio === "") {
@@ -192,6 +212,11 @@ class DataService {
               formatData.hora_fin_refrigerio = newHour + ":" + minutes;
             }
           } else {
+            if (newHour >= Number(hourEnd)) {
+              formatData.falta = "no";
+            } else {
+              formatData.falta = "si";
+            }
             formatData.hora_salida = newHour + ":" + minutes;
           }
         });

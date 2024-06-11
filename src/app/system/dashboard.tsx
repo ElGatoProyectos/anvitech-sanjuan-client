@@ -96,7 +96,7 @@ function Dashboard() {
             href={"/system/reportes"}
             className="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
           >
-            Ir a seccion
+            Ir a sección
           </Link>
         </div>
       </div>
@@ -118,7 +118,7 @@ function Dashboard() {
           {/* content */}
           <div className="flex items-center gap-4 ">
             <div>
-              <span className="text-3xl font-bold">234</span>
+              <span className="text-3xl font-bold">100</span>
             </div>
             <p className="text-gray-600 text-sm">
               Numero total de reportes realizados hasta el dia de hoy {}
@@ -132,7 +132,7 @@ function Dashboard() {
             href={"/system/reportes"}
             className="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
           >
-            Ir a seccion
+            Ir a sección
           </Link>
         </div>
       </div>
@@ -167,7 +167,7 @@ function Dashboard() {
               href={"/system/usuarios"}
               className="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
             >
-              Ir a seccion
+              Ir a sección
             </Link>
           </div>
         </div>

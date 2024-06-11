@@ -39,7 +39,7 @@ model DetailReport {
   tardanza               String
   falta                  String
   dia                    String
-  fecha_reporte          String
+  fecha_reporte          DateTime
   dni                    String
   nombre                 String
   sede                   String
