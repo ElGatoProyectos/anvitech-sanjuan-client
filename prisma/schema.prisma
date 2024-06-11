@@ -55,14 +55,17 @@ model DetailReport {
 }
 
 model Worker {
-  id         Int        @id @default(autoincrement())
-  full_name  String
-  dni        String     @unique
-  department String
-  position   String
-  hire_date  DateTime
-  enabled    String?    @default("si")
-  schedule   Schedule[]
+  id               Int          @id @default(autoincrement())
+  full_name        String
+  dni              String       @unique
+  department       String
+  position         String
+  hire_date        DateTime
+  termination_date DateTime?
+  enabled          String?      @default("si")
+  schedule         Schedule[]
+  Vacation         Vacation?
+  Permissions      Permissions?
 }
 
 model Schedule {
@@ -74,9 +77,28 @@ model Schedule {
   jueves    String
   viernes   String
   sabado    String
+  domingo   String
   comments  String?
   type      String?
   worker    Worker  @relation(fields: [worker_id], references: [id])
+}
+
+model Vacation {
+  id         Int      @id @default(autoincrement())
+  worker_id  Int      @unique
+  start_date DateTime
+  end_date   DateTime
+  comments   String?
+  worker     Worker   @relation(fields: [worker_id], references: [id])
+}
+
+model Permissions {
+  id         Int      @id @default(autoincrement())
+  worker_id  Int      @unique
+  start_date DateTime
+  end_date   DateTime
+  comments   String?
+  worker     Worker   @relation(fields: [worker_id], references: [id])
 }
 
 model Incident {

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CalendarCheck2,
   ChevronDown,
   ChevronUp,
   ContactRound,
@@ -23,6 +24,8 @@ function Sidebar() {
   const nav = pathname.split("/");
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedWorkers, setIsExpandedWokers] = useState(false);
+  const [isExpandedSchedule, setIsExpandedSchedule] = useState(false);
 
   const activePath =
     "bg-gray-50 text-gray-800 border-l-4  border-l-indigo-500 ";
@@ -136,7 +139,6 @@ function Sidebar() {
               </ul>
             )}
           </li>
-
           {session.data?.user.role === "admin" && (
             <li className="transition-all">
               <Link
@@ -156,23 +158,165 @@ function Sidebar() {
               </Link>
             </li>
           )}
-
+          {/* 
+          //- seccion trabajadores ------------------------------------------- */}
           <li>
             <Link
-              href={"/system/trabajadores"}
+              onClick={() => setIsExpandedWokers(!isExpandedWorkers)}
+              href={"#"}
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                pathname === "/system/trabajadores" ? activePath : inactivePath
+                pathname.includes("/system/trabajadores")
+                  ? activePath
+                  : inactivePath
               } transition-all`}
             >
               <span className="inline-flex justify-center items-center ml-4">
-                <ContactRound size={20} />
+                <ListTodo size={20} />
               </span>
-              <span className="ml-2 text-sm tracking-wide truncate">
-                Trabajadores
+              <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                Trabajadores{" "}
+                {isExpandedWorkers ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
               </span>
             </Link>
+
+            {isExpandedWorkers && (
+              <ul className="ml-10 mt-2">
+                <li>
+                  <Link
+                    href={"/system/trabajadores"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Lista general
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/trabajadores/registro"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/registro"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Registro unitario
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/trabajadores/registro_masivo"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/registro_masivo"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Registro masivo
+                    </span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/vacaciones_masivas"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/vacaciones_masivas"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Vaciones masivas
+                    </span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/cese_masivo"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/cese_masivo"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Cese masivo
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
 
+          {/* seccion horario -------------------------------------------*/}
+
+          <li>
+            <Link
+              onClick={() => setIsExpandedSchedule(!isExpandedSchedule)}
+              href={"#"}
+              className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
+                pathname.includes("/system/horario") ? activePath : inactivePath
+              } transition-all`}
+            >
+              <span className="inline-flex justify-center items-center ml-4">
+                <CalendarCheck2 size={20} />
+              </span>
+              <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                Horario{" "}
+                {isExpandedWorkers ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
+              </span>
+            </Link>
+
+            {isExpandedSchedule && (
+              <ul className="ml-10 mt-2">
+                <li>
+                  <Link
+                    href={"/system/horario"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/horario" ? activePath : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Horario general
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/horario/registro_masivo"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/horario/registro_masivo"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Registro masivo
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+          {/* 
+          //- Incidencias */}
           <li>
             <Link
               href={"/system/incidencias"}
@@ -188,7 +332,6 @@ function Sidebar() {
               </span>
             </Link>
           </li>
-
           <li role="button" onClick={handleLogout}>
             <div
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${

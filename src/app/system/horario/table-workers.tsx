@@ -98,6 +98,12 @@ function TableWorkers() {
 
   return (
     <div className=" w-full flex flex-col mt-4">
+      <div className="w-full mb-8 flex justify-between">
+        <h3 className="text-gray-800 text-lg font-semibold">
+          Lista de horarios por trabajador
+        </h3>
+        <Button size={"sm"}>Exportar horario masivos</Button>
+      </div>
       <div className="flex gap-4">
         <Input
           placeholder="Buscar por DNI"
@@ -122,28 +128,21 @@ function TableWorkers() {
             </SelectGroup>
           </SelectContent>
         </Select>
-
-        <Select>
-          <SelectTrigger className="w-[50%]">
-            <SelectValue placeholder="Estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="1">Habilitado</SelectItem>
-              <SelectItem value="2">Deshabilitado</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </div>
       <div className="p-2 overflow-y-scroll ]">
         <table className="w-full text-xs text-left ">
           <thead className="text-gray-600 font-medium border-b">
             <tr>
               <th className="py-3 pr-6">DNI</th>
-              <th className="py-3 pr-6">Departamento</th>
               <th className="py-3 pr-6">Nombres</th>
-              <th className="py-3 pr-6">Estado</th>
-
+              <th className="py-3 pr-6">Lunes</th>
+              <th className="py-3 pr-6">Martes</th>
+              <th className="py-3 pr-6">Miercoles</th>
+              <th className="py-3 pr-6">Jueves</th>
+              <th className="py-3 pr-6">Viernes</th>
+              <th className="py-3 pr-6">Viernes</th>
+              <th className="py-3 pr-6">Sabado</th>
+              <th className="py-3 pr-6">Domingo</th>
               <th className="py-3 pr-6">Detalle</th>
             </tr>
           </thead>
@@ -197,19 +196,23 @@ function TableWorkers() {
               currentWorkers.map((item, idx) => (
                 <tr key={idx}>
                   <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    {item.department}
-                  </td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">
                     {item.full_name}
                   </td>
-                  <td> {item.enabled ? "HABILITADO" : "DESHABILITADO"}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Link
                       className="bg-black rounded-md  outline-none "
-                      href={`/system/trabajadores/` + item.id}
+                      href={`/system/horario/` + item.id}
                     >
                       <Settings size={20} />
                     </Link>

@@ -5,7 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useToastDestructive } from "../hooks/toast.hook";
-import { getExcelFromApi } from "@/lib/core/functions/convert-to-excel";
 
 function FormAuth() {
   const router = useRouter();

@@ -51,6 +51,13 @@ function UpdateDataWorker({ id }: { id: string }) {
     }
   }, [session.status, updatedAction]);
 
+  function formatDateToInput(dateString: string) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
@@ -58,13 +65,13 @@ function UpdateDataWorker({ id }: { id: string }) {
       </div>
       <form
         onSubmit={handleUpdate}
-        className="grid grid-cols-3 w-full gap-20 mt-8 "
+        className="grid grid-cols-2 w-full gap-20 mt-8 "
       >
         {loading ? (
           <Skeleton className="col-span-3 h-36" />
         ) : (
           <>
-            <div className="col-span-2">
+            <div className="">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-3">
                   <Label>DNI</Label>
@@ -106,6 +113,26 @@ function UpdateDataWorker({ id }: { id: string }) {
               </div>
             </div>
             <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
+                <Label>Fecha de ingreso</Label>
+                <Input
+                  type="date"
+                  defaultValue={formatDateToInput(worker.hire_date)}
+                  onChange={(e) =>
+                    setWorker({ ...worker, position: e.target.value })
+                  }
+                ></Input>
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label>Fecha de Cese</Label>
+                <Input
+                  type="date"
+                  defaultValue={formatDateToInput(worker.termination_date)}
+                  onChange={(e) =>
+                    setWorker({ ...worker, position: e.target.value })
+                  }
+                ></Input>
+              </div>
               <div className="flex flex-col gap-3">
                 <Label>Estado</Label>
                 <Select

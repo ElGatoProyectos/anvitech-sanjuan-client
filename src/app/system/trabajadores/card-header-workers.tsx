@@ -74,25 +74,22 @@ function CardHeaderWorker() {
           </h3>
         </div>
         <div className="flex mt-3 md:mt-0 gap-4">
-          <Button
-            onClick={() => setUnitaryModalOpen(true)}
-            className=" flex gap-2"
-          >
-            <span>Registro unitario</span>
-            <UserPlus size={20} />
+          <Button className=" flex gap-2">
+            <span>Exportar datos de trabajadores</span>
+            <Sheet size={20} />
           </Button>
 
-          <Button
+          {/* <Button
             onClick={() => setMassiveModalOpen(true)}
             className=" flex gap-2"
           >
             <span>Registro masivo</span>
             <Sheet size={20} />
-          </Button>
+          </Button> */}
         </div>
       </div>
 
-      <Dialog open={isUnitaryModalOpen} onOpenChange={setUnitaryModalOpen}>
+      {/* <Dialog open={isUnitaryModalOpen} onOpenChange={setUnitaryModalOpen}>
         <DialogContent className="">
           <DialogHeader>
             <DialogTitle>Generar reporte unitario</DialogTitle>
@@ -202,7 +199,7 @@ function CardHeaderWorker() {
             </DialogClose>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }
