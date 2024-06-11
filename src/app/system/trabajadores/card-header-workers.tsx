@@ -20,6 +20,7 @@ import { Sheet, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+import { exportAllWorkers } from "./export";
 
 function CardHeaderWorker() {
   /// define states
@@ -40,31 +41,17 @@ function CardHeaderWorker() {
 
   /// define functions
 
-  async function handleRegistrarDataMassive() {
+  async function exportDataGeneral() {
     try {
       setLoading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      await postImage("workers/file", formData, session.data);
+      const response = await get("workers", session.data);
+      exportAllWorkers(response.data);
       setLoading(false);
     } catch (error) {
-      useToastDestructive("Error", "Error al procesar el archivo excel");
-      setLoading(false);
+      console.log(error);
+      useToastDestructive("Error", "Error al generar el excel");
     }
   }
-
-  async function handleRegisterData() {
-    try {
-      setLoading(true);
-      await post("workers", dataWorker, session.data);
-      setLoading(false);
-      setUpdatedAction();
-    } catch (error) {
-      useToastDestructive("Error", "Error al procesar el registro");
-      setLoading(false);
-    }
-  }
-
   return (
     <>
       <div className="items-start justify-between flex ">
@@ -74,7 +61,7 @@ function CardHeaderWorker() {
           </h3>
         </div>
         <div className="flex mt-3 md:mt-0 gap-4">
-          <Button className=" flex gap-2">
+          <Button className=" flex gap-2" onClick={exportDataGeneral}>
             <span>Exportar datos de trabajadores</span>
             <Sheet size={20} />
           </Button>

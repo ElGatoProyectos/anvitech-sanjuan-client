@@ -14,3 +14,11 @@ export const updateUserDTO = z.object({
   role: z.string().min(1, "El rol es requerido").optional(),
   enabled: z.boolean().optional(),
 });
+
+export const formatUserDTO = z.object({
+  dni: z.string().min(8, "Minimo 8").optional(),
+  nombres: z.string().min(5, "Minimo 5").optional(),
+  celular: z.string().min(5, "Minimo 5").optional(),
+  correo: z.string().email("Correo no valido"),
+  rol: z.string().min(3, "Correo no valido"),
+});

@@ -110,6 +110,18 @@ class WorkerService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async findByDNI(dni: string) {
+    try {
+      const worker = await prisma.worker.findFirst({
+        where: { dni },
+      });
+
+      return httpResponse.http200("Departments distinct", worker);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const workerService = new WorkerService();

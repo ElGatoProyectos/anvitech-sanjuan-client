@@ -89,6 +89,18 @@ function TableWorkers() {
     setCurrentPage(1);
   }
 
+  function handleChangeSelectEnbabled(value: string) {
+    console.log(value);
+    if (value === "1") {
+      const filtered = workers.filter((item) => item.enabled === "si");
+      setWorkersFiltered(filtered);
+    } else if (value === "0") {
+      const filtered = workers.filter((item) => item.enabled === "no");
+      setWorkersFiltered(filtered);
+    }
+    setCurrentPage(1);
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       fetchDataWorkers();
@@ -123,14 +135,14 @@ function TableWorkers() {
           </SelectContent>
         </Select>
 
-        <Select>
+        <Select onValueChange={handleChangeSelectEnbabled}>
           <SelectTrigger className="w-[50%]">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectItem value="1">Habilitado</SelectItem>
-              <SelectItem value="2">Deshabilitado</SelectItem>
+              <SelectItem value="0">Deshabilitado</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

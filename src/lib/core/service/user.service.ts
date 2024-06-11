@@ -1,9 +1,15 @@
 import prisma from "@/lib/prisma";
 import { httpResponse } from "./response.service";
 import { errorService } from "./errors.service";
-import { createUserDTO, updateUserDTO } from "../schemas/user.dto";
+import {
+  createUserDTO,
+  formatUserDTO,
+  updateUserDTO,
+} from "../schemas/user.dto";
+import * as xlsx from "xlsx";
 
 import bcrypt from "bcrypt";
+import { formatSheduleDto } from "../schemas/shedule.dto";
 
 class UserService {
   async findAll() {
@@ -104,6 +110,43 @@ class UserService {
       console.log(error);
       return errorService.handleErrorSchema(error);
     }
+  }
+
+  async registerMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      const exampleData = sheetToJson[0];
+
+      formatUserDTO.parse(exampleData);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          const format = {
+            full_name: item.nombres,
+            dni: item.dni,
+            phone: item.celular,
+            email: item.correo,
+            username: item.dni,
+            password: bcrypt.hashSync(item.dni, 11),
+            role: item.rol,
+            enabled: true,
+          };
+
+          await prisma.user.create({
+            data: format,
+          });
+        })
+      );
+
+      return httpResponse.http201("Users created");
+    } catch (error) {}
   }
 }
 

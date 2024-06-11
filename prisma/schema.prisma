@@ -17,6 +17,7 @@ model User {
   id        Int     @id @default(autoincrement())
   dni       String
   full_name String
+  phone     String
   email     String
   username  String
   password  String

@@ -26,6 +26,7 @@ function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isExpandedWorkers, setIsExpandedWokers] = useState(false);
   const [isExpandedSchedule, setIsExpandedSchedule] = useState(false);
+  const [isExpandedUser, setIsExpandedUsers] = useState(false);
 
   const activePath =
     "bg-gray-50 text-gray-800 border-l-4  border-l-indigo-500 ";
@@ -139,23 +140,78 @@ function Sidebar() {
               </ul>
             )}
           </li>
+
+          {/* usuarios -------------------------------------------------------------- */}
           {session.data?.user.role === "admin" && (
-            <li className="transition-all">
+            <li>
               <Link
-                href={"/system/usuarios"}
+                onClick={() => setIsExpandedUsers(!isExpandedUser)}
+                href={"#"}
                 className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                  pathname === "/system/notifications"
+                  pathname.includes("/system/usuarios")
                     ? activePath
                     : inactivePath
                 } transition-all`}
               >
                 <span className="inline-flex justify-center items-center ml-4">
-                  <Users size={20} />
+                  <ListTodo size={20} />
                 </span>
-                <span className="ml-2 text-sm tracking-wide truncate">
-                  Usuarios
+                <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                  Usuarios{" "}
+                  {isExpandedUser ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
                 </span>
               </Link>
+
+              {isExpandedUser && (
+                <ul className="ml-10 mt-2">
+                  <li>
+                    <Link
+                      href={"/system/usuarios"}
+                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                        pathname === "/system/usuarios"
+                          ? activePath
+                          : inactivePath
+                      } transition-all`}
+                    >
+                      <span className="ml-2 text-sm tracking-wide truncate">
+                        Lista general
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={"/system/usuarios/registro"}
+                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                        pathname === "/system/usuarios/registro"
+                          ? activePath
+                          : inactivePath
+                      } transition-all`}
+                    >
+                      <span className="ml-2 text-sm tracking-wide truncate">
+                        Registro unitario
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={"/system/usuarios/registro_masivo"}
+                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                        pathname === "/system/usuarios/registro_masivo"
+                          ? activePath
+                          : inactivePath
+                      } transition-all`}
+                    >
+                      <span className="ml-2 text-sm tracking-wide truncate">
+                        Registro masivo
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
+              )}
             </li>
           )}
           {/* 
@@ -315,6 +371,7 @@ function Sidebar() {
               </ul>
             )}
           </li>
+
           {/* 
           //- Incidencias */}
           <li>
