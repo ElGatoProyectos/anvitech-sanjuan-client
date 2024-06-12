@@ -35,14 +35,18 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { headers } from "next/headers";
 import { downloadExcel } from "./export";
+import ModalDetailReport from "./modal-detail";
 
 function TableData() {
   const [workers, setWorkers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [workersFiltered, setWorkersFiltered] = useState<any[]>([]);
+  const [isClosing, setIsClosing] = useState(true);
 
-  const [openModal, setOpenModal] = useState(false);
+  const [reportId, setReportId] = useState("");
+
+  const [worker, setWorker] = useState<any>({});
 
   const session = useSession();
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,15 +73,15 @@ function TableData() {
       console.log(day, month, year);
 
       const response = await post(
-        "reports/day",
+        "reports/weekly",
         { day, month, year },
         session.data
       );
 
       console.log(response.data);
 
-      setWorkers(response.data);
-      setWorkersFiltered(response.data);
+      // setWorkers(response.data);
+      // setWorkersFiltered(response.data);
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al traer el reporte");
@@ -125,13 +129,13 @@ function TableData() {
 
       setLoading(true);
 
-      const response = await post(
-        "reports/day",
-        { day, month, year },
-        session.data
-      );
-      setWorkers(response.data);
-      setWorkersFiltered(response.data);
+      // const response = await post(
+      //   "reports/day",
+      //   { day, month, year },
+      //   session.data
+      // );
+      // setWorkers(response.data);
+      // setWorkersFiltered(response.data);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -150,9 +154,13 @@ function TableData() {
     }
   }
 
+  async function handleSelectItemTable(worker: any) {
+    setWorker(worker);
+    setIsClosing(false);
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
-      useToastDefault("Aviso", "Este reporte es del dia anterior");
       fetchReport();
       fetDepartments();
     }
@@ -215,14 +223,12 @@ function TableData() {
               <tr>
                 <th className="py-3 pr-6">DNI</th>
                 <th className="py-3 pr-6">Nombres</th>
-                <th className="py-3 pr-6">Departamento</th>
-                <th className="py-3 pr-6">Fecha</th>
-                <th className="py-3 pr-6">Hora inicio</th>
-                <th className="py-3 pr-6">Inicio refrigerio</th>
-                <th className="py-3 pr-6">Fin refrigerio</th>
-                <th className="py-3 pr-6">Hora salida</th>
-                <th className="py-3 pr-6">Tardanza</th>
-                <th className="py-3 pr-6">Falta</th>
+                <th className="py-3 pr-6">Lunes</th>
+                <th className="py-3 pr-6">Martes</th>
+                <th className="py-3 pr-6">Miercoles</th>
+                <th className="py-3 pr-6">Jueves</th>
+                <th className="py-3 pr-6">Viernes</th>
+                <th className="py-3 pr-6">Sabado</th>
 
                 <th className="py-3 pr-6">Acción</th>
               </tr>
@@ -237,9 +243,7 @@ function TableData() {
                     <td className="pr-6 py-4 whitespace-nowrap">
                       <Skeleton className=" h-18"></Skeleton>
                     </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
+
                     <th className="py-3 pr-6">
                       <Skeleton className=" h-18"></Skeleton>
                     </th>
@@ -261,10 +265,6 @@ function TableData() {
                     <th className="py-3 pr-6" align="center">
                       <Skeleton className=" h-18"></Skeleton>
                     </th>
-
-                    <td className=" whitespace-nowrap">
-                      <Skeleton></Skeleton>
-                    </td>
                   </tr>
                   <tr>
                     <td className="pr-6 py-4 whitespace-nowrap">
@@ -276,12 +276,7 @@ function TableData() {
                     <td className="pr-6 py-4 whitespace-nowrap">
                       <Skeleton className=" h-18"></Skeleton>
                     </td>
-                    <th className="py-3 pr-6">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
+
                     <th className="py-3 pr-6" align="center">
                       <Skeleton className=" h-18"></Skeleton>
                     </th>
@@ -310,31 +305,23 @@ function TableData() {
                     <td className="pr-6 py-4 whitespace-nowrap">
                       {item.nombre}
                     </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">{item.sede}</td>
-                    <th className="py-3 pr-6">{item.fecha_reporte}</th>
+                    <th className="pr-6 py-4 ">OK</th>
+
                     <th className="py-3 pr-6" align="center">
-                      {item.hora_inicio}
+                      OK
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      {item.hora_inicio_refrigerio}
+                      T
                     </th>
-                    <th className="py-3 pr-6" align="center">
-                      {item.hora_fin_refrigerio}
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      {item.hora_salida}
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      {item.tardanza}
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      {item.falta}
-                    </th>
+                    <th className="py-3 pr-6" align="center"></th>
+                    <th className="py-3 pr-6" align="center"></th>
+
+                    <th className="py-3 pr-6" align="center"></th>
 
                     <td className=" whitespace-nowrap">
                       <Button
                         variant="secondary"
-                        onClick={() => setOpenModal(true)}
+                        onClick={() => handleSelectItemTable({})}
                       >
                         <Settings size={20} />
                       </Button>
@@ -353,27 +340,13 @@ function TableData() {
           />
         </div>
       </div>
-
-      <Dialog open={openModal} onOpenChange={() => setOpenModal(false)}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Aviso de sistema</DialogTitle>
-          </DialogHeader>
-          {/* Contenido personalizado del modal */}
-          <div className="overflow-y-hidden">
-            <span>
-              Esta opcion no esta permitida, por favor visite la seccion{" "}
-              <Link
-                className="underline text-blue-500"
-                href={"/system/reportes/semanal"}
-              >
-                reportes semanales
-              </Link>{" "}
-              para poder modificar un dia en especifico
-            </span>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* {worker && (
+        <ModalDetailReport
+          worker={worker}
+          reportId={reportId}
+          isClosing={isClosing}
+        ></ModalDetailReport>
+      )} */}
     </div>
   );
 }

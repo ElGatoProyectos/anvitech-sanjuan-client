@@ -82,6 +82,19 @@ function Form() {
         </div>
 
         <div className="flex flex-col gap-2  col-span-2">
+          <Label>Supervisor</Label>
+          <Input
+            type="text"
+            onChange={(e) =>
+              setDataWorker({
+                ...dataWorker,
+                coordinator: e.target.value.toUpperCase(),
+              })
+            }
+          />
+        </div>
+
+        <div className="flex flex-col gap-2  col-span-2">
           <Label>Fecha de contratación</Label>
           <Input
             type="date"

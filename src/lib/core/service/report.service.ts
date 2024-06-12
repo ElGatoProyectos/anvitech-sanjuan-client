@@ -288,6 +288,66 @@ class ReportService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async generateReportForDayNoToday(day: number, month: number, year: number) {
+    try {
+      const startDate = new Date(year, month - 1, day);
+      const endDate = new Date(year, month - 1, day + 1);
+
+      const data = await prisma.detailReport.findMany({
+        where: {
+          fecha_reporte: {
+            gte: startDate, // Greater than or equal to the start of the day
+            lt: endDate, // Less than the start of the next day
+          },
+        },
+      });
+      return httpResponse.http200("Report day created", data);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async generateReportForWeek(days: string[]) {
+    try {
+      const { content: workers } = await workerService.findAll();
+
+      const response = await Promise.all(
+        workers.map(async (worker: any) => {
+          const formatData = {
+            worker,
+            lunes: {},
+            martes: {},
+            miercoles: {},
+            jueves: {},
+            viernes: {},
+            sabado: {},
+          };
+
+          for (let i = 0; i < days.length; i++) {
+            const day = days[i];
+
+            const data: any = await prisma.detailReport.findFirst({
+              where: { fecha_reporte: day, dni: worker.dni },
+            });
+
+            if (i === 0) formatData.lunes = data;
+            else if (i === 1) formatData.martes = data;
+            else if (i === 2) formatData.miercoles = data;
+            else if (i === 3) formatData.jueves = data;
+            else if (i === 4) formatData.viernes = data;
+            else if (i === 5) formatData.sabado = data;
+          }
+
+          return formatData;
+        })
+      );
+
+      return httpResponse.http200("Report weekly", response);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const reportService = new ReportService();

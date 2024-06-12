@@ -1,9 +1,9 @@
-import Form from "./form";
+import FormRegisterUserMassive from "./form";
 
 function Page() {
   return (
     <div className="flex flex-col w-full gap-8 ">
-      <Form></Form>
+      <FormRegisterUserMassive></FormRegisterUserMassive>
     </div>
   );
 }

@@ -85,13 +85,18 @@ class DataService {
         "jueves",
         "viernes",
         "sabado",
+        "domingo",
       ];
 
       let pos = 0;
 
       for (let day = minDay; day <= maxDay; day++) {
         /// definimos el dia donde estamos para poder hacer el registro a la bd 📅
-        const dayString = days[pos];
+        const dayString = this.functionCaptureDayFromNumber(
+          day,
+          selectedYear,
+          selectedMonth
+        );
         console.log("=================" + dayString + "======================");
 
         ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
@@ -247,6 +252,7 @@ class DataService {
       "jueves",
       "viernes",
       "sabado",
+      "domingo",
     ];
     const dayOfWeekName = daysOfWeek[dayOfWeekNumber];
 
@@ -480,6 +486,50 @@ class DataService {
       monday: monday.getDate(),
       saturday: saturday.getDate(),
     };
+  }
+
+  getMondayAndSaturdayDatetime(day: number, month: number, year: number) {
+    // Crear una fecha a partir de los datos proporcionados
+    const inputDate = new Date(year, month - 1, day); // Los meses en JavaScript son 0-indexados
+
+    const dayOfWeek = inputDate.getDay();
+
+    // Calcular el lunes de esa semana
+    const monday = new Date(inputDate);
+    monday.setDate(inputDate.getDate() - ((dayOfWeek + 6) % 7));
+
+    // Calcular el sábado de esa semana
+    const saturday = new Date(inputDate);
+    saturday.setDate(inputDate.getDate() + (6 - dayOfWeek));
+
+    return {
+      monday: monday.toISOString(),
+      saturday: saturday.toISOString(),
+    };
+  }
+
+  async getDaysBetweenMondayAndSaturday(
+    day: number,
+    month: number,
+    year: number
+  ) {
+    const inputDate = new Date(year, month - 1, day);
+
+    const dayOfWeek = inputDate.getDay();
+
+    const monday = new Date(inputDate);
+    monday.setDate(inputDate.getDate() - ((dayOfWeek + 6) % 7));
+
+    const saturday = new Date(inputDate);
+    saturday.setDate(inputDate.getDate() + (6 - dayOfWeek));
+
+    const daysBetween = [];
+
+    for (let d = new Date(monday); d <= saturday; d.setDate(d.getDate() + 1)) {
+      daysBetween.push(new Date(d).toISOString());
+    }
+
+    return daysBetween;
   }
 }
 

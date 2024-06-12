@@ -64,11 +64,11 @@ function CardHeaderUser() {
             Lista de usuarios
           </h3>
         </div>
-        <div className="mt-3 md:mt-0">
+        {/* <div className="mt-3 md:mt-0">
           <DialogTrigger asChild>
             <Button className=" ">Registrar</Button>
           </DialogTrigger>
-        </div>
+        </div> */}
       </div>
 
       <DialogContent className="">

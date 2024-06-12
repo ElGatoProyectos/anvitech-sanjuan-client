@@ -1,4 +1,5 @@
 import { dataService } from "@/lib/core/service/data.service";
+import { reportService } from "@/lib/core/service/report.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -29,18 +30,41 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log(body);
 
-    const response = await dataService.instanceDataInit(
-      Number(body.day),
-      Number(body.day),
-      Number(body.year),
-      Number(body.month),
-      false
+    const dayBody = Number(body.day);
+    const monthBody = Number(body.month) - 1;
+    const yearBody = Number(body.year);
+
+    const dateBody = new Date(yearBody, monthBody, dayBody);
+
+    const currentDate = new Date();
+    const currentDateOnly = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
     );
-    return NextResponse.json(response.content, {
-      status: response.statusCode,
-    });
+
+    if (dateBody < currentDateOnly) {
+      const response = await reportService.generateReportForDayNoToday(
+        dayBody,
+        monthBody + 1,
+        yearBody
+      );
+      return NextResponse.json(response.content, {
+        status: response.statusCode,
+      });
+    } else {
+      const response = await dataService.instanceDataInit(
+        dayBody,
+        dayBody,
+        yearBody,
+        monthBody + 1,
+        false
+      );
+      return NextResponse.json(response.content, {
+        status: response.statusCode,
+      });
+    }
   } catch (error) {
     console.log(error);
     return NextResponse.json(error, {

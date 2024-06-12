@@ -91,7 +91,7 @@ model Vacation {
   worker_id  Int      @unique
   start_date DateTime
   end_date   DateTime
-  comments   String?
+  reason     String?
   worker     Worker   @relation(fields: [worker_id], references: [id])
 }
 
@@ -100,7 +100,7 @@ model Permissions {
   worker_id  Int      @unique
   start_date DateTime
   end_date   DateTime
-  comments   String?
+  reason     String?
   worker     Worker   @relation(fields: [worker_id], references: [id])
 }
 

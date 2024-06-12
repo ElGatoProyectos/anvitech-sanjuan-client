@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
-function Form() {
+function FormRegisterUserMassive() {
   const [file, setFile] = useState<any>();
   const [loading, setLoading] = useState(false);
   const session = useSession();
@@ -72,4 +72,4 @@ function Form() {
   );
 }
 
-export default Form;
+export default FormRegisterUserMassive;

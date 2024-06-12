@@ -27,6 +27,7 @@ function Sidebar() {
   const [isExpandedWorkers, setIsExpandedWokers] = useState(false);
   const [isExpandedSchedule, setIsExpandedSchedule] = useState(false);
   const [isExpandedUser, setIsExpandedUsers] = useState(false);
+  const [isExpandedManagement, setIsExpandedManagement] = useState(false);
 
   const activePath =
     "bg-gray-50 text-gray-800 border-l-4  border-l-indigo-500 ";
@@ -373,22 +374,64 @@ function Sidebar() {
           </li>
 
           {/* 
-          //- Incidencias */}
+          //- Incidencias ================================================================================================= */}
+
           <li>
             <Link
-              href={"/system/incidencias"}
+              onClick={() => setIsExpandedManagement(!isExpandedManagement)}
+              href={"#"}
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                pathname === "/system/incidencias" ? activePath : inactivePath
+                pathname.includes("/system/horario") ? activePath : inactivePath
               } transition-all`}
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <ListMinusIcon size={20} />
               </span>
-              <span className="ml-2 text-sm tracking-wide truncate">
-                Incidencias
+              <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                Mantenimiento{" "}
+                {isExpandedSchedule ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
               </span>
             </Link>
+
+            {isExpandedManagement && (
+              <ul className="ml-10 mt-2">
+                <li>
+                  <Link
+                    href={"/system/mantenimiento/incidencias"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/mantenimiento/incidencias"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Incidencias
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/mantenimiento/motivos_cese"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/mantenimiento/motivos_cese"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Motivos cese
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
+
+          {/* =================================================================================== */}
           <li role="button" onClick={handleLogout}>
             <div
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
