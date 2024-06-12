@@ -40,16 +40,21 @@ class WorkerService {
       const sheet = workbook.Sheets[sheetName];
       const sheetToJson = xlsx.utils.sheet_to_json(sheet);
 
+      //- pendiente la validacion de esquemas con zod
+
       const convertedArray = sheetToJson.map((item: any) => {
-        const hireDate = excelSerialDateToJSDate(item["Hire Date"]);
+        const hireDate = excelSerialDateToJSDate(item.fecha_contratacion);
         const hireDateTimestamp = formatDateForPrisma(hireDate);
 
         return {
-          full_name: `${item["First Name"]} ${item["Last Name"]}`,
-          dni: item["Employee No."].toString(),
-          department: item.Department,
-          position: item.Position,
+          full_name: item.nombres,
+          dni: item.dni.toString(),
+          department: item.departamento ? "No definido" : item.departamento,
+          position: item.posicion ? "No definido" : "No definido",
+          enabled: item.estado === "ACTIVO" ? "si" : "no",
           hire_date: hireDateTimestamp,
+
+          coordinator: item.coordinador ? "Definido" : "No definido",
         };
       });
 
@@ -63,6 +68,7 @@ class WorkerService {
         jueves: "09:00-18:00",
         viernes: "09:00-18:00",
         sabado: "09:00-18:00",
+        domingo: "",
         type: "default",
       };
 
@@ -76,6 +82,7 @@ class WorkerService {
       });
       return httpResponse.http201("Workers created", created);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

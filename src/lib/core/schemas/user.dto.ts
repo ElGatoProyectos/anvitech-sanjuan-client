@@ -16,9 +16,9 @@ export const updateUserDTO = z.object({
 });
 
 export const formatUserDTO = z.object({
-  dni: z.string().min(8, "Minimo 8").optional(),
-  nombres: z.string().min(5, "Minimo 5").optional(),
-  celular: z.string().min(5, "Minimo 5").optional(),
+  dni: z.number().min(8, "Minimo 8"),
+  nombres: z.string().min(5, "Minimo 5"),
+  celular: z.number().min(5, "Minimo 5"),
   correo: z.string().email("Correo no valido"),
   rol: z.string().min(3, "Correo no valido"),
 });

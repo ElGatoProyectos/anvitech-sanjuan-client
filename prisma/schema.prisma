@@ -17,7 +17,7 @@ model User {
   id        Int     @id @default(autoincrement())
   dni       String
   full_name String
-  phone     String
+  phone     String?
   email     String
   username  String
   password  String
@@ -57,6 +57,7 @@ model DetailReport {
 
 model Worker {
   id               Int          @id @default(autoincrement())
+  coordinator      String
   full_name        String
   dni              String       @unique
   department       String

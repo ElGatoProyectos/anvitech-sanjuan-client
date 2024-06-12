@@ -30,7 +30,7 @@ function TableWorkers() {
   const session = useSession();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [workersPerPage] = useState(20);
+  const [workersPerPage] = useState(50);
 
   // Get current workers
   const indexOfLastWorker = currentPage * workersPerPage;
@@ -256,29 +256,91 @@ const Pagination: React.FC<PaginationProps> = ({
   currentPage,
 }) => {
   const pageNumbers = [];
+  const totalPages = Math.ceil(totalWorkers / workersPerPage);
 
-  for (let i = 1; i <= Math.ceil(totalWorkers / workersPerPage); i++) {
+  for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
+
+  const renderPageNumbers = () => {
+    const pagesToShow = [];
+
+    if (totalPages <= 6) {
+      // Show all pages if the total is 6 or less
+      for (let i = 1; i <= totalPages; i++) {
+        pagesToShow.push(i);
+      }
+    } else {
+      if (currentPage > 3) {
+        pagesToShow.push(1, 2, 3, "...");
+      } else {
+        for (let i = 1; i <= 3; i++) {
+          pagesToShow.push(i);
+        }
+      }
+
+      if (currentPage > 3 && currentPage < totalPages - 2) {
+        pagesToShow.push(currentPage);
+      }
+
+      if (currentPage < totalPages - 2) {
+        pagesToShow.push("...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pagesToShow.push(i);
+        }
+      }
+    }
+
+    return pagesToShow.map((number, index) => (
+      <li
+        key={index}
+        className={`page-item mx-1 ${
+          number === currentPage ? "font-bold" : ""
+        }`}
+      >
+        {number === "..." ? (
+          <span className="page-link px-2 py-1">...</span>
+        ) : (
+          <button
+            onClick={() => paginate(number as number)}
+            className="page-link px-2 py-1 border rounded cursor-pointer"
+          >
+            {number}
+          </button>
+        )}
+      </li>
+    ));
+  };
 
   return (
     <nav className="w-full flex justify-start">
       <ul className="pagination flex justify-center mt-4">
-        {pageNumbers.map((number) => (
-          <li
-            key={number}
-            className={`page-item mx-1 ${
-              number === currentPage ? "font-bold" : ""
-            }`}
+        <li className={`page-item mx-1 ${currentPage === 1 ? "disabled" : ""}`}>
+          <button
+            onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+            className="page-link px-2 py-1 border rounded cursor-pointer"
+            disabled={currentPage === 1}
           >
-            <button
-              onClick={() => paginate(number)}
-              className="page-link px-2 py-1 border rounded cursor-pointer"
-            >
-              {number}
-            </button>
-          </li>
-        ))}
+            Anterior
+          </button>
+        </li>
+        {renderPageNumbers()}
+        <li
+          className={`page-item mx-1 ${
+            currentPage === totalPages ? "disabled" : ""
+          }`}
+        >
+          <button
+            onClick={() =>
+              currentPage < totalPages && paginate(currentPage + 1)
+            }
+            className="page-link px-2 py-1 border rounded cursor-pointer"
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </li>
       </ul>
     </nav>
   );

@@ -84,13 +84,13 @@ class ScheduleService {
 
           const format = {
             worker_id: worker.content.id,
-            lunes: worker.content.id,
-            martes: worker.content.id,
-            miercoles: worker.content.id,
-            jueves: worker.content.id,
-            viernes: worker.content.id,
-            sabado: worker.content.id,
-            domingo: worker.content.id,
+            lunes: item.lunes,
+            martes: item.martes,
+            miercoles: item.miercoles,
+            jueves: item.juves,
+            viernes: item.viernes,
+            sabado: item.sabado,
+            domingo: item.domingo,
             comments: "",
             type: "default",
           };

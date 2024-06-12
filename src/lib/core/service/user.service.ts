@@ -128,13 +128,14 @@ class UserService {
 
       await Promise.all(
         sheetToJson.map(async (item: any) => {
+          const password = bcrypt.hashSync(String(item.dni), 11);
           const format = {
             full_name: item.nombres,
-            dni: item.dni,
-            phone: item.celular,
+            dni: String(item.dni),
+            phone: String(item.celular),
             email: item.correo,
-            username: item.dni,
-            password: bcrypt.hashSync(item.dni, 11),
+            username: String(item.dni),
+            password,
             role: item.rol,
             enabled: true,
           };
@@ -146,7 +147,10 @@ class UserService {
       );
 
       return httpResponse.http201("Users created");
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
   }
 }
 

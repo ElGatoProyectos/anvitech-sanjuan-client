@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,9 @@ function Form() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/massive-vacation", formData, session.data);
+      await postImage("schedule/massive-schedule", formData, session.data);
       setLoading(false);
+      useToastDefault("Ok", "Carga realizada con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
@@ -32,15 +33,15 @@ function Form() {
   return (
     <div className="p-8 bg-white rounded-lg">
       <div className="mb-8">
-        <h1 className="text-lg font-semibold">Registrar vaciones masivas</h1>
+        <h1 className="text-lg font-semibold">Registrar horarios masivos</h1>
       </div>
       <form
         onSubmit={handleRegistrarDataMassive}
         className="flex flex-col gap-8"
       >
         <div>
-          Recuerde que el archivo debe tener un formato único, los usuarios que
-          ya existan lanzaran un error.
+          Recuerde que el archivo debe tener un formato único, valide el formato
+          descargando la muestra.
           <Link
             target="_blank"
             download

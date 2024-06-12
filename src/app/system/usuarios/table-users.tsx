@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { get, putId } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ import { useEffect, useState } from "react";
 import { useUpdatedStore } from "@/app/store/zustand";
 
 function TableUser() {
-  const { updatedAction } = useUpdatedStore();
+  const { updatedAction, setUpdatedAction } = useUpdatedStore();
 
   const [users, setUsers] = useState<any[]>([]);
 
@@ -40,6 +40,8 @@ function TableUser() {
     full_name: "",
     dni: "",
     email: "",
+    phone: "",
+    role: "",
     enabled: true,
   });
 
@@ -54,6 +56,8 @@ function TableUser() {
       email: user.email,
       dni: user.dni,
       enabled: user.enabled,
+      role: user.role,
+      phone: user.phone,
     });
   }
 
@@ -72,6 +76,8 @@ function TableUser() {
         console.log(session);
         console.log(userSelected);
         await putId("users", userSelected, idSelected, session.data);
+        useToastDefault("Ok", "Modificación realizada con exito");
+        setUpdatedAction();
       }
     } catch (error) {
       useToastDestructive("Error", "Error procesar la informacion");
@@ -91,10 +97,13 @@ function TableUser() {
           <thead className="text-gray-600 font-medium border-b">
             <tr>
               <th className="py-3 pr-6">Nombre</th>
-              <th className="py-3 pr-6">Fecha</th>
+              <th className="py-3 pr-6">DNI</th>
+
               <th className="py-3 pr-6">Estado</th>
 
               <th className="py-3 pr-6">Usuario</th>
+              <th className="py-3 pr-6">Correo</th>
+
               <th className="py-3 pr-6">Acciones</th>
             </tr>
           </thead>
@@ -119,6 +128,9 @@ function TableUser() {
 
                 <td className="pr-6 py-4 whitespace-nowrap font-semibold">
                   {item.username}
+                </td>
+                <td className="pr-6 py-4 whitespace-nowrap font-semibold">
+                  {item.email}
                 </td>
                 <td className="text-left whitespace-nowrap">
                   <DialogTrigger asChild>
@@ -174,6 +186,37 @@ function TableUser() {
                 defaultValue={userSelected.email}
                 type="email"
               />
+            </div>
+
+            <div className="gap-2">
+              <Label>Celular</Label>
+              <Input
+                onChange={(e) =>
+                  setUserSelected({ ...userSelected, phone: e.target.value })
+                }
+                defaultValue={userSelected.phone}
+                type="text"
+              />
+            </div>
+
+            <div className="gap-2">
+              <Label>Seleccione un rol</Label>
+              <Select
+                defaultValue={userSelected.role}
+                onValueChange={(value) =>
+                  setUserSelected({ ...userSelected, role: value })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="user">Usuario</SelectItem>
+                    <SelectItem value="admin">Administrador</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="gap-2">

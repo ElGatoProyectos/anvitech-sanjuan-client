@@ -294,7 +294,7 @@ function Sidebar() {
                     } transition-all`}
                   >
                     <span className="ml-2 text-sm tracking-wide truncate">
-                      Vaciones masivas
+                      Vacaciones masivas
                     </span>
                   </Link>
                 </li>
@@ -332,7 +332,7 @@ function Sidebar() {
               </span>
               <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
                 Horario{" "}
-                {isExpandedWorkers ? (
+                {isExpandedSchedule ? (
                   <ChevronUp size={20} />
                 ) : (
                   <ChevronDown size={20} />

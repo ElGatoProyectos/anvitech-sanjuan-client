@@ -20,9 +20,10 @@ function Form() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/file", formData, session.data);
+      await postImage("users/file", formData, session.data);
       setLoading(false);
     } catch (error) {
+      console.log(error);
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
     }

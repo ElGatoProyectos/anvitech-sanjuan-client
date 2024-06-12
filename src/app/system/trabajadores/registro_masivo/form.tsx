@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ function Form() {
       formData.append("file", file);
 
       await postImage("workers/file", formData, session.data);
+      useToastDefault("Ok", "Carga realizada con exito");
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
@@ -46,8 +47,8 @@ function Form() {
           <Link
             target="_blank"
             download
-            as="/files/formato_entrada.xlsx"
-            href="/files/formato_entrada.xlsx"
+            as="/files/formato_trabajadores_masivo.xlsx"
+            href="/files/formato_trabajadores_masivo.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato

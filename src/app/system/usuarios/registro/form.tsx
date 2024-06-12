@@ -3,8 +3,17 @@
 import { createUserSchema } from "@/app/form-schemas/create-user.schema";
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post } from "@/app/http/api.http";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSession } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
@@ -14,6 +23,7 @@ function Form() {
   const session = useSession();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     try {
       setLoading(true);
       createUserSchema.parse(data);
@@ -44,6 +54,20 @@ function Form() {
           />
         </div>
         <div className="gap-2">
+          <Label>Seleccione un rol</Label>
+          <Select onValueChange={(value) => setData({ ...data, role: value })}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un rol" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="user">Usuario</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="gap-2">
           <Label>DNI</Label>
           <Input
             onChange={(e) => setData({ ...data, dni: e.target.value })}
@@ -57,6 +81,9 @@ function Form() {
             onChange={(e) => setData({ ...data, email: e.target.value })}
             type="email"
           />
+        </div>
+        <div className="">
+          <Button disabled={loading}>Registrar usuario</Button>
         </div>
       </form>
     </div>
