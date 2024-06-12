@@ -129,6 +129,37 @@ class WorkerService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async updateTerminationDate(data: any, workerId: number) {
+    try {
+      if (data.restore) {
+        const worker = await prisma.worker.update({
+          where: { id: workerId },
+          data: {
+            termination_date: null,
+            reason: "",
+            enabled: "si",
+          },
+        });
+
+        return httpResponse.http200("Worker updated", worker);
+      } else {
+        const worker = await prisma.worker.update({
+          where: { id: workerId },
+          data: {
+            termination_date: new Date(data.termination_date),
+            reason: data.reason,
+            enabled: "no",
+          },
+        });
+
+        return httpResponse.http200("Worker updated", worker);
+      }
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const workerService = new WorkerService();

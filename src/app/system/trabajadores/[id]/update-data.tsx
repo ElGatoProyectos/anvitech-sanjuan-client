@@ -1,9 +1,18 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
-import { getId, putId } from "@/app/http/api.http";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
+import { getId, post, putId } from "@/app/http/api.http";
 import { useUpdatedStore } from "@/app/store/zustand";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,20 +24,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import React, { FormEvent, useEffect, useState } from "react";
 
 function UpdateDataWorker({ id }: { id: string }) {
   // todo  define states
-  const { updatedAction } = useUpdatedStore();
+  const { updatedAction, setUpdatedAction } = useUpdatedStore();
 
   const [loading, setLoading] = useState(true);
   const [worker, setWorker] = useState<any>({});
   const session = useSession();
 
+  const [termination, setTermination] = useState({
+    termination_date: "",
+    reason: "",
+  });
+
+  const [openModalTermination, setOpenModalTermination] = useState(false);
+
   async function fetchDataWorker(id: string) {
     try {
       const response = await getId("workers", Number(id), session.data);
+      console.log(response.data);
       setWorker(response.data);
       setLoading(false);
     } catch (error) {
@@ -58,6 +76,47 @@ function UpdateDataWorker({ id }: { id: string }) {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
+
+  const formatDateToInputNull = (date: Date | null) => {
+    if (!date) return "";
+    const isoString = new Date(date).toISOString();
+    return isoString.split("T")[0];
+  };
+
+  // =========================== cese de trabajador ================================
+
+  async function handleUpdateDateTermination() {
+    try {
+      setLoading(true);
+      await putId("workers/termination", termination, worker.id, session.data);
+      setLoading(false);
+      useToastDefault("Ok", "Fecha de cese registrada");
+      setUpdatedAction();
+    } catch (error) {
+      useToastDestructive("Error", "Error al ingresar el cese");
+      setLoading(false);
+    }
+  }
+
+  async function handleRemoveTermination() {
+    try {
+      setLoading(true);
+      await putId(
+        "workers/termination",
+        { restore: true },
+        worker.id,
+        session.data
+      );
+      setLoading(false);
+      useToastDefault("Ok", "Fecha de cese anulada");
+      setUpdatedAction();
+    } catch (error) {
+      useToastDestructive("Error", "Error al ingresar el cese");
+      setLoading(false);
+    }
+  }
+
+  //- component
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
@@ -110,6 +169,15 @@ function UpdateDataWorker({ id }: { id: string }) {
                     }
                   ></Input>
                 </div>
+                <div className="flex flex-col gap-3">
+                  <Label>Coordinador</Label>
+                  <Input
+                    defaultValue={worker.coordinator}
+                    onChange={(e) =>
+                      setWorker({ ...worker, position: e.target.value })
+                    }
+                  ></Input>
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-4">
@@ -126,11 +194,9 @@ function UpdateDataWorker({ id }: { id: string }) {
               <div className="flex flex-col gap-3">
                 <Label>Fecha de Cese</Label>
                 <Input
+                  disabled
                   type="date"
-                  defaultValue={formatDateToInput(worker.termination_date)}
-                  onChange={(e) =>
-                    setWorker({ ...worker, position: e.target.value })
-                  }
+                  defaultValue={formatDateToInputNull(worker.termination_date)}
                 ></Input>
               </div>
               <div className="flex flex-col gap-3">
@@ -152,13 +218,81 @@ function UpdateDataWorker({ id }: { id: string }) {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Button>Modificar datos</Button>
+              <div className="flex gap-4">
+                <Button type="submit">Guardar cambios</Button>
+                <Button
+                  type="button"
+                  onClick={() => setOpenModalTermination(true)}
+                  variant={"outline"}
+                >
+                  Fecha de cese
+                </Button>
               </div>
             </div>
           </>
         )}
       </form>
+
+      <Dialog
+        open={openModalTermination}
+        onOpenChange={() => setOpenModalTermination(!openModalTermination)}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Fecha de cese</DialogTitle>
+            <DialogDescription>
+              Recuerde que esta accion inhabilita al trabajador
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div>
+              <Label>Seleccione una fecha</Label>
+              <Input
+                type="date"
+                defaultValue={formatDateToInputNull(worker.termination_date)}
+                onChange={(e) =>
+                  setTermination({
+                    ...termination,
+                    termination_date: e.target.value,
+                  })
+                }
+              ></Input>
+            </div>
+            <div>
+              <Label>Ingrese el motivo</Label>
+              <Textarea
+                defaultValue={worker.reason}
+                onChange={(e) =>
+                  setTermination({
+                    ...termination,
+                    reason: e.target.value,
+                  })
+                }
+              ></Textarea>
+            </div>
+          </div>
+          <DialogFooter>
+            {worker.termination_date !== "" && (
+              <Button
+                type="button"
+                variant={"outline"}
+                onClick={handleRemoveTermination}
+                disabled={loading}
+              >
+                Anular cese
+              </Button>
+            )}
+
+            <Button
+              type="button"
+              onClick={handleUpdateDateTermination}
+              disabled={loading}
+            >
+              Registrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
