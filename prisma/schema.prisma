@@ -86,6 +86,17 @@ model Schedule {
   worker    Worker  @relation(fields: [worker_id], references: [id])
 }
 
+model TypeSchedule {
+  id        Int    @id @default(autoincrement())
+  name      String
+  lunes     String
+  martes    String
+  miercoles String
+  jueves    String
+  viernes   String
+  sabado    String
+}
+
 model Vacation {
   id         Int      @id @default(autoincrement())
   worker_id  Int      @unique

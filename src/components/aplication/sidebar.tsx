@@ -70,7 +70,7 @@ function Sidebar() {
               </span>
             </Link>
           </li>
-          {/* ---------------------------- */}
+          {/* ------------- reportes--------------- */}
           <li>
             <Link
               onClick={() => setIsExpanded(!isExpanded)}
@@ -124,6 +124,22 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    href={"/system/reportes/carga_masiva"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/reportes/carga_masiva"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Carga masiva
+                    </span>
+                  </Link>
+                </li>
+
                 <li>
                   <Link
                     href={"/system/reportes/exportar"}
@@ -314,6 +330,21 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/supervisores_masivos"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/supervisores_masivos"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Supervisores masivos
+                    </span>
+                  </Link>
+                </li>
               </ul>
             )}
           </li>
@@ -426,6 +457,21 @@ function Sidebar() {
                   >
                     <span className="ml-2 text-sm tracking-wide truncate">
                       Motivos cese
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/mantenimiento/horarios_predeterminado"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname ===
+                      "/system/mantenimiento/horarios_predeterminado"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Horarios predeterminado
                     </span>
                   </Link>
                 </li>

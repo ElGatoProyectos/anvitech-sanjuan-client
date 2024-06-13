@@ -40,6 +40,7 @@ class ScheduleService {
         viernes:
           data.schedule[4].hours.start + "-" + data.schedule[4].hours.end,
         sabado: data.schedule[5].hours.start + "-" + data.schedule[5].hours.end,
+        domingo: "",
         comments: data.comments,
       };
 
@@ -104,6 +105,41 @@ class ScheduleService {
 
       return httpResponse.http201("Workers updated");
     } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  // =================
+
+  async findTypeSchedule() {
+    try {
+      const typesSchedules = await prisma.typeSchedule.findMany();
+      return httpResponse.http200("All types schedules", typesSchedules);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async createTypeSchedule(data: any) {
+    try {
+      console.log(data);
+      const created = await prisma.typeSchedule.create({ data });
+      return httpResponse.http200("Type schedule creayed", created);
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async updateTypeSchedule(typScheduleId: number, data: any) {
+    try {
+      const updatedTypeSchedule = await prisma.typeSchedule.update({
+        where: { id: typScheduleId },
+        data,
+      });
+      return httpResponse.http200("Type schedule updated", updatedTypeSchedule);
+    } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
