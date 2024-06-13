@@ -39,7 +39,7 @@ function Sidebar() {
   }
 
   return (
-    <div className="fixed min-h-screen flex flex-col top-0 left-0 w-64 bg-white h-full border-r z-50">
+    <div className="fixed min-h-screen flex flex-col top-0 left-0 w-60 bg-white h-full border-r z-50">
       <div className="flex items-center justify-center h-14 ">
         <div className="w-full flex gap-4  pt-8  items-center">
           <img className="w-full rounded-lg " src="/digimax.jpeg" alt="" />

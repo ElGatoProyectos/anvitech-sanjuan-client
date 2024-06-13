@@ -13,7 +13,7 @@ function FormIncidents() {
   /// define states
   const session = useSession();
   const { setUpdatedAction, updatedAction } = useUpdatedStore();
-  const [incident, setIncident] = useState({ title: "", description: "" });
+  const [termination, setTermination] = useState({ title: "" });
   const [loading, setLoading] = useState(false);
 
   /// define functions
@@ -22,9 +22,9 @@ function FormIncidents() {
     e.preventDefault();
     try {
       setLoading(true);
-      await post("incidents", incident, session.data);
+      await post("terminations", termination, session.data);
       setUpdatedAction();
-      setIncident({ title: "", description: "" });
+      setTermination({ title: "" });
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
@@ -35,26 +35,23 @@ function FormIncidents() {
   return (
     <div className="w-full  col-span-1">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <span className="text-gray-600">
+          Los motivos de cese no alteran al trabajador desdepues de haberlos
+          modificados, si desea modificar su motivos de cese tiene que ir al
+          detalle de trabajador
+        </span>
         <div className="flex flex-col gap-2">
           <Label>Titulo</Label>
-          <Input
-            onChange={(e) =>
-              setIncident({ ...incident, title: e.target.value })
-            }
-          ></Input>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label>Descripción</Label>
           <Textarea
-            className="w-full"
+            value={termination.title}
             onChange={(e) =>
-              setIncident({ ...incident, description: e.target.value })
+              setTermination({ ...termination, title: e.target.value })
             }
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button disabled={loading}>Registrar incidente</Button>
+          <Button disabled={loading}>Registrar motivo</Button>
         </div>
       </form>
     </div>

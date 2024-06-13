@@ -6,6 +6,7 @@ import * as xlsx from "xlsx";
 import { dataService } from "./data.service";
 import { workerService } from "./worker.service";
 import { incidentService } from "./incident.service";
+import { scheduleService } from "./schedule.service";
 
 class ReportService {
   async generateReport() {
@@ -345,6 +346,109 @@ class ReportService {
 
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async updateDetailReport(data: any, detailReportId: number) {
+    try {
+      // capturamos el horario del trabajador
+
+      const { dataTemporalHours, dataDetail } = data;
+
+      console.log(dataTemporalHours);
+
+      const workerResponse = await workerService.findByDNI(dataDetail.dni);
+      if (!workerResponse.ok) return workerResponse;
+
+      const schedule = await prisma.schedule.findFirst({
+        where: { worker_id: workerResponse.content.id },
+      });
+
+      if (!schedule) return httpResponse.http400("Schedule not found");
+
+      // ahora validamos ==========================================================================
+
+      const hourTotal = schedule.lunes; // "09:00-18:00"
+      const [hourStart, hourEnd] = hourTotal.split("-"); // ["09:00", "18:00"]
+
+      const [scheduleStartHour, scheduStartMinute] = hourStart
+        .split(":")
+        .map(Number); // [9, 0]
+      const [scheduleEndHour, scheduEndMinute] = hourEnd.split(":").map(Number); // [18, 0]
+
+      const dataStart = dataTemporalHours.hora_inicio; // "09:00"
+      const dataEnd = dataTemporalHours.hora_salida; // "18:00"
+
+      const formatData = {
+        hora_inicio: dataTemporalHours.hora_inicio,
+        hora_inicio_refrigerio: dataTemporalHours.hora_inicio_refrigerio,
+        hora_fin_refrigerio: dataTemporalHours.hora_fin_refrigerio,
+        hora_salida: dataTemporalHours.hora_salida,
+        tardanza: "no",
+        falta: "no",
+      };
+
+      // cuando el usuario tiene una hora de entrada
+      if (
+        dataTemporalHours.hora_inicio !== "" &&
+        dataTemporalHours.hora_salida === ""
+      ) {
+        const [dataStartHour, dataStartMinute] = dataTemporalHours.hora_inicio
+          .split(":")
+          .map(Number);
+
+        if (dataStartHour > scheduleStartHour) formatData.falta = "si";
+        else if (dataStartHour === scheduleStartHour) {
+          if (dataStartMinute > 0) formatData.falta = "si";
+        }
+      }
+      // cuando el usuario tiene una hora de salida
+      else if (
+        dataTemporalHours.hora_inicio === "" &&
+        dataTemporalHours.hora_salida !== ""
+      ) {
+        const [dataEndHour, dataEndMinute] = dataTemporalHours.hora_salida
+          .split(":")
+          .map(Number);
+
+        if (dataEndHour < scheduleEndHour) {
+          formatData.falta = "si";
+          formatData.tardanza = "no";
+        } else if (dataEndHour === scheduleEndHour) {
+          if (dataTemporalHours.hora_inicio === "") formatData.tardanza = "si";
+          formatData.falta = "no";
+        }
+      } else if (dataStart === "" && dataEnd === "") {
+        formatData.falta = "si";
+        formatData.tardanza = "no";
+      } else {
+        const [dataStartHour, dataStartMinute] = dataTemporalHours.hora_inicio
+          .split(":")
+          .map(Number);
+        const [dataEndHour, dataEndMinute] = dataTemporalHours.hora_salida
+          .split(":")
+          .map(Number);
+
+        if (dataStartHour > scheduleStartHour) formatData.falta = "si";
+        else if (dataStartHour === scheduleStartHour) {
+          if (dataStartMinute > 0) formatData.falta = "si";
+        }
+
+        if (dataEndHour < scheduleEndHour) {
+          formatData.falta = "si";
+          formatData.tardanza = "no";
+        } else if (dataEndHour === scheduleEndHour) {
+          formatData.falta = "no";
+        }
+      }
+      const updated = await prisma.detailReport.update({
+        where: { id: detailReportId },
+        data: formatData,
+      });
+      return httpResponse.http200("Detail report updated", updated);
+    } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

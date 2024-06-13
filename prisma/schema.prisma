@@ -71,6 +71,11 @@ model Worker {
   Permissions      Permissions?
 }
 
+model TypeTermination {
+  id    Int    @id @default(autoincrement())
+  title String
+}
+
 model Schedule {
   id        Int     @id @default(autoincrement())
   worker_id Int     @unique

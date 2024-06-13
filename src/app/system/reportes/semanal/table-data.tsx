@@ -233,7 +233,7 @@ function TableData() {
                 <th className="py-3 pr-6">Viernes</th>
                 <th className="py-3 pr-6">Sabado</th>
 
-                <th className="py-3 pr-6">Acción</th>
+                {/* <th className="py-3 pr-6">Acción</th> */}
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
@@ -367,14 +367,14 @@ function TableData() {
                         : "OK"}
                     </th>
 
-                    <td className=" whitespace-nowrap">
+                    {/* <td className=" whitespace-nowrap">
                       <Button
                         variant="secondary"
                         onClick={() => handleSelectItemTable({})}
                       >
                         <Settings size={20} />
                       </Button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               )}

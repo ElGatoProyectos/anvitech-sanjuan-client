@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, post, postExcel } from "@/app/http/api.http";
+import { get, post, postExcel, putId } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -35,6 +35,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { headers } from "next/headers";
 import { downloadExcel } from "./export";
+import { Label } from "@/components/ui/label";
 
 function TableData() {
   const [workers, setWorkers] = useState<any[]>([]);
@@ -42,7 +43,19 @@ function TableData() {
   const [loading, setLoading] = useState(true);
   const [workersFiltered, setWorkersFiltered] = useState<any[]>([]);
 
-  const [openModal, setOpenModal] = useState(false);
+  const [dataDetail, setDataDetail] = useState<any>({});
+  const [dataTemporalHours, setDataTemporalHours] = useState<any>({});
+
+  const [incidents, setIncidents] = useState<any[]>([]);
+
+  // =======================================loadings
+
+  const [loadingUpdateHours, setLoadingUpdateHours] = useState(false);
+
+  // modals =======================
+  const [openModalAlert, setOpenModalAlert] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
+  // modals =======================
 
   const session = useSession();
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,6 +106,16 @@ function TableData() {
     }
   }
 
+  async function fetchIncidents() {
+    try {
+      const response = await get("incidents", session.data);
+
+      setIncidents(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al crear el archivo");
+    }
+  }
+
   function handleSelectDepartment(value: string) {
     if (value === "all") {
       setWorkersFiltered(workers);
@@ -140,6 +163,50 @@ function TableData() {
     }
   }
 
+  // sobre el modal de detalle ==============================================================================
+
+  function handleOpenModalPrev(item: any) {
+    function resetTime(date: Date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    const dayRegister = resetTime(new Date(item.fecha_reporte));
+    const dayActually = resetTime(new Date());
+
+    setDataDetail(item);
+
+    setDataTemporalHours({
+      hora_inicio: item.hora_inicio,
+      hora_inicio_refrigerio: item.hora_inicio_refrigerio,
+      hora_fin_refrigerio: item.hora_fin_refrigerio,
+      hora_salida: item.hora_salida,
+    });
+
+    if (dayRegister < dayActually) {
+      setOpenModalEdit(true);
+    } else {
+      setOpenModalAlert(true);
+    }
+  }
+
+  async function handleUpdateHours() {
+    try {
+      setLoading(true);
+      await putId(
+        "detail-report",
+        { dataTemporalHours, dataDetail },
+        dataDetail.id,
+        session.data
+      );
+      setLoading(false);
+      setLoadingUpdateHours(!loadingUpdateHours);
+    } catch (error) {
+      setLoading(false);
+
+      useToastDestructive("Error", "Error al modificar las horas");
+    }
+  }
+
   async function exportToExcel() {
     try {
       ("use server");
@@ -150,13 +217,18 @@ function TableData() {
     }
   }
 
+  function formatDate(dateString: string) {
+    return format(new Date(dateString), "yyyy-MM-dd");
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       useToastDefault("Aviso", "Este reporte es del dia anterior");
       fetchReport();
       fetDepartments();
+      fetchIncidents();
     }
-  }, [session.status]);
+  }, [session.status, loadingUpdateHours]);
 
   return (
     <div>
@@ -311,7 +383,9 @@ function TableData() {
                       {item.nombre}
                     </td>
                     <td className="pr-6 py-4 whitespace-nowrap">{item.sede}</td>
-                    <th className="py-3 pr-6">{item.fecha_reporte}</th>
+                    <th className="py-3 pr-6">
+                      {formatDate(item.fecha_reporte)}
+                    </th>
                     <th className="py-3 pr-6" align="center">
                       {item.hora_inicio}
                     </th>
@@ -334,7 +408,7 @@ function TableData() {
                     <td className=" whitespace-nowrap">
                       <Button
                         variant="secondary"
-                        onClick={() => setOpenModal(true)}
+                        onClick={() => handleOpenModalPrev(item)}
                       >
                         <Settings size={20} />
                       </Button>
@@ -354,7 +428,10 @@ function TableData() {
         </div>
       </div>
 
-      <Dialog open={openModal} onOpenChange={() => setOpenModal(false)}>
+      <Dialog
+        open={openModalAlert}
+        onOpenChange={() => setOpenModalAlert(false)}
+      >
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>Aviso de sistema</DialogTitle>
@@ -362,15 +439,103 @@ function TableData() {
           {/* Contenido personalizado del modal */}
           <div className="overflow-y-hidden">
             <span>
-              Esta opcion no esta permitida, por favor visite la seccion{" "}
-              <Link
-                className="underline text-blue-500"
-                href={"/system/reportes/semanal"}
-              >
-                reportes semanales
-              </Link>{" "}
-              para poder modificar un dia en especifico
+              Esta opcion no esta permitida, es un reporte del dia actual,
+              espere al dia siguiente para poder editarlo
             </span>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openModalEdit} onOpenChange={() => setOpenModalEdit(false)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{dataDetail.nombre}</DialogTitle>
+          </DialogHeader>
+          {/* Contenido personalizado del modal */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Hora de inicio</Label>
+              <Input
+                defaultValue={dataDetail.hora_inicio}
+                onChange={(e) =>
+                  setDataTemporalHours({
+                    ...dataTemporalHours,
+                    hora_inicio: e.target.value,
+                  })
+                }
+              ></Input>
+            </div>
+
+            <div>
+              <Label>Hora de salida</Label>
+              <Input
+                defaultValue={dataDetail.hora_salida}
+                onChange={(e) =>
+                  setDataTemporalHours({
+                    ...dataTemporalHours,
+                    hora_salida: e.target.value,
+                  })
+                }
+              ></Input>
+            </div>
+
+            <div>
+              <Label>Hora inicio refrigerio</Label>
+              <Input
+                defaultValue={dataDetail.hora_inicio_refrigerio}
+                onChange={(e) =>
+                  setDataTemporalHours({
+                    ...dataTemporalHours,
+                    hora_inicio_refrigerio: e.target.value,
+                  })
+                }
+              ></Input>
+            </div>
+            <div>
+              <Label>Hora fin refrigerio</Label>
+              <Input
+                defaultValue={dataDetail.hora_fin_refrigerio}
+                onChange={(e) =>
+                  setDataTemporalHours({
+                    ...dataTemporalHours,
+                    hora_fin_refrigerio: e.target.value,
+                  })
+                }
+              ></Input>
+            </div>
+            <div className="col-span-2 flex justify-end">
+              <Button
+                size={"sm"}
+                onClick={handleUpdateHours}
+                disabled={loading}
+              >
+                Guardar cambios
+              </Button>
+            </div>
+
+            <hr className="col-span-2" />
+
+            <div className="col-span-2">
+              <Label>Seleccione un incidente</Label>
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione un incidente" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {incidents.map((incident, idx) => (
+                      <SelectItem value={incident.id} key={idx}>
+                        {incident.title}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="col-span-2 flex justify-end">
+              <Button size={"sm"}>Registrar incidencia</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

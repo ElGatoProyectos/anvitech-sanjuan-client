@@ -49,12 +49,7 @@ function TableIncidents() {
 
   async function handleUpdateIncident() {
     try {
-      await putId(
-        "incidents",
-        { incident: incidentSelected, password },
-        incidentId,
-        session.data
-      );
+      await putId("incidents", incidentSelected, incidentId, session.data);
       setUpdatedAction();
     } catch (error) {
       useToastDestructive("Error", "Error al modificar");
@@ -168,14 +163,6 @@ function TableIncidents() {
                 })
               }
             ></Textarea>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Contrasena administrador</Label>
-            <Input
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
           </div>
         </div>
         <DialogFooter>
