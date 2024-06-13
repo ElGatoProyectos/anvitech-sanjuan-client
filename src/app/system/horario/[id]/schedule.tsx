@@ -184,25 +184,31 @@ function ScheduleWorker({ id }: { id: string }) {
     <div className="bg-white p-8 rounded-lg">
       <div className=" flex justify-between">
         <span className="font-semibold">Horario del trabajador</span>
-        <Select onValueChange={handleSelectDay} disabled={custom !== "custom"}>
-          <SelectTrigger className="min-w-56 max-w-56">
-            <SelectValue placeholder="Seleccione el dia" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="LUNES">Lunes</SelectItem>
-              <SelectItem value="MARTES">Martes</SelectItem>
-              <SelectItem value="MIERCOLES">Miercoles</SelectItem>
-              <SelectItem value="JUEVES">Jueves</SelectItem>
-              <SelectItem value="VIERNES">Viernes</SelectItem>
-              <SelectItem value="SABADO">Sabado</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </div>
       <div className="w-full flex mt-8">
         <div className="w-full grid grid-cols-3 gap-16">
           <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label>Dia de semana</Label>
+              <Select
+                onValueChange={handleSelectDay}
+                disabled={custom !== "custom"}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione el dia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="LUNES">Lunes</SelectItem>
+                    <SelectItem value="MARTES">Martes</SelectItem>
+                    <SelectItem value="MIERCOLES">Miercoles</SelectItem>
+                    <SelectItem value="JUEVES">Jueves</SelectItem>
+                    <SelectItem value="VIERNES">Viernes</SelectItem>
+                    <SelectItem value="SABADO">Sabado</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex flex-col gap-2">
               <Label>Hora de entrada</Label>
               <Input

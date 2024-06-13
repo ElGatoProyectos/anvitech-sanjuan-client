@@ -138,13 +138,39 @@ function FormOptions() {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
-        <div className="">
+      <div className="flex flex-row gap-16">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-4">
+            <Label>Mes a reportar</Label>
+            <Select onValueChange={(e) => setMonthSelected(e)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecciona un mes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {months.map((item, index) => (
+                    <SelectItem value={item.number} key={index}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Button onClick={() => setOpenFirst(true)}>
             Descargar formato STARSOFT
           </Button>
         </div>
-        <div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-4">
+            <Label>Fecha inicio</Label>
+            <Input type="date"></Input>
+          </div>
+          <div className="flex flex-col gap-4 mt-4">
+            <Label>Fecha fin</Label>
+            <Input type="date"></Input>
+          </div>
           <Button onClick={() => setOpenSecond(true)}>
             Descargar formato NORMAL
           </Button>
@@ -190,7 +216,7 @@ function FormOptions() {
       <Dialog open={openSecond} onOpenChange={() => setOpenSecond(!openSecond)}>
         <DialogContent className="">
           <DialogHeader>
-            <DialogTitle>Registrar usuario</DialogTitle>
+            <DialogTitle>Reporte normal</DialogTitle>
             <DialogDescription className="mt-2">
               El reporte normal, es un reporte en base a las coincidencias de
               los campos de la base de datos. Seleccione los dias a generar el

@@ -63,6 +63,7 @@ function TableData() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  // fetchs principales ================================================================
   async function fetchReport() {
     try {
       let x = new Date();
@@ -80,13 +81,15 @@ function TableData() {
 
       console.log(response.data);
 
-      // setWorkers(response.data);
-      // setWorkersFiltered(response.data);
+      setWorkers(response.data);
+      setWorkersFiltered(response.data);
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al traer el reporte");
     }
   }
+
+  // filtros ================================================================
 
   async function fetDepartments() {
     try {
@@ -301,22 +304,68 @@ function TableData() {
               ) : (
                 currentWorkers.map((item: any, idx) => (
                   <tr key={idx}>
-                    <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="pr-6 py-4 whitespace-nowrap">
-                      {item.nombre}
+                      {item.worker.dni}
                     </td>
-                    <th className="pr-6 py-4 ">OK</th>
+                    <td className="pr-6 py-4 whitespace-nowrap">
+                      {item.worker.full_name}
+                    </td>
+                    <th className="pr-6 py-4 ">
+                      {!item.lunes
+                        ? "PENDIENTE"
+                        : item.lunes.tardanza === "si"
+                        ? "T"
+                        : item.lunes.falta === "si"
+                        ? "F"
+                        : "OK"}
+                    </th>
 
                     <th className="py-3 pr-6" align="center">
-                      OK
+                      {!item.martes
+                        ? "PENDIENTE"
+                        : item.martes.tardanza === "si"
+                        ? "T"
+                        : item.martes.falta === "si"
+                        ? "F"
+                        : "OK"}
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      T
+                      {!item.miercoles
+                        ? "PENDIENTE"
+                        : item.miercoles.tardanza === "si"
+                        ? "T"
+                        : item.miercoles.falta === "si"
+                        ? "F"
+                        : "OK"}
                     </th>
-                    <th className="py-3 pr-6" align="center"></th>
-                    <th className="py-3 pr-6" align="center"></th>
+                    <th className="py-3 pr-6" align="center">
+                      {!item.jueves
+                        ? "PENDIENTE"
+                        : item.jueves.tardanza === "si"
+                        ? "T"
+                        : item.jueves.falta === "si"
+                        ? "F"
+                        : "OK"}
+                    </th>
+                    <th className="py-3 pr-6" align="center">
+                      {!item.viernes
+                        ? "PENDIENTE"
+                        : item.viernes.tardanza === "si"
+                        ? "T"
+                        : item.viernes.falta === "si"
+                        ? "F"
+                        : "OK"}
+                    </th>
 
-                    <th className="py-3 pr-6" align="center"></th>
+                    <th className="py-3 pr-6" align="center">
+                      {!item.sabado
+                        ? "PENDIENTE"
+                        : item.sabado.tardanza === "si"
+                        ? "T"
+                        : item.sabado.falta === "si"
+                        ? "F"
+                        : "OK"}
+                    </th>
 
                     <td className=" whitespace-nowrap">
                       <Button

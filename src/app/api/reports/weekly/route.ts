@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const responseData = await reportService.generateReportForWeek(allDays);
 
-    return NextResponse.json(responseData, {
+    return NextResponse.json(responseData.content, {
       status: responseData.statusCode,
     });
   } catch (error) {

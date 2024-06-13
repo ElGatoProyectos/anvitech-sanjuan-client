@@ -96,7 +96,7 @@ function VacationWorker() {
               ></Input>
             </div>
             <div>
-              <Label>Fecha de inicio</Label>
+              <Label>Fecha fin</Label>
               <Input
                 onChange={(e) =>
                   setDateVacation({ ...dateVacation, end_date: e.target.value })

@@ -164,7 +164,7 @@ class DataService {
 
       const formatData: any = {
         report_id: report.id,
-        tardanza: "si",
+        tardanza: "no",
         falta: "si",
         dia: day,
         // fecha_reporte: report.date_created.toISOString(),?
@@ -221,6 +221,7 @@ class DataService {
               formatData.falta = "no";
             } else {
               formatData.falta = "si";
+              formatData.tardanza = "no";
             }
             formatData.hora_salida = newHour + ":" + minutes;
           }
@@ -338,7 +339,7 @@ class DataService {
         const formatData = {
           report_id: "",
           tardanza: "no",
-          falta: "no",
+          falta: "si",
           dia: day,
           fecha_reporte: dateToString,
           dni: worker.dni,
@@ -354,36 +355,51 @@ class DataService {
         };
         /// dataFiltered
 
-        dataFiltered.map((item, index) => {
-          const horaCompleta = item.checktime.split("T")[1].split("+")[0];
-          const [hour, minutes] = horaCompleta.split(":");
-          let newHour = Number(hour) - 5;
-          if (Number(hour) >= 0 && Number(hour) <= 4) {
-            newHour = 23 - 4 + Number(hour);
-          }
+        if (dataFiltered.length) {
+          //! formatData.sede=dataFiltered[0].device.name,
+          dataFiltered.map((item, index) => {
+            const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+            const [hour, minutes] = horaCompleta.split(":");
 
-          if (newHour <= 11) {
-            formatData.hora_inicio = newHour + ":" + minutes;
-            if (newHour > hourStart) {
-              formatData.tardanza = "si";
-            } else {
-              formatData.tardanza = "no";
+            let newHour: number = Number(hour) - 5;
+
+            if (Number(hour) >= 0 && Number(hour) <= 4) {
+              newHour = 23 - 4 + Number(hour);
             }
-          } else if (newHour >= 12 && newHour <= 16) {
-            if (formatData.hora_inicio_refrigerio === "") {
-              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+
+            if (newHour <= 11) {
+              formatData.hora_inicio = newHour + ":" + minutes;
+              if (newHour > Number(hourStart)) {
+                formatData.tardanza = "si";
+              } else {
+                if (newHour >= 9 && Number(minutes) > 0) {
+                  formatData.tardanza = "si";
+                } else {
+                  formatData.tardanza = "no";
+                }
+              }
+            } else if (newHour >= 12 && newHour <= 16) {
+              if (formatData.hora_inicio_refrigerio === "") {
+                formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+              } else {
+                formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+              }
             } else {
-              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+              if (newHour >= Number(hourEnd)) {
+                formatData.falta = "no";
+              } else {
+                formatData.falta = "si";
+                formatData.tardanza = "no";
+              }
+              formatData.hora_salida = newHour + ":" + minutes;
             }
-          } else {
-            formatData.hora_salida = newHour + ":" + minutes;
-          }
-        });
+          });
+        }
         return formatData;
       } else {
         const formatData = {
           report_id: "",
-          tardanza: "si",
+          tardanza: "no",
           falta: "si",
           dia: day,
           fecha_reporte: dateToString,

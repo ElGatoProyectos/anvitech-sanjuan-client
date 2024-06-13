@@ -381,7 +381,9 @@ function Sidebar() {
               onClick={() => setIsExpandedManagement(!isExpandedManagement)}
               href={"#"}
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                pathname.includes("/system/horario") ? activePath : inactivePath
+                pathname.includes("/system/mantenimiento")
+                  ? activePath
+                  : inactivePath
               } transition-all`}
             >
               <span className="inline-flex justify-center items-center ml-4">
@@ -389,7 +391,7 @@ function Sidebar() {
               </span>
               <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
                 Mantenimiento{" "}
-                {isExpandedSchedule ? (
+                {isExpandedManagement ? (
                   <ChevronUp size={20} />
                 ) : (
                   <ChevronDown size={20} />
