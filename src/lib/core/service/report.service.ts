@@ -7,6 +7,8 @@ import { dataService } from "./data.service";
 import { workerService } from "./worker.service";
 import { incidentService } from "./incident.service";
 import { scheduleService } from "./schedule.service";
+import { formatSheduleDto } from "../schemas/shedule.dto";
+import { formatReportFileDTO } from "../schemas/report.dto";
 
 class ReportService {
   async generateReport() {
@@ -151,11 +153,21 @@ class ReportService {
 
   async deleteIncident(detailId: number) {
     try {
+      // tenemos que validar si el trabajador tiene tardanza o falta
+      const reporseDetail = await prisma.detailReportIncident.findFirst({
+        where: { id: detailId },
+      });
+      await prisma.detailReport.update({
+        where: { id: reporseDetail?.detail_report_id },
+        data: { falta: "si" },
+      });
+
       const deleted = await prisma.detailReportIncident.delete({
         where: { id: detailId },
       });
       return httpResponse.http201("Incident detail deleted", deleted);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -404,9 +416,10 @@ class ReportService {
           .split(":")
           .map(Number);
 
-        if (dataStartHour > scheduleStartHour) formatData.falta = "si";
+        // aqui cambie la falta por tardanza
+        if (dataStartHour > scheduleStartHour) formatData.tardanza = "si";
         else if (dataStartHour === scheduleStartHour) {
-          if (dataStartMinute > 0) formatData.falta = "si";
+          if (dataStartMinute > 0) formatData.tardanza = "si";
         }
       }
       // cuando el usuario tiene una hora de salida
@@ -457,6 +470,129 @@ class ReportService {
       console.log(error);
       return errorService.handleErrorSchema(error);
     }
+  }
+
+  async uploadReportMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      const exampleData = sheetToJson[0];
+
+      const report = await reportService.generateReport();
+
+      await Promise.all(
+        sheetToJson.map(async (row: any, index) => {
+          const worker = await workerService.findByDNI(String(row.dni));
+          const schedule = await scheduleService.findScheduleForWorker(
+            worker.content.id
+          );
+
+          console.log(worker, schedule);
+
+          const [scheduleStart, scheduleEnd] =
+            schedule.content[row.dia].split("-");
+          const [scheduleHourStart, scheduleMinuteStart] = scheduleStart
+            .split(":")
+            .map(Number);
+
+          const [scheduleHourEnd, scheduleMinuteEnd] = scheduleEnd
+            .split(":")
+            .map(Number);
+
+          const formatData = {
+            report_id: report.content.id,
+            tardanza: "no",
+            falta: "si",
+            fecha_reporte: this.excelSerialDateToJSDate(row.fecha_reporte),
+            dia: row.dia,
+            dni: String(row.dni),
+            nombre: worker.content.full_name,
+            sede: worker.content.department,
+            hora_inicio: row.hora_inicio ? String(row.hora_inicio) : "",
+            hora_inicio_refrigerio: row.hora_inicio_refrigerio
+              ? String(row.hora_inicio_refrigerio)
+              : "",
+            hora_fin_refrigerio: row.hora_fin_refrigerio
+              ? String(row.hora_fin_refrigerio)
+              : "",
+            hora_salida: row.hora_salida ? String(row.hora_salida) : "",
+          };
+
+          if (row.hora_inicio !== "" && row.hora_salida === "") {
+            const [dataStartHour, dataStartMinute] = row.hora_inicio
+              .split(":")
+              .map(Number);
+
+            if (dataStartHour > scheduleHourStart) formatData.tardanza = "si";
+            else if (dataStartHour === scheduleHourStart) {
+              if (dataStartMinute > 0) formatData.tardanza = "si";
+            }
+          }
+          // cuando el usuario tiene una hora de salida
+          else if (row.hora_inicio === "" && row.hora_salida !== "") {
+            const [dataEndHour, dataEndMinute] = row.hora_salida
+              .split(":")
+              .map(Number);
+
+            if (dataEndHour < scheduleHourEnd) {
+              formatData.falta = "si";
+              formatData.tardanza = "no";
+            } else if (dataEndHour === scheduleHourEnd) {
+              if (row.hora_inicio === "") formatData.tardanza = "si";
+              formatData.falta = "no";
+            }
+          } else if (row.hora_inicio === "" && row.hora_salida === "") {
+            formatData.falta = "si";
+            formatData.tardanza = "no";
+          } else {
+            const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
+              .split(":")
+              .map(Number);
+            const [dataEndHour, dataEndMinute] = String(row.hora_salida)
+              .split(":")
+              .map(Number);
+
+            if (dataStartHour > scheduleHourStart) formatData.falta = "si";
+            else if (dataStartHour === scheduleHourStart) {
+              if (dataStartMinute > 0) formatData.falta = "si";
+            }
+
+            if (dataEndHour < scheduleHourEnd) {
+              formatData.falta = "si";
+              formatData.tardanza = "no";
+            } else if (dataEndHour === scheduleHourEnd) {
+              formatData.falta = "no";
+            }
+          }
+
+          await prisma.detailReport.create({ data: formatData });
+        })
+      );
+      return httpResponse.http200("Ok", "Reports upload");
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  excelSerialDateToJSDate(serial: number): Date {
+    const excelEpoch = new Date("1899-12-31"); // Fecha base de Excel
+    const millisecondsInDay = 24 * 60 * 60 * 1000; // Milisegundos en un día
+    const offsetDays = Math.floor(serial); // Parte entera del número de serie
+
+    // Calcular el número de milisegundos desde la fecha base
+    const dateMilliseconds =
+      excelEpoch.getTime() + offsetDays * millisecondsInDay;
+
+    // Crear y devolver el objeto Date
+    const date = new Date(dateMilliseconds);
+    return date;
   }
 }
 

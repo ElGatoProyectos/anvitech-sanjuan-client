@@ -6,6 +6,19 @@ import { formatSheduleDto } from "../schemas/shedule.dto";
 import { workerService } from "./worker.service";
 
 class ScheduleService {
+  async findAll() {
+    try {
+      const schedules = await prisma.schedule.findMany({
+        include: {
+          worker: true,
+        },
+      });
+      return httpResponse.http200("All schedules", schedules);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async findScheduleForWorker(workerId: number) {
     try {
       const schedule = await prisma.schedule.findFirst({

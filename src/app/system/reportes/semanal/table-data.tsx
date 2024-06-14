@@ -312,7 +312,7 @@ function TableData() {
                     </td>
                     <th className="pr-6 py-4 ">
                       {!item.lunes
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.lunes.tardanza === "si"
                         ? "T"
                         : item.lunes.falta === "si"
@@ -322,7 +322,7 @@ function TableData() {
 
                     <th className="py-3 pr-6" align="center">
                       {!item.martes
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.martes.tardanza === "si"
                         ? "T"
                         : item.martes.falta === "si"
@@ -331,7 +331,7 @@ function TableData() {
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.miercoles
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.miercoles.tardanza === "si"
                         ? "T"
                         : item.miercoles.falta === "si"
@@ -340,7 +340,7 @@ function TableData() {
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.jueves
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.jueves.tardanza === "si"
                         ? "T"
                         : item.jueves.falta === "si"
@@ -349,7 +349,7 @@ function TableData() {
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.viernes
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.viernes.tardanza === "si"
                         ? "T"
                         : item.viernes.falta === "si"
@@ -359,7 +359,7 @@ function TableData() {
 
                     <th className="py-3 pr-6" align="center">
                       {!item.sabado
-                        ? "PENDIENTE"
+                        ? "-"
                         : item.sabado.tardanza === "si"
                         ? "T"
                         : item.sabado.falta === "si"

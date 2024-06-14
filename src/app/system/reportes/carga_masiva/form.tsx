@@ -21,7 +21,7 @@ function FormReportMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/mass-dismissal", formData, session.data);
+      await postImage("reports/upload", formData, session.data);
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
@@ -44,8 +44,8 @@ function FormReportMassive() {
           <Link
             target="_blank"
             download
-            as="/files/formato_cese_masivo.xlsx"
-            href="/files/formato_cese_masivo.xlsx"
+            as="/files/formato_reporte_carga_masiva.xlsx"
+            href="/files/formato_reporte_carga_masiva.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato

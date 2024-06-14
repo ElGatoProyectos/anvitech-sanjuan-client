@@ -48,7 +48,7 @@ function TableWorkers() {
   async function fetchDataWorkers() {
     try {
       setLoading(true);
-      const response = await get("workers", session.data);
+      const response = await get("workers/schedule", session.data);
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -142,7 +142,6 @@ function TableWorkers() {
               <th className="py-3 pr-6">Viernes</th>
               <th className="py-3 pr-6">Viernes</th>
               <th className="py-3 pr-6">Sabado</th>
-              <th className="py-3 pr-6">Domingo</th>
               <th className="py-3 pr-6">Detalle</th>
             </tr>
           </thead>
@@ -162,25 +161,6 @@ function TableWorkers() {
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Skeleton className="h-8" />
                   </td>
-                </tr>
-                <tr>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <Skeleton className="h-8" />
-                  </td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <Skeleton className="h-8" />
-                  </td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <Skeleton className="h-8" />
-                  </td>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <Skeleton className="h-8" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="pr-6 py-4 whitespace-nowrap">
-                    <Skeleton className="h-8" />
-                  </td>
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Skeleton className="h-8" />
                   </td>
@@ -195,18 +175,19 @@ function TableWorkers() {
             ) : (
               currentWorkers.map((item, idx) => (
                 <tr key={idx}>
-                  <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    {item.worker.dni}
+                  </td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">
-                    {item.full_name}
+                    {item.worker.full_name}
                   </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td>{item.lunes}</td>
+                  <td>{item.martes}</td>
+                  <td>{item.miercoles}</td>
+                  <td>{item.jueves}</td>
+                  <td>{item.viernes}</td>
+                  <td>{item.sabado}</td>
                   <td></td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">

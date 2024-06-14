@@ -15,7 +15,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { scheduleFullTime, schedulePartTime } from "./schedule.examples";
-import { getId, post } from "@/app/http/api.http";
+import { get, getId, post } from "@/app/http/api.http";
 import { useSession } from "next-auth/react";
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 
@@ -35,6 +35,9 @@ function ScheduleWorker({ id }: { id: string }) {
   const [custom, setCustom] = useState("custom");
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState("");
+  const [dataWorker, setDataWorker] = useState<any>({});
+
+  const [typesSchedule, setTypesSchedule] = useState<any[]>([]);
 
   type ApiResponse = {
     [key: string]: string;
@@ -74,6 +77,19 @@ function ScheduleWorker({ id }: { id: string }) {
 
   /// define function
 
+  async function fetchDataWorker() {
+    try {
+      const response = await getId("workers", Number(id), session.data);
+      console.log(response.data);
+      setDataWorker(response.data);
+    } catch (error) {
+      useToastDestructive(
+        "Error",
+        "Error al traer la información del trabajador"
+      );
+    }
+  }
+
   async function fetchScheduleWorker() {
     try {
       setLoading(true);
@@ -97,7 +113,6 @@ function ScheduleWorker({ id }: { id: string }) {
       useToastDestructive("Error", "Error al traer la información");
     }
   }
-  console.log(schedule);
 
   function handleSelectDay(e: any) {
     const day = schedule.find((x) => x.name === e);
@@ -146,12 +161,21 @@ function ScheduleWorker({ id }: { id: string }) {
     }));
   }
 
+  // function handleChangeTypeSchedule(value: string) {
+  //   setCustom(value);
+  //   if (value === "full-time") {
+  //     setSchedule(scheduleFullTime);
+  //   } else if (value === "part-time") {
+  //     setSchedule(schedulePartTime);
+  //   }
+  // }
   function handleChangeTypeSchedule(value: string) {
     setCustom(value);
-    if (value === "full-time") {
-      setSchedule(scheduleFullTime);
-    } else if (value === "part-time") {
-      setSchedule(schedulePartTime);
+    if (value !== "custom") {
+      const dataFiltered = typesSchedule.find((item) => item.name === value);
+      const { id, name, ...hours } = dataFiltered;
+      const transformedSchedule = transformSchedule(hours);
+      setSchedule([...transformedSchedule]);
     }
   }
 
@@ -172,9 +196,20 @@ function ScheduleWorker({ id }: { id: string }) {
     }
   }
 
+  async function fetchTypesSchedule() {
+    try {
+      const response = await get("schedule/type", session.data);
+      setTypesSchedule(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer los horarios");
+    }
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       fetchScheduleWorker();
+      fetchTypesSchedule();
+      fetchDataWorker();
     }
   }, [session.status]);
 
@@ -183,7 +218,9 @@ function ScheduleWorker({ id }: { id: string }) {
   return (
     <div className="bg-white p-8 rounded-lg">
       <div className=" flex justify-between">
-        <span className="font-semibold">Horario del trabajador</span>
+        <span className="font-semibold">
+          {dataWorker.full_name} - {dataWorker.dni}
+        </span>
       </div>
       <div className="w-full flex mt-8">
         <div className="w-full grid grid-cols-3 gap-16">
@@ -235,8 +272,13 @@ function ScheduleWorker({ id }: { id: string }) {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="custom">Personalizado</SelectItem>
-                    <SelectItem value="full-time">Por defecto</SelectItem>
-                    <SelectItem value="part-time">Part time</SelectItem>
+                    {typesSchedule.map((item, index) => (
+                      <SelectItem value={item.name} key={index}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                    {/* <SelectItem value="full-time">Por defecto</SelectItem>
+                    <SelectItem value="part-time">Part time</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>

@@ -434,7 +434,12 @@ function TableData() {
                 </>
               ) : (
                 currentWorkers.map((item: any, idx) => (
-                  <tr key={idx}>
+                  <tr
+                    key={idx}
+                    className={`${
+                      item.falta === "si" ? "bg-red-200" : "bg-green-200"
+                    }`}
+                  >
                     <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="pr-6 py-4 whitespace-nowrap">
                       {item.nombre}
