@@ -130,6 +130,12 @@ class ReportService {
 
   async addIncident(detailReportId: number, incidentId: number) {
     try {
+      // modifica la tardanza y falta porque esta justificado
+      await prisma.detailReport.update({
+        where: { id: detailReportId },
+        data: { tardanza: "no", falta: "no" },
+      });
+
       const updated = await prisma.detailReportIncident.create({
         data: {
           detail_report_id: detailReportId,

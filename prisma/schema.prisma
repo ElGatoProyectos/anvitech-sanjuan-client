@@ -130,6 +130,7 @@ model Incident {
 
 model DetailReportIncident {
   id               Int          @id @default(autoincrement())
+  created_date     DateTime     @default(now())
   detail_report_id Int
   incident_id      Int
   incident         Incident     @relation(fields: [incident_id], references: [id])

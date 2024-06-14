@@ -1,7 +1,14 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, post, postExcel, putId } from "@/app/http/api.http";
+import {
+  deleteId,
+  get,
+  getId,
+  post,
+  postExcel,
+  putId,
+} from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, FileSpreadsheet, Settings } from "lucide-react";
+import { CalendarIcon, FileSpreadsheet, Rss, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -48,9 +55,15 @@ function TableData() {
 
   const [incidents, setIncidents] = useState<any[]>([]);
 
+  const [incidentSelected, setIncidentSelected] = useState<any>();
+
+  const [incidentsDetail, setIncidentsDetail] = useState<any[]>([]);
+
   // =======================================loadings
 
   const [loadingUpdateHours, setLoadingUpdateHours] = useState(false);
+
+  const [actionActive, setActionActive] = useState(false);
 
   // modals =======================
   const [openModalAlert, setOpenModalAlert] = useState(false);
@@ -217,6 +230,46 @@ function TableData() {
     }
   }
 
+  async function fetchIncidentsForDetail() {
+    try {
+      if (dataDetail.id) {
+        const response = await getId(
+          "reports/incident",
+          dataDetail.id,
+          session.data
+        );
+        setIncidentsDetail(response.data);
+      }
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer incidente");
+    }
+  }
+
+  async function handleAddIncident() {
+    // para que se vea visualemnete en tiempo real
+    try {
+      await post(
+        "reports/incident",
+        { detailReportId: dataDetail.id, incidentId: incidentSelected },
+        session.data
+      );
+      // setIncidentSelected(incident);
+      useToastDefault("Ok", "Incidente registrado!");
+      setActionActive(!actionActive);
+    } catch (error) {
+      useToastDestructive("Error", "Error al registrar incidente");
+    }
+  }
+
+  async function handleDeleteDetailIncident(detailIncidentId: number) {
+    try {
+      await deleteId("reports/incident", detailIncidentId, session.data);
+      setActionActive(!actionActive);
+    } catch (error) {
+      useToastDestructive("Error", "Error al eliminar incidente");
+    }
+  }
+
   function formatDate(dateString: string) {
     return format(new Date(dateString), "yyyy-MM-dd");
   }
@@ -229,6 +282,10 @@ function TableData() {
       fetchIncidents();
     }
   }, [session.status, loadingUpdateHours]);
+
+  useEffect(() => {
+    fetchIncidentsForDetail();
+  }, [openModalEdit, actionActive]);
 
   return (
     <div>
@@ -517,7 +574,7 @@ function TableData() {
 
             <div className="col-span-2">
               <Label>Seleccione un incidente</Label>
-              <Select>
+              <Select onValueChange={(e) => setIncidentSelected(e)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione un incidente" />
                 </SelectTrigger>
@@ -533,8 +590,41 @@ function TableData() {
               </Select>
             </div>
 
+            <div>
+              {incidentsDetail.length && (
+                <table className="text-sm text-left">
+                  <thead>
+                    <tr>
+                      <th>Incidente</th>
+                      <th>Accion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {incidentsDetail.map((incident, idx) => (
+                      <tr key={idx}>
+                        <td className="w-full">{incident.incident.title}</td>
+                        <td>
+                          <span
+                            role="button"
+                            className="text-red-500 underline"
+                            onClick={() =>
+                              handleDeleteDetailIncident(incident.id)
+                            }
+                          >
+                            Eliminar
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
             <div className="col-span-2 flex justify-end">
-              <Button size={"sm"}>Registrar incidencia</Button>
+              <Button size={"sm"} onClick={handleAddIncident}>
+                Registrar incidencia
+              </Button>
             </div>
           </div>
         </DialogContent>
