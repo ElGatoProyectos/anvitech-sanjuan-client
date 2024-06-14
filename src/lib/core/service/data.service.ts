@@ -6,6 +6,7 @@ import { httpResponse } from "./response.service";
 import { workerService } from "./worker.service";
 import { formatDateForPrisma } from "../functions/date-transform";
 import { scheduleService } from "./schedule.service";
+import { vacationService } from "./vacation.service";
 
 class DataService {
   async instanceDataInit(
@@ -155,7 +156,7 @@ class DataService {
       const [hourStart, minutesStart] = lunesStart.split(":");
       const [hourEnd, minutesEnd] = lunesEnd.split(":");
 
-      ///devuelve un array de posiblemente 4 objetos que contienen la fecha de inicio a fin
+      //-devuelve un array de posiblemente 4 objetos que contienen la fecha de inicio a fin
       const dataFiltered = dataGeneralDay.filter(
         (item) => item.employee.workno === worker.dni
       );
@@ -185,7 +186,7 @@ class DataService {
 
       const dateI = new Date(yearI, monthI - 1, dayI);
       formatData.fecha_reporte = dateI;
-      /// dataFiltered
+      // caso normal ==========================================================================================
 
       if (dataFiltered.length) {
         //! formatData.sede=dataFiltered[0].device.name,
@@ -226,8 +227,58 @@ class DataService {
             formatData.hora_salida = newHour + ":" + minutes;
           }
         });
+
+        // ========================================================= caso de vacaciones y permisos =============================================================
+      } else {
+        const dateYesterday = new Date();
+        dateYesterday.setDate(dateYesterday.getDate() - 1);
+
+        //- validamos si esta de vacaciones o permiso
+
+        // validamos las vacaciones
+
+        const vacationResponse = await prisma.vacation.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+        // validamos los permisos
+
+        const permissionResponse = await prisma.permissions.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        if (vacationResponse.length > 0 || permissionResponse.length > 0) {
+          formatData.falta = "no";
+          formatData.tardanza = "no";
+        }
       }
-      console.log(formatData);
 
       await prisma.detailReport.create({ data: formatData });
 
@@ -333,26 +384,26 @@ class DataService {
         (item) => item.employee.workno === worker.dni
       );
 
+      const formatData = {
+        report_id: "",
+        tardanza: "no",
+        falta: "si",
+        dia: day,
+        fecha_reporte: dateToString,
+        dni: worker.dni,
+        nombre: worker.full_name,
+        // sede: dataFiltered[0].device.name,
+        sede: worker.department,
+
+        hora_entrada: "",
+        hora_inicio: "",
+        hora_inicio_refrigerio: "",
+        hora_fin_refrigerio: "",
+        hora_salida: "",
+      };
       if (dataFiltered.length) {
         const [lunesStart, lunesEnd] = schedule.lunes.split("-");
         const [hourStart, hourEnd] = lunesStart.split(":");
-        const formatData = {
-          report_id: "",
-          tardanza: "no",
-          falta: "si",
-          dia: day,
-          fecha_reporte: dateToString,
-          dni: worker.dni,
-          nombre: worker.full_name,
-          // sede: dataFiltered[0].device.name,
-          sede: worker.department,
-
-          hora_entrada: "",
-          hora_inicio: "",
-          hora_inicio_refrigerio: "",
-          hora_fin_refrigerio: "",
-          hora_salida: "",
-        };
         /// dataFiltered
 
         if (dataFiltered.length) {
@@ -397,22 +448,71 @@ class DataService {
         }
         return formatData;
       } else {
-        const formatData = {
-          report_id: "",
-          tardanza: "no",
-          falta: "si",
-          dia: day,
-          fecha_reporte: dateToString,
-          dni: worker.dni,
-          nombre: worker.full_name,
-          sede: worker.department,
-          hora_entrada: "",
-          hora_inicio: "",
-          hora_inicio_refrigerio: "",
-          hora_fin_refrigerio: "",
-          hora_salida: "",
-        };
-        return formatData;
+        const dateYesterday = new Date();
+
+        //- validamos si esta de vacaciones o permiso
+
+        // validamos las vacaciones
+
+        const vacationResponse = await prisma.vacation.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+        // validamos los permisos
+
+        const permissionResponse = await prisma.permissions.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        if (vacationResponse.length > 0 || permissionResponse.length > 0) {
+          formatData.falta = "no";
+          formatData.tardanza = "no";
+          return formatData;
+        } else {
+          const formatData = {
+            report_id: "",
+            tardanza: "no",
+            falta: "si",
+            dia: day,
+            fecha_reporte: dateToString,
+            dni: worker.dni,
+            nombre: worker.full_name,
+            sede: worker.department,
+            hora_entrada: "",
+            hora_inicio: "",
+            hora_inicio_refrigerio: "",
+            hora_fin_refrigerio: "",
+            hora_salida: "",
+          };
+          return formatData;
+        }
       }
     } catch (error) {
       return errorService.handleErrorSchema(error);
