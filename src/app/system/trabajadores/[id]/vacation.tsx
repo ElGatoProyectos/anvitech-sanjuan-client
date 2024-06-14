@@ -1,5 +1,7 @@
 "use client";
 
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
+import { getId, post } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,22 +14,83 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { format } from "date-fns";
+import { useSession } from "next-auth/react";
+import { FormEvent, useEffect, useState } from "react";
 
-function VacationWorker() {
+function VacationWorker({ id }: { id: string }) {
   const [dateVacation, setDateVacation] = useState({
     start_date: "",
     end_date: "",
     reason: "",
   });
 
+  const [dataVacationsMin, setDataVacationsMin] = useState<any[]>([]);
+
   const [openModal, setOpenModal] = useState(false);
   const [openModalHistory, setOpenModalHistory] = useState(false);
 
-  async function handleUpdate() {
+  const [isFetching, setIsFetching] = useState(false);
+
+  const session = useSession();
+
+  async function handleRegister() {
     try {
-    } catch (error) {}
+      await post(
+        "vacations",
+        { ...dateVacation, worker_id: Number(id) },
+        session.data
+      );
+
+      setOpenModal(false);
+      useToastDefault("Ok", "Vacacion registrada");
+      setIsFetching(!isFetching);
+    } catch (error) {
+      useToastDestructive("Error", "Error al registrar la vacion");
+    }
   }
+
+  async function fetchLastVactions() {
+    try {
+      const response = await getId(
+        "workers/vacations/min",
+        Number(id),
+        session.data
+      );
+      setDataVacationsMin(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer las vacaciones");
+    }
+  }
+
+  function formatDate(dateString: string) {
+    return format(new Date(dateString), "yyyy-MM-dd");
+  }
+
+  function parseDateString(dateString: string): Date {
+    return new Date(dateString.replace(" ", "T"));
+  }
+
+  function calculateDateDifference(
+    dateString1: string,
+    dateString2: string
+  ): number {
+    const date1 = parseDateString(dateString1);
+    const date2 = parseDateString(dateString2);
+
+    const differenceInMillis = date2.getTime() - date1.getTime();
+
+    const differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24);
+
+    return differenceInDays;
+  }
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      fetchLastVactions();
+    }
+  }, [session.status, isFetching]);
+
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
@@ -44,24 +107,18 @@ function VacationWorker() {
             </tr>
           </thead>
           <tbody>
-            <tr className="border-y ">
-              <td>Mayo 2024</td>
-              <td>7</td>
-              <td>15/02/2024</td>
-              <td>15/02/2024</td>
-            </tr>
-            <tr className="border-y">
-              <td>Mayo 2024</td>
-              <td>7</td>
-              <td>15/02/2024</td>
-              <td>15/02/2024</td>
-            </tr>
-            <tr className="border-y">
-              <td>Mayo 2024</td>
-              <td>7</td>
-              <td>15/02/2024</td>
-              <td>15/02/2024</td>
-            </tr>
+            {dataVacationsMin.map((item, idx) => (
+              <tr className="border-y " key={idx}>
+                <td>
+                  {formatDate(item.start_date)} - {formatDate(item.end_date)}
+                </td>
+                <td>
+                  {calculateDateDifference(item.start_date, item.end_date)}
+                </td>
+                <td>{formatDate(item.start_date)}</td>
+                <td>{formatDate(item.end_date)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className=" flex gap-4">
@@ -79,10 +136,7 @@ function VacationWorker() {
           <DialogHeader>
             <DialogTitle>Registro vaciones</DialogTitle>
           </DialogHeader>
-          <form
-            onSubmit={handleUpdate}
-            className="grid grid-cols-2 w-full gap-4 mt-2 "
-          >
+          <div className="grid grid-cols-2 w-full gap-4 mt-2 ">
             <div>
               <Label>Fecha de inicio</Label>
               <Input
@@ -113,9 +167,9 @@ function VacationWorker() {
                 }
               ></Textarea>
             </div>
-          </form>
+          </div>
           <DialogFooter>
-            <Button>Registrar vacaciones</Button>
+            <Button onClick={handleRegister}>Registrar vacaciones</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

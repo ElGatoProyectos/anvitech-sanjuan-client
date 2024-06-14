@@ -8,7 +8,7 @@ function Page({ params }: { params: { id: string } }) {
   return (
     <div className="flex flex-col w-full gap-8 ">
       <UpdateDataWorker id={id}></UpdateDataWorker>
-      <VacationWorker></VacationWorker>
+      <VacationWorker id={id}></VacationWorker>
       <PermissionsWorker></PermissionsWorker>
       {/* <ScheduleWorker id={id}></ScheduleWorker> */}
     </div>
