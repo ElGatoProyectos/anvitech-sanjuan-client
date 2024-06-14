@@ -27,6 +27,8 @@ function VacationWorker({ id }: { id: string }) {
 
   const [dataVacationsMin, setDataVacationsMin] = useState<any[]>([]);
 
+  const [dataVacationsAll, setDataVacationsAll] = useState<any[]>([]);
+
   const [openModal, setOpenModal] = useState(false);
   const [openModalHistory, setOpenModalHistory] = useState(false);
 
@@ -63,6 +65,19 @@ function VacationWorker({ id }: { id: string }) {
     }
   }
 
+  async function fetchAllVacations() {
+    try {
+      const response = await getId(
+        "workers/vacations",
+        Number(id),
+        session.data
+      );
+      setDataVacationsAll(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer las vacaciones");
+    }
+  }
+
   function formatDate(dateString: string) {
     return format(new Date(dateString), "yyyy-MM-dd");
   }
@@ -91,6 +106,10 @@ function VacationWorker({ id }: { id: string }) {
     }
   }, [session.status, isFetching]);
 
+  useEffect(() => {
+    if (openModalHistory) fetchAllVacations();
+  }, [openModalHistory]);
+
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
@@ -110,7 +129,7 @@ function VacationWorker({ id }: { id: string }) {
             {dataVacationsMin.map((item, idx) => (
               <tr className="border-y " key={idx}>
                 <td>
-                  {formatDate(item.start_date)} - {formatDate(item.end_date)}
+                  {formatDate(item.start_date)} a {formatDate(item.end_date)}
                 </td>
                 <td>
                   {calculateDateDifference(item.start_date, item.end_date)}
@@ -193,174 +212,19 @@ function VacationWorker({ id }: { id: string }) {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-y ">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
-                <tr className="border-y">
-                  <td>Mayo 2024</td>
-                  <td>7</td>
-                  <td>15/02/2024</td>
-                  <td>15/02/2024</td>
-                </tr>
+                {dataVacationsAll.map((item, idx) => (
+                  <tr className="border-y " key={idx}>
+                    <td>
+                      {formatDate(item.start_date)} a{" "}
+                      {formatDate(item.end_date)}
+                    </td>
+                    <td>
+                      {calculateDateDifference(item.start_date, item.end_date)}
+                    </td>
+                    <td>{formatDate(item.start_date)}</td>
+                    <td>{formatDate(item.end_date)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

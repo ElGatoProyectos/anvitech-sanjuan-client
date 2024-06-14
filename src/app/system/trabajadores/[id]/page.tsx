@@ -9,7 +9,7 @@ function Page({ params }: { params: { id: string } }) {
     <div className="flex flex-col w-full gap-8 ">
       <UpdateDataWorker id={id}></UpdateDataWorker>
       <VacationWorker id={id}></VacationWorker>
-      <PermissionsWorker></PermissionsWorker>
+      <PermissionsWorker id={id}></PermissionsWorker>
       {/* <ScheduleWorker id={id}></ScheduleWorker> */}
     </div>
   );
