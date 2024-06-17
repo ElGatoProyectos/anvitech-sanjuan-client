@@ -24,9 +24,13 @@ class IncidentService {
 
   async create(data: any) {
     try {
-      console.log("======", data);
-      const created = await prisma.incident.create({ data });
-      console.log(created);
+      const formatData = {
+        title: data.title,
+        description: data.description,
+        date: new Date(data.date).toISOString(),
+      };
+      const created = await prisma.incident.create({ data: formatData });
+
       return httpResponse.http201("Incidente created", created);
     } catch (error) {
       console.log(error);
@@ -36,10 +40,58 @@ class IncidentService {
 
   async update(data: any, id: number) {
     try {
-      const updated = await prisma.incident.update({ where: { id }, data });
+      const formatData = {
+        title: data.title,
+        description: data.description,
+        date: new Date(data.date).toISOString(),
+      };
+      const updated = await prisma.incident.update({
+        where: { id },
+        data: formatData,
+      });
       return httpResponse.http200("Incident updated", updated);
     } catch (error) {
       console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async findIncidentesAbsolute() {
+    try {
+      const incidents = await prisma.incidentAbsolute.findMany();
+
+      return httpResponse.http200("Incidentes found", incidents);
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async createIncidenteAbsolute(data: any) {
+    try {
+      const formatData = {
+        description: data.description,
+        date: new Date(data.date).toISOString(),
+      };
+
+      const created = await prisma.incidentAbsolute.create({
+        data: formatData,
+      });
+
+      return httpResponse.http201("Incidente created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async deleteIncidentAbsolute(id: number) {
+    try {
+      const deleted = await prisma.incidentAbsolute.delete({
+        where: { id },
+      });
+
+      return httpResponse.http201("Incidente deleted", deleted);
+    } catch (error) {
       return errorService.handleErrorSchema(error);
     }
   }

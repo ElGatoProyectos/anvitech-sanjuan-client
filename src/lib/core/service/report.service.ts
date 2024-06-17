@@ -187,51 +187,6 @@ class ReportService {
     }
   }
 
-  /// no sirve
-  async exportToExcel(data: any) {
-    try {
-      const dataGeneral = data.map((item: any) => {
-        return {
-          DNI: item.dni,
-          Nombres: item.nombre,
-          departamento: item.sede,
-          "Fecha reporte": item.fecha_reporte,
-          "Hora inicio": item.hora_inicio,
-          "Hora inicio refrigerio": item.hora_inicio_refrigerio,
-          "Hora fin refrigerio": item.hora_fin_refrigerio,
-          "Hora salida": item.hora_salida,
-          tadanza: item.tardanza,
-          falta: item.falta,
-        };
-      });
-
-      console.log(dataGeneral);
-      const worksheet = xlsx.utils.json_to_sheet(dataGeneral, {
-        header: [
-          "DNI",
-          "Nombres",
-          "departamento",
-          "Fecha reporte",
-          "Hora inicio",
-          "Hora inicio refrigerio",
-          "Hora fin refrigerio",
-          "Hora salida",
-          "tadanza",
-          "falta",
-        ],
-      });
-
-      const workbook = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-      const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
-      return httpResponse.http200("Excel created", buffer);
-    } catch (error) {
-      console.log(error);
-      return errorService.handleErrorSchema(error);
-    }
-  }
-
   getMondayAndSaturdayDates() {
     const now = new Date();
     const dayOfWeek = now.getDay();
@@ -303,6 +258,15 @@ class ReportService {
 
   async dataForExportNormal(dateMin: Date, dateMax: Date) {
     try {
+      const data = await prisma.detailReport.findMany({
+        where: {
+          fecha_reporte: {
+            lte: dateMin,
+            gte: dateMax,
+          },
+        },
+      });
+      return httpResponse.http200("All data", data);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
@@ -496,7 +460,9 @@ class ReportService {
           console.log(worker, schedule);
 
           const [scheduleStart, scheduleEnd] =
-            schedule.content[row.dia].split("-");
+            schedule.content[
+              this.getDayOfWeek(new Date(row.fecha_reporte))
+            ].split("-");
           const [scheduleHourStart, scheduleMinuteStart] = scheduleStart
             .split(":")
             .map(Number);
@@ -574,6 +540,138 @@ class ReportService {
           }
 
           await prisma.detailReport.create({ data: formatData });
+        })
+      );
+      return httpResponse.http200("Ok", "Reports upload");
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async uploadUpdateReportMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (row: any, index) => {
+          const worker = await workerService.findByDNI(String(row.dni));
+          const schedule = await scheduleService.findScheduleForWorker(
+            worker.content.id
+          );
+
+          console.log(
+            this.excelSerialDateToJSDate(row.fecha_reporte).toISOString()
+          );
+          console.log(String(row.dni));
+
+          const detail = await prisma.detailReport.findFirst({
+            where: {
+              dni: String(row.dni),
+              dia: this.getDayOfWeek(new Date(row.fecha_reporte)),
+            },
+          });
+          console.log(
+            "detail ================================================"
+          );
+
+          console.log(detail);
+
+          const [scheduleStart, scheduleEnd] =
+            schedule.content[
+              this.getDayOfWeek(new Date(row.fecha_reporte))
+            ].split("-");
+          const [scheduleHourStart, scheduleMinuteStart] = scheduleStart
+            .split(":")
+            .map(Number);
+
+          const [scheduleHourEnd, scheduleMinuteEnd] = scheduleEnd
+            .split(":")
+            .map(Number);
+
+          const formatData = {
+            report_id: detail?.report_id,
+            tardanza: "no",
+            falta: "si",
+            fecha_reporte: this.excelSerialDateToJSDate(row.fecha_reporte),
+            dia: this.getDayOfWeek(
+              this.excelSerialDateToJSDate(row.fecha_reporte)
+            ),
+            dni: String(row.dni),
+            nombre: worker.content.full_name,
+            sede: worker.content.department,
+            hora_inicio: row.hora_inicio ? String(row.hora_inicio) : "",
+            hora_inicio_refrigerio: row.hora_inicio_refrigerio
+              ? String(row.hora_inicio_refrigerio)
+              : "",
+            hora_fin_refrigerio: row.hora_fin_refrigerio
+              ? String(row.hora_fin_refrigerio)
+              : "",
+            hora_salida: row.hora_salida ? String(row.hora_salida) : "",
+          };
+
+          // si hay un registro empezamos a condicionar los horarios =============================================
+          if (detail) {
+            if (row.hora_inicio !== "" && row.hora_salida === "") {
+              const [dataStartHour, dataStartMinute] = row.hora_inicio
+                .split(":")
+                .map(Number);
+
+              if (dataStartHour > scheduleHourStart) formatData.tardanza = "si";
+              else if (dataStartHour === scheduleHourStart) {
+                if (dataStartMinute > 0) formatData.tardanza = "si";
+              }
+            }
+            // cuando el usuario tiene una hora de salida
+            else if (row.hora_inicio === "" && row.hora_salida !== "") {
+              const [dataEndHour, dataEndMinute] = row.hora_salida
+                .split(":")
+                .map(Number);
+
+              if (dataEndHour < scheduleHourEnd) {
+                formatData.falta = "si";
+                formatData.tardanza = "no";
+              } else if (dataEndHour === scheduleHourEnd) {
+                if (row.hora_inicio === "") formatData.tardanza = "si";
+                formatData.falta = "no";
+              }
+            } else if (row.hora_inicio === "" && row.hora_salida === "") {
+              formatData.falta = "si";
+              formatData.tardanza = "no";
+            } else {
+              const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
+                .split(":")
+                .map(Number);
+              const [dataEndHour, dataEndMinute] = String(row.hora_salida)
+                .split(":")
+                .map(Number);
+
+              if (dataStartHour > scheduleHourStart) formatData.falta = "si";
+              else if (dataStartHour === scheduleHourStart) {
+                if (dataStartMinute > 0) formatData.falta = "si";
+              }
+
+              if (dataEndHour < scheduleHourEnd) {
+                formatData.falta = "si";
+                formatData.tardanza = "no";
+              } else if (dataEndHour === scheduleHourEnd) {
+                formatData.falta = "no";
+              }
+            }
+
+            const created = await prisma.detailReport.update({
+              where: { id: detail.id },
+              data: formatData,
+            });
+          }
+
+          // si hay un registro empezamos a condicionar los horarios =============================================
         })
       );
       return httpResponse.http200("Ok", "Reports upload");

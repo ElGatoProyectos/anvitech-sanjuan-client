@@ -30,8 +30,8 @@ import { cn } from "@/lib/utils";
 import { ArrowDownAZ, CheckIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { exportStartSoft } from "./export";
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { exportNormal, exportStartSoft } from "./export";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import {
   Select,
   SelectContent,
@@ -102,21 +102,50 @@ function FormOptions() {
   const [loadingFirst, setLoadingFirst] = useState(false);
   const [loadingSecond, setLoadingSecond] = useState(false);
 
+  const [dateLimits, setdateLimits] = useState({
+    min: "",
+    max: "",
+  });
+
   async function handleGenerateReportStarSoft() {
     try {
-      const response = await post(
-        "reports/export/starsoft",
-        { month: monthSelected },
-        session.data
-      );
+      setOpenFirst(true);
+      if (monthSelected !== "") {
+        const response = await post(
+          "reports/export/starsoft",
+          { month: monthSelected },
+          session.data
+        );
 
-      exportStartSoft(response.data);
+        exportStartSoft(response.data);
+        setOpenFirst(false);
+
+        useToastDefault("Ok", "Reporte generado con exito");
+      }
+      setOpenFirst(false);
     } catch (error) {
+      setOpenFirst(false);
+
       useToastDestructive("Error", "Error al generar excel");
     }
   }
 
-  async function handleGenerateReportNormal() {}
+  async function handleGenerateReportNormal() {
+    try {
+      setOpenFirst(true);
+      const response = await post("reports/export", dateLimits, session.data);
+
+      exportStartSoft(response.data);
+      setOpenFirst(false);
+
+      useToastDefault("Ok", "Reporte generado con exito");
+      setOpenFirst(false);
+    } catch (error) {
+      setOpenFirst(false);
+
+      useToastDestructive("Error", "Error al generar excel");
+    }
+  }
 
   async function fetchReports() {
     try {
@@ -158,20 +187,30 @@ function FormOptions() {
             </Select>
           </div>
 
-          <Button onClick={() => setOpenFirst(true)}>
+          <Button onClick={() => handleGenerateReportStarSoft()}>
             Descargar formato STARSOFT
           </Button>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 mt-4">
             <Label>Fecha inicio</Label>
-            <Input type="date"></Input>
+            <Input
+              type="date"
+              onChange={(e) =>
+                setdateLimits({ ...dateLimits, min: e.target.value })
+              }
+            ></Input>
           </div>
           <div className="flex flex-col gap-4 mt-4">
             <Label>Fecha fin</Label>
-            <Input type="date"></Input>
+            <Input
+              type="date"
+              onChange={(e) =>
+                setdateLimits({ ...dateLimits, max: e.target.value })
+              }
+            ></Input>
           </div>
-          <Button onClick={() => setOpenSecond(true)}>
+          <Button onClick={() => handleGenerateReportNormal()}>
             Descargar formato NORMAL
           </Button>
         </div>
@@ -180,36 +219,12 @@ function FormOptions() {
       <Dialog open={openFirst} onOpenChange={() => setOpenFirst(!openFirst)}>
         <DialogContent className="">
           <DialogHeader>
-            <DialogTitle>Reporte Starsoft</DialogTitle>
-            <DialogDescription className="mt-2">
-              Recuerde que este tipo de reporte solo se hace semanalmente, tiene
-              que haber un reporte semanal previo
-            </DialogDescription>
+            <DialogTitle>Generando reporte</DialogTitle>
+            <DialogDescription className="mt-2"></DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 mt-4">
-            <Select onValueChange={(e) => setMonthSelected(e)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona un mes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {months.map((item, index) => (
-                    <SelectItem value={item.number} key={index}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            Generando reporte, espere...
           </div>
-          <DialogFooter className="mt-4">
-            <Button
-              disabled={loadingFirst}
-              onClick={handleGenerateReportStarSoft}
-            >
-              Crear reporte
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 

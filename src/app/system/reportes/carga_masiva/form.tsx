@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ function FormReportMassive() {
 
       await postImage("reports/upload", formData, session.data);
       setLoading(false);
+
+      useToastDefault("Ok", "Registros realizado con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);

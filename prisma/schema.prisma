@@ -49,6 +49,8 @@ model DetailReport {
   hora_inicio_refrigerio String?
   hora_fin_refrigerio    String?
   hora_salida            String?
+  daily_license          String?
+  reason_license         String?
   report                 Report                 @relation(fields: [report_id], references: [id])
   DetailReportIncident   DetailReportIncident[]
   Incident               Incident?              @relation(fields: [incidentId], references: [id])
@@ -122,10 +124,17 @@ model Permissions {
 
 model Incident {
   id                   Int                    @id @default(autoincrement())
+  date                 DateTime?
   title                String
   description          String
   detailReports        DetailReport[]
   DetailReportIncident DetailReportIncident[]
+}
+
+model IncidentAbsolute {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  description String
 }
 
 // aqui deberia agregar  otro tipo de incidencia que seria general, que cuando se registre pida fecha, para que este marque por defecto a todos

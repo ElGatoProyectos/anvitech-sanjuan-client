@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,9 @@ function FormUpdateMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("reports/upload", formData, session.data);
+      await postImage("reports/upload-update", formData, session.data);
       setLoading(false);
+      useToastDefault("Ok", "Modificacion realizada con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
@@ -32,7 +33,7 @@ function FormUpdateMassive() {
   return (
     <div className="p-8 bg-white rounded-lg">
       <div className="mb-8">
-        <h1 className="text-lg font-semibold">Registrar reportes masivos</h1>
+        <h1 className="text-lg font-semibold">Modificar reportes masivos</h1>
       </div>
       <form
         onSubmit={handleRegistrarDataMassive}

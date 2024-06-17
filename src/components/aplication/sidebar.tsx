@@ -142,6 +142,21 @@ function Sidebar() {
 
                 <li>
                   <Link
+                    href={"/system/reportes/modificacion_masiva"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/reportes/modificacion_masiva"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Modificacion masiva
+                    </span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
                     href={"/system/reportes/exportar"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
                       pathname === "/system/reportes/exportar"
@@ -471,6 +486,20 @@ function Sidebar() {
                   >
                     <span className="ml-2 text-sm tracking-wide truncate">
                       Motivos cese
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={"/system/mantenimiento/licencias_diarias"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/mantenimiento/licencias_diarias"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Licencias diarias
                     </span>
                   </Link>
                 </li>

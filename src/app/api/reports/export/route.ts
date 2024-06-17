@@ -5,15 +5,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const response = await reportService.exportToExcel(body);
+    const response = await reportService.dataForExportNormal(
+      new Date(body.min),
+      new Date(body.max)
+    );
 
     return NextResponse.json(response.content, {
-      status: 200,
-      headers: {
-        "Content-Disposition": "attachment; filename=report.xlsx",
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      },
+      status: response.statusCode,
     });
   } catch (error) {
     return NextResponse.json(error, {

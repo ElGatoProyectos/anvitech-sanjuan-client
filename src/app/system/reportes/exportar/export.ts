@@ -33,7 +33,7 @@ export function exportStartSoft(content: any) {
   XLSX.writeFile(workbook, "reporte-startsoft.xlsx");
 }
 
-export function exportNormal(dateMin: Date, dateMax: Date) {
+export function exportNormal(content: any) {
   try {
   } catch (error) {}
 }

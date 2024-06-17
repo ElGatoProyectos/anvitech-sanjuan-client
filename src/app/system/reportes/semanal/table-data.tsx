@@ -52,7 +52,7 @@ function TableData() {
   const [currentPage, setCurrentPage] = useState(1);
   const [workersPerPage] = useState(20);
 
-  const [date, setDate] = useState<any>();
+  const [date, setDate] = useState<any>("");
 
   const indexOfLastWorker = currentPage * workersPerPage;
   const indexOfFirstWorker = indexOfLastWorker - workersPerPage;
@@ -66,13 +66,9 @@ function TableData() {
   // fetchs principales ================================================================
   async function fetchReport() {
     try {
-      let x = new Date();
-      const day = x.getDate();
-      const month = x.getMonth() + 1;
-      const year = x.getFullYear();
-
-      console.log(day, month, year);
-
+      const day = new Date().getDate();
+      const month = new Date().getMonth() + 1;
+      const year = new Date().getFullYear();
       const response = await post(
         "reports/weekly",
         { day, month, year },
@@ -121,24 +117,23 @@ function TableData() {
     setCurrentPage(1);
   }
 
-  async function handleChangeDay() {
+  async function handleFilterDay() {
     try {
-      let x = new Date(date);
-
-      console.log(x);
-      const day = x.getDate() + 1;
-      const month = x.getMonth() + 1;
-      const year = x.getFullYear();
-
       setLoading(true);
 
-      // const response = await post(
-      //   "reports/day",
-      //   { day, month, year },
-      //   session.data
-      // );
-      // setWorkers(response.data);
-      // setWorkersFiltered(response.data);
+      const day = new Date(date).getDate();
+      const month = new Date(date).getMonth() + 1;
+      const year = new Date(date).getFullYear();
+      const response = await post(
+        "reports/weekly",
+        { day, month, year },
+        session.data
+      );
+
+      console.log(response.data);
+
+      setWorkers(response.data);
+      setWorkersFiltered(response.data);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -207,7 +202,7 @@ function TableData() {
             </div>
             <Button
               className="mt-0"
-              onClick={handleChangeDay}
+              onClick={handleFilterDay}
               disabled={loading}
             >
               Aplicar fecha
@@ -226,12 +221,13 @@ function TableData() {
               <tr>
                 <th className="py-3 pr-6">DNI</th>
                 <th className="py-3 pr-6">Nombres</th>
+                <th className="py-3 pr-6">Sabado</th>
+                <th className="py-3 pr-6">Domingo</th>
                 <th className="py-3 pr-6">Lunes</th>
                 <th className="py-3 pr-6">Martes</th>
                 <th className="py-3 pr-6">Miercoles</th>
                 <th className="py-3 pr-6">Jueves</th>
                 <th className="py-3 pr-6">Viernes</th>
-                <th className="py-3 pr-6">Sabado</th>
 
                 {/* <th className="py-3 pr-6">Acción</th> */}
               </tr>
@@ -269,37 +265,6 @@ function TableData() {
                       <Skeleton className=" h-18"></Skeleton>
                     </th>
                   </tr>
-                  <tr>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-
-                    <td className=" whitespace-nowrap">
-                      <Skeleton></Skeleton>
-                    </td>
-                  </tr>
                 </>
               ) : (
                 currentWorkers.map((item: any, idx) => (
@@ -311,6 +276,17 @@ function TableData() {
                       {item.worker.full_name}
                     </td>
                     <th className="pr-6 py-4 ">
+                      {!item.sabado
+                        ? "-"
+                        : item.sabado.tardanza === "si"
+                        ? "T"
+                        : item.sabado.falta === "si"
+                        ? "F"
+                        : "OK"}
+                    </th>
+                    <th className="pr-6 py-4 ">-</th>
+
+                    <th className="py-3 pr-6" align="center">
                       {!item.lunes
                         ? "-"
                         : item.lunes.tardanza === "si"
@@ -319,7 +295,6 @@ function TableData() {
                         ? "F"
                         : "OK"}
                     </th>
-
                     <th className="py-3 pr-6" align="center">
                       {!item.martes
                         ? "-"
@@ -347,22 +322,13 @@ function TableData() {
                         ? "F"
                         : "OK"}
                     </th>
+
                     <th className="py-3 pr-6" align="center">
                       {!item.viernes
                         ? "-"
                         : item.viernes.tardanza === "si"
                         ? "T"
                         : item.viernes.falta === "si"
-                        ? "F"
-                        : "OK"}
-                    </th>
-
-                    <th className="py-3 pr-6" align="center">
-                      {!item.sabado
-                        ? "-"
-                        : item.sabado.tardanza === "si"
-                        ? "T"
-                        : item.sabado.falta === "si"
                         ? "F"
                         : "OK"}
                     </th>
