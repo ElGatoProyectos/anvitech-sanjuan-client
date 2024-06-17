@@ -98,6 +98,7 @@ function TableUser() {
             <tr>
               <th className="py-3 pr-6">Nombre</th>
               <th className="py-3 pr-6">DNI</th>
+              <th className="py-3 pr-6">Rol</th>
 
               <th className="py-3 pr-6">Estado</th>
 
@@ -114,6 +115,8 @@ function TableUser() {
                   {item.full_name}
                 </td>
                 <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
+                <td className="pr-6 py-4 whitespace-nowrap">{item.role}</td>
+
                 <td className="pr-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-2 rounded-full font-semibold text-xs ${
@@ -133,14 +136,39 @@ function TableUser() {
                   {item.email}
                 </td>
                 <td className="text-left whitespace-nowrap">
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={() => handleSelectUser(item)}
-                      variant={"outline"}
-                    >
-                      Configurar
-                    </Button>
-                  </DialogTrigger>
+                  {session.data?.user.role === "admin" &&
+                  item.role !== "admin" ? (
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleSelectUser(item)}
+                        variant={"outline"}
+                      >
+                        Configurar
+                      </Button>
+                    </DialogTrigger>
+                  ) : session.data?.user.role === "admin" &&
+                    item.role === "admin" &&
+                    session.data?.user.username === item.username ? (
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleSelectUser(item)}
+                        variant={"outline"}
+                      >
+                        Configurar
+                      </Button>
+                    </DialogTrigger>
+                  ) : session.data?.user.role === "superadmin" ? (
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleSelectUser(item)}
+                        variant={"outline"}
+                      >
+                        Configurar
+                      </Button>
+                    </DialogTrigger>
+                  ) : (
+                    <></>
+                  )}
                 </td>
               </tr>
             ))}

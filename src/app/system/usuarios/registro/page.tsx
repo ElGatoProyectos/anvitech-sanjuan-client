@@ -3,8 +3,8 @@ import Form from "./form";
 
 function Page() {
   return (
-    <div className=" grid md:grid-cols-2 grid-cols-1 w-full gap-8 ">
-      <FormRegisterUserMassive></FormRegisterUserMassive>
+    <div className=" grid md:grid-cols-1 grid-cols-1 w-full gap-8 ">
+      {/* <FormRegisterUserMassive></FormRegisterUserMassive> */}
       <Form></Form>
     </div>
   );

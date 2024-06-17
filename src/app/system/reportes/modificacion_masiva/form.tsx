@@ -1,14 +1,15 @@
 "use client";
-import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { postImage } from "@/app/http/api.http";
+
+import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 
-function FormRegisterUserMassive() {
+function FormUpdateMassive() {
   const [file, setFile] = useState<any>();
   const [loading, setLoading] = useState(false);
   const session = useSession();
@@ -20,11 +21,9 @@ function FormRegisterUserMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("users/file", formData, session.data);
+      await postImage("reports/upload", formData, session.data);
       setLoading(false);
-      useToastDefault("Ok", "Registro masivo realizado con exito");
     } catch (error) {
-      console.log(error);
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
     }
@@ -33,22 +32,20 @@ function FormRegisterUserMassive() {
   return (
     <div className="p-8 bg-white rounded-lg">
       <div className="mb-8">
-        <h1 className="text-lg font-semibold">
-          Registrar usuarios de manera masiva
-        </h1>
+        <h1 className="text-lg font-semibold">Registrar reportes masivos</h1>
       </div>
       <form
         onSubmit={handleRegistrarDataMassive}
         className="flex flex-col gap-8"
       >
         <div>
-          Recuerde que el archivo debe tener un formato único, los usuarios que
-          ya existan lanzaran un error.
+          Recuerde que el archivo debe tener un formato único, los reportes que
+          no tengan el formato anulara toda la carga.
           <Link
             target="_blank"
             download
-            as="/files/formato_usuarios_masivo.xlsx"
-            href="/files/formato_usuarios_masivo.xlsx"
+            as="/files/formato_reporte_modificacion_masiva.xlsx"
+            href="/files/formato_reporte_modificacion_masiva.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato
@@ -73,4 +70,4 @@ function FormRegisterUserMassive() {
   );
 }
 
-export default FormRegisterUserMassive;
+export default FormUpdateMassive;

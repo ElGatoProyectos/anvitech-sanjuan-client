@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import {
   Dialog,
@@ -19,6 +19,10 @@ import { CircleUserRound } from "lucide-react";
 
 function Header() {
   const { data: session } = useSession();
+
+  function handleLogout() {
+    signOut();
+  }
 
   return (
     <header className="w-full bg-white py-2 px-2 min-h-16">
@@ -42,41 +46,19 @@ function Header() {
 
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Detalle de usuario</DialogTitle>
-                <DialogDescription>
-                  Recuerde que estas modificaciones afectaran directamente a la
-                  base de datos
-                </DialogDescription>
+                <DialogTitle>Sesion de usuario</DialogTitle>
               </DialogHeader>
-              <div className="w-full flex flex-col gap-4">
-                <div className="w-full flex flex-col gap-2">
-                  <Label>Usuario</Label>
-                  <Input type="text" />
-                </div>
-                <div className="w-full flex flex-col gap-2">
-                  <Label>Nueva contrasena</Label>
-                  <Input type="password" />
-                </div>
-
-                <div className="w-full flex flex-col gap-2">
-                  <Label>Confirmar nueva contrasena</Label>
-                  <Input type="password" />
-                </div>
-
-                <div className="w-full flex flex-col gap-2">
-                  <Label>Contrasena anterior</Label>
-                  <Input type="password" />
-                </div>
-              </div>
+              <div className="w-full flex flex-col gap-4"></div>
               <DialogFooter className="justify-end">
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Cerrar
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleLogout}
+                  >
+                    Cerrar sesion
                   </Button>
                 </DialogClose>
-                <Button type="button" variant="default">
-                  Guardar Cambios
-                </Button>
               </DialogFooter>
             </DialogContent>
           </div>

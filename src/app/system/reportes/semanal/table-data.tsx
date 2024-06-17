@@ -67,7 +67,7 @@ function TableData() {
   async function fetchReport() {
     try {
       let x = new Date();
-      const day = x.getDate() - 1;
+      const day = x.getDate();
       const month = x.getMonth() + 1;
       const year = x.getFullYear();
 

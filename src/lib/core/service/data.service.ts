@@ -647,6 +647,36 @@ class DataService {
 
     return daysBetween;
   }
+
+  async getDaysFromLastSaturdayToThisFriday(
+    day: number,
+    month: number,
+    year: number
+  ) {
+    const inputDate = new Date(year, month - 1, day);
+    const dayOfWeek = inputDate.getDay();
+
+    // Encontrar el sábado anterior
+    const lastSaturday = new Date(inputDate);
+    lastSaturday.setDate(inputDate.getDate() - dayOfWeek - 1);
+
+    // Encontrar el viernes actual
+    const thisFriday = new Date(inputDate);
+    thisFriday.setDate(inputDate.getDate() + (5 - dayOfWeek));
+
+    // Generar todas las fechas entre el sábado anterior y el viernes actual
+    const daysBetween = [];
+
+    for (
+      let d = new Date(lastSaturday);
+      d <= thisFriday;
+      d.setDate(d.getDate() + 1)
+    ) {
+      daysBetween.push(new Date(d).toISOString());
+    }
+
+    return daysBetween;
+  }
 }
 
 export const dataService = new DataService();

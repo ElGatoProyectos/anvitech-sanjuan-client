@@ -14,11 +14,21 @@ export async function POST(request: NextRequest) {
     const monthBody = Number(body.month);
     const yearBody = Number(body.year);
 
-    const allDays = await dataService.getDaysBetweenMondayAndSaturday(
+    // const allDays = await dataService.getDaysBetweenMondayAndSaturday(
+    //   dayBody,
+    //   monthBody,
+    //   yearBody
+    // );
+
+    console.log(dayBody, monthBody, yearBody);
+
+    const allDays = await dataService.getDaysFromLastSaturdayToThisFriday(
       dayBody,
       monthBody,
       yearBody
     );
+
+    // deberia hbaer un metodo el cual  al pasarle un fecha, la reciba y devuelva de sabado a viernes y eso deberia ser el allDays
 
     console.log(allDays);
 

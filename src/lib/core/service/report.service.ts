@@ -510,7 +510,9 @@ class ReportService {
             tardanza: "no",
             falta: "si",
             fecha_reporte: this.excelSerialDateToJSDate(row.fecha_reporte),
-            dia: row.dia,
+            dia: this.getDayOfWeek(
+              this.excelSerialDateToJSDate(row.fecha_reporte)
+            ),
             dni: String(row.dni),
             nombre: worker.content.full_name,
             sede: worker.content.department,
@@ -593,6 +595,22 @@ class ReportService {
     // Crear y devolver el objeto Date
     const date = new Date(dateMilliseconds);
     return date;
+  }
+
+  getDayOfWeek(date: Date): string {
+    const daysOfWeek = [
+      "domingo",
+      "lunes",
+      "martes",
+      "miercoles",
+      "jueves",
+      "viernes",
+      "sabado",
+    ];
+
+    const dayIndex = date.getDay();
+
+    return daysOfWeek[dayIndex];
   }
 }
 
