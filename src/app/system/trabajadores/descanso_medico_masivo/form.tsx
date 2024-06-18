@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { FormEvent, useState } from "react";
 
-function FormRegisterSupervisorMassive() {
+function FormRegisterMedicalRestMassive() {
   const [file, setFile] = useState<any>();
   const [loading, setLoading] = useState(false);
   const session = useSession();
@@ -21,7 +21,7 @@ function FormRegisterSupervisorMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/mass-dismissal", formData, session.data);
+      await postImage("workers/massive-vacation", formData, session.data);
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
@@ -33,7 +33,7 @@ function FormRegisterSupervisorMassive() {
     <div className="p-8 bg-white rounded-lg">
       <div className="mb-8">
         <h1 className="text-lg font-semibold">
-          Registrar supervisores masivos
+          Registrar descansos medicos masivos
         </h1>
       </div>
       <form
@@ -45,8 +45,8 @@ function FormRegisterSupervisorMassive() {
           <Link
             target="_blank"
             download
-            as="/files/formato_cese_masivo.xlsx"
-            href="/files/formato_cese_masivo.xlsx"
+            as="/files/formato_vacaciones_masivas.xlsx"
+            href="/files/formato_vacaciones_masivas.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato
@@ -71,4 +71,4 @@ function FormRegisterSupervisorMassive() {
   );
 }
 
-export default FormRegisterSupervisorMassive;
+export default FormRegisterMedicalRestMassive;

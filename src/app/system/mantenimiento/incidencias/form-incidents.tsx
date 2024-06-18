@@ -13,7 +13,11 @@ function FormIncidents() {
   /// define states
   const session = useSession();
   const { setUpdatedAction, updatedAction } = useUpdatedStore();
-  const [incident, setIncident] = useState({ title: "", description: "" });
+  const [incident, setIncident] = useState({
+    title: "",
+    description: "",
+    date: "",
+  });
   const [loading, setLoading] = useState(false);
 
   /// define functions
@@ -24,7 +28,7 @@ function FormIncidents() {
       setLoading(true);
       await post("incidents", incident, session.data);
       setUpdatedAction();
-      setIncident({ title: "", description: "" });
+      setIncident({ title: "", description: "", date: "" });
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
@@ -35,14 +39,27 @@ function FormIncidents() {
   return (
     <div className="w-full  col-span-1">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label>Titulo</Label>
-          <Input
-            onChange={(e) =>
-              setIncident({ ...incident, title: e.target.value })
-            }
-          ></Input>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <Label>Titulo</Label>
+            <Input
+              onChange={(e) =>
+                setIncident({ ...incident, title: e.target.value })
+              }
+            ></Input>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Fecha de ejecucion</Label>
+            <Input
+              type="date"
+              onChange={(e) =>
+                setIncident({ ...incident, date: e.target.value })
+              }
+            ></Input>
+          </div>
         </div>
+
         <div className="flex flex-col gap-2">
           <Label>Descripción</Label>
           <Textarea

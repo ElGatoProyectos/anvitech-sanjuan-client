@@ -346,7 +346,7 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     href={"/system/trabajadores/registro_masivo"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
@@ -359,9 +359,9 @@ function Sidebar() {
                       Registro masivo
                     </span>
                   </Link>
-                </li>
+                </li> */}
 
-                <li>
+                {/* <li>
                   <Link
                     href={"/system/trabajadores/vacaciones_masivas"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
@@ -374,9 +374,9 @@ function Sidebar() {
                       Vacaciones masivas
                     </span>
                   </Link>
-                </li>
+                </li> */}
 
-                <li>
+                {/* <li>
                   <Link
                     href={"/system/trabajadores/cese_masivo"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
@@ -389,9 +389,9 @@ function Sidebar() {
                       Cese masivo
                     </span>
                   </Link>
-                </li>
+                </li> */}
 
-                <li>
+                {/* <li>
                   <Link
                     href={"/system/trabajadores/supervisores_masivos"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
@@ -402,6 +402,21 @@ function Sidebar() {
                   >
                     <span className="ml-2 text-sm tracking-wide truncate">
                       Supervisores masivos
+                    </span>
+                  </Link>
+                </li> */}
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/cargas_masivas"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/cargas_masivas"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Cargas masivas
                     </span>
                   </Link>
                 </li>
@@ -539,7 +554,7 @@ function Sidebar() {
           </li>
 
           {/* =================================================================================== */}
-          <li role="button" onClick={handleLogout}>
+          {/* <li role="button" onClick={handleLogout}>
             <div
               className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
                 pathname === "/system/notifications" ? activePath : inactivePath
@@ -550,7 +565,7 @@ function Sidebar() {
               </span>
               <span className="ml-2 text-sm tracking-wide truncate">Salir</span>
             </div>
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

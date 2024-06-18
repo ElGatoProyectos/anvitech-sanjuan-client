@@ -180,6 +180,7 @@ class DataService {
         hora_inicio_refrigerio: "",
         hora_fin_refrigerio: "",
         hora_salida: "",
+        discount: 0,
       };
 
       //- aqui vamos a crear la fecha
@@ -204,9 +205,21 @@ class DataService {
             formatData.hora_inicio = newHour + ":" + minutes;
             if (newHour > Number(hourStart)) {
               formatData.tardanza = "si";
+              formatData.discount = 35;
             } else {
-              if (newHour >= 9 && Number(minutes) > 0) {
-                formatData.tardanza = "si";
+              if (newHour === 9) {
+                if (Number(minutes) <= 5) {
+                  formatData.tardanza = "no";
+                } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 5;
+                } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 10;
+                } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 20;
+                }
               } else {
                 formatData.tardanza = "no";
               }
@@ -233,7 +246,7 @@ class DataService {
         const dateYesterday = new Date();
         dateYesterday.setDate(dateYesterday.getDate() - 1);
 
-        //- validamos si esta de vacaciones o permiso
+        //- validamos si esta de vacaciones, permiso, licencia o descanso medico
 
         // validamos las vacaciones
 
@@ -274,9 +287,51 @@ class DataService {
           },
         });
 
-        if (vacationResponse.length > 0 || permissionResponse.length > 0) {
+        const licencesResponse = await prisma.licence.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        const medicalRestResponse = await prisma.medicalRest.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        if (
+          vacationResponse.length > 0 ||
+          permissionResponse.length > 0 ||
+          licencesResponse.length > 0 ||
+          medicalRestResponse.length > 0
+        ) {
           formatData.falta = "no";
           formatData.tardanza = "no";
+          formatData.discount = 0;
         }
       }
 
@@ -400,6 +455,7 @@ class DataService {
         hora_inicio_refrigerio: "",
         hora_fin_refrigerio: "",
         hora_salida: "",
+        discount: 0,
       };
       if (dataFiltered.length) {
         const [lunesStart, lunesEnd] = schedule.lunes.split("-");
@@ -422,9 +478,21 @@ class DataService {
               formatData.hora_inicio = newHour + ":" + minutes;
               if (newHour > Number(hourStart)) {
                 formatData.tardanza = "si";
+                formatData.discount = 35;
               } else {
-                if (newHour >= 9 && Number(minutes) > 0) {
-                  formatData.tardanza = "si";
+                if (newHour === 9) {
+                  if (Number(minutes) <= 5) {
+                    formatData.tardanza = "no";
+                  } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 5;
+                  } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 10;
+                  } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 20;
+                  }
                 } else {
                   formatData.tardanza = "no";
                 }
@@ -491,10 +559,51 @@ class DataService {
           },
         });
 
-        if (vacationResponse.length > 0 || permissionResponse.length > 0) {
+        const licencesResponse = await prisma.licence.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        const medicalRestResponse = await prisma.medicalRest.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        if (
+          vacationResponse.length > 0 ||
+          permissionResponse.length > 0 ||
+          licencesResponse.length > 0 ||
+          medicalRestResponse.length > 0
+        ) {
           formatData.falta = "no";
           formatData.tardanza = "no";
-          return formatData;
+          formatData.discount = 0;
         } else {
           const formatData = {
             report_id: "",

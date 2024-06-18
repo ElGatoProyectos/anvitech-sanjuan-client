@@ -154,8 +154,8 @@ function TableWorkers() {
               <th className="py-3 pr-6">DNI</th>
               <th className="py-3 pr-6">Departamento</th>
               <th className="py-3 pr-6">Nombres</th>
+              <th className="py-3 pr-6">Tipo</th>
               <th className="py-3 pr-6">Estado</th>
-
               <th className="py-3 pr-6">Detalle</th>
             </tr>
           </thead>
@@ -215,6 +215,9 @@ function TableWorkers() {
 
                   <td className="pr-6 py-4 whitespace-nowrap">
                     {item.full_name}
+                  </td>
+                  <td className="pr-6 py-4 whitespace-nowrap">
+                    {item.type_contract}
                   </td>
                   <td> {item.enabled ? "HABILITADO" : "DESHABILITADO"}</td>
 

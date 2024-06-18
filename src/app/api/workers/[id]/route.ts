@@ -22,3 +22,28 @@ export async function GET(
     });
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: number } }
+) {
+  try {
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
+
+    const data = await request.json();
+
+    const response = await workerService.updateWorker(
+      data,
+      Number(context.params.id)
+    );
+
+    return NextResponse.json(response.content, {
+      status: response.statusCode,
+    });
+  } catch (error) {
+    return NextResponse.json(error, {
+      status: 500,
+    });
+  }
+}

@@ -42,23 +42,31 @@ class WorkerService {
 
       //- pendiente la validacion de esquemas con zod
 
-      const convertedArray = sheetToJson.map((item: any) => {
-        const hireDate = excelSerialDateToJSDate(item.fecha_contratacion);
-        const hireDateTimestamp = formatDateForPrisma(hireDate);
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          const hireDate = excelSerialDateToJSDate(item.fecha_contratacion);
+          const formatData = {
+            full_name: item.nombres,
+            type_contract: item.tipo_contrato,
+            dni: item.dni.toString(),
+            type_dni: item.tipo_documento,
+            department: item.departamento ? item.departamento : "No definido",
+            position: item.posicion ? item.posicion : "No definido",
+            enabled: item.estado === "ACTIVO" ? "si" : "no",
+            hire_date: hireDate.toISOString(),
+            supervisor:
+              item.supervisor === "" ? "No definido" : item.supervisor,
+            coordinator:
+              item.coordinador === "" ? "No definido" : item.coordinador,
+            management:
+              item.gestor_comercial === ""
+                ? "No definido"
+                : item.gestor_comercial,
+          };
 
-        return {
-          full_name: item.nombres,
-          dni: item.dni.toString(),
-          department: item.departamento ? "No definido" : item.departamento,
-          position: item.posicion ? "No definido" : "No definido",
-          enabled: item.estado === "ACTIVO" ? "si" : "no",
-          hire_date: hireDateTimestamp,
-
-          coordinator: item.coordinador ? "Definido" : "No definido",
-        };
-      });
-
-      const created = await prisma.worker.createMany({ data: convertedArray });
+          await prisma.worker.create({ data: formatData });
+        })
+      );
 
       /// registrar los horarios por defecto
       const formatSchedule = {
@@ -80,7 +88,7 @@ class WorkerService {
         };
         await scheduleService.createScheduleMassive(wFormat);
       });
-      return httpResponse.http201("Workers created", created);
+      return httpResponse.http201("Workers created");
     } catch (error) {
       console.log(error);
       return errorService.handleErrorSchema(error);
@@ -163,55 +171,74 @@ class WorkerService {
 
   // ==============================
 
-  async findAllSupervisor() {
-    try {
-      const data = await prisma.supervisor.findMany();
-      return httpResponse.http200("All supervisors", data);
-    } catch (error) {
-      return errorService.handleErrorSchema(error);
-    }
-  }
-  async createSupervisor(data: any) {
-    try {
-      const created = await prisma.supervisor.create({ data });
-      return httpResponse.http201("Supervisor created", created);
-    } catch (error) {
-      return errorService.handleErrorSchema(error);
-    }
-  }
+  // async findAllSupervisor() {
+  //   try {
+  //     const data = await prisma.supervisor.findMany();
+  //     return httpResponse.http200("All supervisors", data);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+  // async createSupervisor(data: any) {
+  //   try {
+  //     const created = await prisma.supervisor.create({ data });
+  //     return httpResponse.http201("Supervisor created", created);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
 
-  async findAllCoordinator() {
+  // async findAllCoordinator() {
+  //   try {
+  //     const data = await prisma.coordinator.findMany();
+  //     return httpResponse.http200("All coordinators", data);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+  // async createCoordinator(data: any) {
+  //   try {
+  //     const created = await prisma.coordinator.create({ data });
+  //     return httpResponse.http201("Supervisor created", created);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+
+  // async findAllManagement() {
+  //   try {
+  //     const data = await prisma.management.findMany();
+  //     return httpResponse.http200("All managements", data);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+
+  // async createManagement(data: any) {
+  //   try {
+  //     const created = await prisma.management.create({ data });
+  //     return httpResponse.http201("Supervisor created", created);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+
+  async updateWorker(data: any, workerId: number) {
     try {
-      const data = await prisma.coordinator.findMany();
-      return httpResponse.http200("All coordinators", data);
-    } catch (error) {
-      return errorService.handleErrorSchema(error);
-    }
-  }
-  async createCoordinator(data: any) {
-    try {
-      const created = await prisma.coordinator.create({ data });
-      return httpResponse.http201("Supervisor created", created);
+      const { hire_date, ...restData } = data;
+
+      const formatData = {
+        ...restData,
+        hire_date: new Date(hire_date),
+      };
+      const updated = await prisma.worker.update({
+        where: { id: workerId },
+        data: formatData,
+      });
+      return httpResponse.http200("Worker updated", updated);
     } catch (error) {
       console.log(error);
-      return errorService.handleErrorSchema(error);
-    }
-  }
-
-  async findAllManagement() {
-    try {
-      const data = await prisma.management.findMany();
-      return httpResponse.http200("All managements", data);
-    } catch (error) {
-      return errorService.handleErrorSchema(error);
-    }
-  }
-
-  async createManagement(data: any) {
-    try {
-      const created = await prisma.management.create({ data });
-      return httpResponse.http201("Supervisor created", created);
-    } catch (error) {
       return errorService.handleErrorSchema(error);
     }
   }

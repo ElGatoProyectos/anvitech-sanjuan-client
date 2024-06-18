@@ -51,6 +51,7 @@ model DetailReport {
   hora_salida            String?
   daily_license          String?
   reason_license         String?
+  discount               Float?
   report                 Report                 @relation(fields: [report_id], references: [id])
   DetailReportIncident   DetailReportIncident[]
   Incident               Incident?              @relation(fields: [incidentId], references: [id])
@@ -58,12 +59,17 @@ model DetailReport {
 }
 
 model Worker {
-  id               Int           @id @default(autoincrement())
-  coordinator      String
+  id Int @id @default(autoincrement())
+
   full_name        String
   dni              String        @unique
+  type_dni         String?
+  type_contract    String?
   department       String
   position         String
+  supervisor       String?
+  coordinator      String?
+  management       String?
   hire_date        DateTime
   termination_date DateTime?
   reason           String?
@@ -71,6 +77,8 @@ model Worker {
   schedule         Schedule[]
   Vacation         Vacation[]
   Permissions      Permissions[]
+  Licence          Licence[]
+  MedicalRest      MedicalRest[]
 }
 
 model TypeTermination {
@@ -131,26 +139,45 @@ model Incident {
   DetailReportIncident DetailReportIncident[]
 }
 
-model Supervisor {
-  id        Int    @id @default(autoincrement())
-  full_name String
+model Licence {
+  id         Int      @id @default(autoincrement())
+  Worker     Worker?  @relation(fields: [worker_id], references: [id])
+  worker_id  Int?
+  start_date DateTime
+  end_date   DateTime
+  reason     String?
 }
 
-model Coordinator {
-  id        Int    @id @default(autoincrement())
-  full_name String
+model MedicalRest {
+  id         Int      @id @default(autoincrement())
+  Worker     Worker?  @relation(fields: [worker_id], references: [id])
+  worker_id  Int?
+  start_date DateTime
+  end_date   DateTime
+  reason     String?
 }
 
-model Management {
-  id        Int    @id @default(autoincrement())
-  full_name String
-}
+// estos 4 se van
+// model Supervisor {
+//   id        Int    @id @default(autoincrement())
+//   full_name String
+// }
 
-model IncidentAbsolute {
-  id          Int      @id @default(autoincrement())
-  date        DateTime
-  description String
-}
+// model Coordinator {
+//   id        Int    @id @default(autoincrement())
+//   full_name String
+// }
+
+// model Management {
+//   id        Int    @id @default(autoincrement())
+//   full_name String
+// }
+
+// model IncidentAbsolute {
+//   id          Int      @id @default(autoincrement())
+//   date        DateTime
+//   description String
+// }
 
 // aqui deberia agregar  otro tipo de incidencia que seria general, que cuando se registre pida fecha, para que este marque por defecto a todos
 

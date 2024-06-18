@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { FormEvent, useState } from "react";
 
-function Form() {
+function FormRegisterWorkersMassive() {
   const [file, setFile] = useState<any>();
   const [loading, setLoading] = useState(false);
   const session = useSession();
@@ -31,7 +31,7 @@ function Form() {
   }
 
   return (
-    <div className="p-8 bg-white rounded-lg">
+    <div className=" bg-white rounded-lg  p-8">
       <div className="mb-8">
         <h1 className="text-lg font-semibold">
           Registrar trabajadores masivos
@@ -42,8 +42,7 @@ function Form() {
         className="flex flex-col gap-8"
       >
         <div>
-          Recuerde que el archivo debe tener un formato único, los usuarios que
-          ya existan lanzaran un error.
+          👉
           <Link
             target="_blank"
             download
@@ -65,7 +64,7 @@ function Form() {
 
         <div className="flex flex-col gap-2  col-span-2">
           <Button disabled={loading} type="submit">
-            Registrar trabajador
+            Registrar masivamente
           </Button>
         </div>
       </form>
@@ -73,4 +72,4 @@ function Form() {
   );
 }
 
-export default Form;
+export default FormRegisterWorkersMassive;

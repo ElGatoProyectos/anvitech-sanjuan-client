@@ -57,7 +57,11 @@ function UpdateDataWorker({ id }: { id: string }) {
   async function handleUpdate(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      // await putId("workers", worker, Number(id), session.data);
+      console.log(worker);
+
+      await putId("workers", worker, Number(id), session.data);
+
+      useToastDefault("Ok", "Modificacion realizada con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al modificar trabajador");
     }
@@ -133,6 +137,15 @@ function UpdateDataWorker({ id }: { id: string }) {
             <div className="">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-3">
+                  <Label>Tipo de documento</Label>
+                  <Input
+                    onChange={(e) =>
+                      setWorker({ ...worker, type_dni: e.target.value })
+                    }
+                    defaultValue={worker.type_dni}
+                  ></Input>
+                </div>
+                <div className="flex flex-col gap-3">
                   <Label>DNI</Label>
                   <Input
                     onChange={(e) =>
@@ -172,7 +185,27 @@ function UpdateDataWorker({ id }: { id: string }) {
                 <div className="flex flex-col gap-3">
                   <Label>Supervisor</Label>
                   <Input
+                    defaultValue={worker.supervisor}
+                    onChange={(e) =>
+                      setWorker({ ...worker, position: e.target.value })
+                    }
+                  ></Input>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Label>Coordinador</Label>
+                  <Input
                     defaultValue={worker.coordinator}
+                    onChange={(e) =>
+                      setWorker({ ...worker, position: e.target.value })
+                    }
+                  ></Input>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Label>Gestor comercial</Label>
+                  <Input
+                    defaultValue={worker.management}
                     onChange={(e) =>
                       setWorker({ ...worker, position: e.target.value })
                     }
@@ -182,12 +215,35 @@ function UpdateDataWorker({ id }: { id: string }) {
             </div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-3">
+                <Label>Tipo contratacion</Label>
+                <Select
+                  value={worker.type_contract}
+                  onValueChange={(e) =>
+                    setWorker({ ...worker, type_contract: e })
+                  }
+                >
+                  <SelectTrigger className="w-full ">
+                    <SelectValue>
+                      {worker.type_contract === "VENDEDOR"
+                        ? "VENDEDOR"
+                        : "SUPERVISOR"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="VENDEDOR">VENDEDOR</SelectItem>
+                      <SelectItem value="SUPERVISOR">SUPERVISOR</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-3">
                 <Label>Fecha de ingreso</Label>
                 <Input
                   type="date"
                   defaultValue={formatDateToInput(worker.hire_date)}
                   onChange={(e) =>
-                    setWorker({ ...worker, position: e.target.value })
+                    setWorker({ ...worker, hire_date: e.target.value })
                   }
                 ></Input>
               </div>

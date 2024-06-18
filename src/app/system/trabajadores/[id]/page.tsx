@@ -1,3 +1,5 @@
+import LicencesWorker from "./licences";
+import MedicalRestWorker from "./medical-rest";
 import PermissionsWorker from "./permission";
 import ScheduleWorker from "./schedule";
 import UpdateDataWorker from "./update-data";
@@ -10,6 +12,8 @@ function Page({ params }: { params: { id: string } }) {
       <UpdateDataWorker id={id}></UpdateDataWorker>
       <VacationWorker id={id}></VacationWorker>
       <PermissionsWorker id={id}></PermissionsWorker>
+      <LicencesWorker id={id}></LicencesWorker>
+      <MedicalRestWorker id={id}></MedicalRestWorker>
       {/* <ScheduleWorker id={id}></ScheduleWorker> */}
     </div>
   );

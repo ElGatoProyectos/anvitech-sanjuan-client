@@ -116,12 +116,10 @@ function TableIncidents() {
                   <td className="pr-6 py-4 whitespace-nowrap ">{item.title}</td>
                   <td className="pr-6 py-4 whitespace-nowrap ">
                     <DialogTrigger asChild>
-                      <Button
-                        size={"sm"}
+                      <Settings
+                        role="button"
                         onClick={() => handleIncidentSelected(item)}
-                      >
-                        <Settings />
-                      </Button>
+                      />
                     </DialogTrigger>
                   </td>
                 </tr>
