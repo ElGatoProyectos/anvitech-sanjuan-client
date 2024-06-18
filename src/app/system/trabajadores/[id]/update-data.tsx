@@ -170,7 +170,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                   ></Input>
                 </div>
                 <div className="flex flex-col gap-3">
-                  <Label>Coordinador</Label>
+                  <Label>Supervisor</Label>
                   <Input
                     defaultValue={worker.coordinator}
                     onChange={(e) =>

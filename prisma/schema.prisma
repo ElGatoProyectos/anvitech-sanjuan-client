@@ -131,6 +131,21 @@ model Incident {
   DetailReportIncident DetailReportIncident[]
 }
 
+model Supervisor {
+  id        Int    @id @default(autoincrement())
+  full_name String
+}
+
+model Coordinator {
+  id        Int    @id @default(autoincrement())
+  full_name String
+}
+
+model Management {
+  id        Int    @id @default(autoincrement())
+  full_name String
+}
+
 model IncidentAbsolute {
   id          Int      @id @default(autoincrement())
   date        DateTime

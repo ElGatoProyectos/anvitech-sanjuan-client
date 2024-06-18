@@ -47,8 +47,8 @@ function FormRegisterUserMassive() {
           <Link
             target="_blank"
             download
-            as="/files/formato_usuarios_masivo.xlsx"
-            href="/files/formato_usuarios_masivo.xlsx"
+            as="/files/formato_usuarios_carga_masiva.xlsx"
+            href="/files/formato_usuarios_carga_masiva.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato

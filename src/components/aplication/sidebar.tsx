@@ -287,6 +287,51 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/supervisores"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/supervisores"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Supervisores
+                    </span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/coordinadores"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/coordinadores"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Coordinadores
+                    </span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href={"/system/trabajadores/gestores_comercial"}
+                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                      pathname === "/system/trabajadores/gestores_comercial"
+                        ? activePath
+                        : inactivePath
+                    } transition-all`}
+                  >
+                    <span className="ml-2 text-sm tracking-wide truncate">
+                      Gestores comerciales
+                    </span>
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href={"/system/trabajadores/registro"}
@@ -486,20 +531,6 @@ function Sidebar() {
                   >
                     <span className="ml-2 text-sm tracking-wide truncate">
                       Motivos cese
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href={"/system/mantenimiento/licencias_diarias"}
-                    className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                      pathname === "/system/mantenimiento/licencias_diarias"
-                        ? activePath
-                        : inactivePath
-                    } transition-all`}
-                  >
-                    <span className="ml-2 text-sm tracking-wide truncate">
-                      Licencias diarias
                     </span>
                   </Link>
                 </li>

@@ -160,6 +160,61 @@ class WorkerService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  // ==============================
+
+  async findAllSupervisor() {
+    try {
+      const data = await prisma.supervisor.findMany();
+      return httpResponse.http200("All supervisors", data);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+  async createSupervisor(data: any) {
+    try {
+      const created = await prisma.supervisor.create({ data });
+      return httpResponse.http201("Supervisor created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async findAllCoordinator() {
+    try {
+      const data = await prisma.coordinator.findMany();
+      return httpResponse.http200("All coordinators", data);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+  async createCoordinator(data: any) {
+    try {
+      const created = await prisma.coordinator.create({ data });
+      return httpResponse.http201("Supervisor created", created);
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async findAllManagement() {
+    try {
+      const data = await prisma.management.findMany();
+      return httpResponse.http200("All managements", data);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async createManagement(data: any) {
+    try {
+      const created = await prisma.management.create({ data });
+      return httpResponse.http201("Supervisor created", created);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const workerService = new WorkerService();
