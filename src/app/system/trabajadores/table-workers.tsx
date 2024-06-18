@@ -101,6 +101,17 @@ function TableWorkers() {
     setCurrentPage(1);
   }
 
+  function handleSelectTypeContract(value: string) {
+    if (value === "all") {
+      setWorkersFiltered(workers);
+      setCurrentPage(1);
+    } else {
+      const filtered = workers.filter((item) => item.type_contract === value);
+      setWorkersFiltered(filtered);
+      setCurrentPage(1);
+    }
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       fetchDataWorkers();
@@ -115,6 +126,19 @@ function TableWorkers() {
           placeholder="Buscar por DNI"
           onChange={handleChangeInput}
         ></Input>
+
+        <Select onValueChange={(e) => handleSelectTypeContract(e)}>
+          <SelectTrigger className="w-[50%]">
+            <SelectValue placeholder="Tipo de trabajador" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="VENDEDOR">VENDEDOR</SelectItem>
+              <SelectItem value="SUPERVISOR">SUPERVISOR</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
         <Select onValueChange={(e) => handleSelectDepartment(e)}>
           <SelectTrigger className="w-[50%]">
             <SelectValue placeholder="Departamento" />

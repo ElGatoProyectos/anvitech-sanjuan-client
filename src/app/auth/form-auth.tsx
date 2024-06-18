@@ -67,7 +67,7 @@ function FormAuth() {
             type="password"
             onChange={(e) => setData({ ...data, password: e.target.value })}
             className="w-full flex-1 appearance-none border-gray-300 bg-white px-4 py-2 text-base text-gray-700 placeholder-gray-400 focus:outline-none"
-            placeholder="Contrasen~a"
+            placeholder="Contraseña"
           />
         </div>
       </div>

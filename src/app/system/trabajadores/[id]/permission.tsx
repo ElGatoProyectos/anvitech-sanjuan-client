@@ -221,7 +221,8 @@ function PermissionsWorker({ id }: { id: string }) {
                       {formatDate(item.end_date)}
                     </td>
                     <td>
-                      {calculateDateDifference(item.start_date, item.end_date)}
+                      {calculateDateDifference(item.start_date, item.end_date) +
+                        1}
                     </td>
                     <td>{formatDate(item.start_date)}</td>
                     <td>{formatDate(item.end_date)}</td>

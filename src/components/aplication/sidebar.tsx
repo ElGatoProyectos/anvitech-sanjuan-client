@@ -288,7 +288,7 @@ function Sidebar() {
                   </Link>
                 </li>
 
-                <li>
+                {/* <li>
                   <Link
                     href={"/system/trabajadores/supervisores"}
                     className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
@@ -331,7 +331,7 @@ function Sidebar() {
                       Gestores comerciales
                     </span>
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link
                     href={"/system/trabajadores/registro"}
