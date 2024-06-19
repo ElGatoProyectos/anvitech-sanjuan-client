@@ -457,8 +457,6 @@ class ReportService {
             worker.content.id
           );
 
-          console.log(worker, schedule);
-
           const [scheduleStart, scheduleEnd] =
             schedule.content[
               this.getDayOfWeek(new Date(row.fecha_reporte))
@@ -490,16 +488,49 @@ class ReportService {
               ? String(row.hora_fin_refrigerio)
               : "",
             hora_salida: row.hora_salida ? String(row.hora_salida) : "",
+            discount: 0,
           };
+
+          // cuando el usuario tiene registrado una hora de inicio ===============
 
           if (row.hora_inicio !== "" && row.hora_salida === "") {
             const [dataStartHour, dataStartMinute] = row.hora_inicio
               .split(":")
               .map(Number);
 
-            if (dataStartHour > scheduleHourStart) formatData.tardanza = "si";
-            else if (dataStartHour === scheduleHourStart) {
-              if (dataStartMinute > 0) formatData.tardanza = "si";
+            if (dataStartHour <= 11) {
+              if (dataStartHour > scheduleHourStart) {
+                formatData.tardanza = "si";
+                formatData.discount = 35;
+              } else {
+                if (dataStartHour === scheduleHourStart) {
+                  if (Number(dataStartMinute) <= 5) {
+                    formatData.tardanza = "no";
+                  } else if (
+                    Number(dataStartMinute) > 5 &&
+                    Number(dataStartMinute) <= 15
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 5;
+                  } else if (
+                    Number(dataStartMinute) > 15 &&
+                    Number(dataStartMinute) <= 30
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 10;
+                  } else if (
+                    Number(dataStartMinute) > 30 &&
+                    Number(dataStartMinute) <= 59
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 20;
+                  }
+                } else {
+                  formatData.tardanza = "no";
+                }
+              }
+            } else {
+              formatData.tardanza = "si";
             }
           }
           // cuando el usuario tiene una hora de salida
@@ -526,17 +557,55 @@ class ReportService {
               .split(":")
               .map(Number);
 
-            if (dataStartHour > scheduleHourStart) formatData.falta = "si";
-            else if (dataStartHour === scheduleHourStart) {
-              if (dataStartMinute > 0) formatData.falta = "si";
-            }
+            if (dataStartHour <= 11) {
+              if (dataStartHour > scheduleHourStart) {
+                formatData.tardanza = "si";
 
-            if (dataEndHour < scheduleHourEnd) {
-              formatData.falta = "si";
-              formatData.tardanza = "no";
-            } else if (dataEndHour === scheduleHourEnd) {
+                formatData.discount = 35;
+              } else {
+                if (dataStartHour === scheduleHourStart) {
+                  if (Number(dataStartMinute) <= 5) {
+                    formatData.tardanza = "no";
+                  } else if (
+                    Number(dataStartMinute) > 5 &&
+                    Number(dataStartMinute) <= 15
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 5;
+                  } else if (
+                    Number(dataStartMinute) > 15 &&
+                    Number(dataStartMinute) <= 30
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 10;
+                  } else if (
+                    Number(dataStartMinute) > 30 &&
+                    Number(dataStartMinute) <= 59
+                  ) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 20;
+                  }
+                } else {
+                  formatData.tardanza = "no";
+                }
+              }
               formatData.falta = "no";
+            } else {
+              formatData.tardanza = "si";
             }
+          }
+
+          //- validamos si esta en un fecha donde tiene una escusa para no asistir
+
+          const responseValidateWorkerInDay = await this.validateDayInWorker(
+            new Date(row.fecha_reporte),
+            worker.content.id
+          );
+
+          if (responseValidateWorkerInDay) {
+            formatData.falta = "no";
+            formatData.tardanza = "no";
+            formatData.discount = 0;
           }
 
           await prisma.detailReport.create({ data: formatData });
@@ -566,10 +635,7 @@ class ReportService {
             worker.content.id
           );
 
-          console.log(
-            this.excelSerialDateToJSDate(row.fecha_reporte).toISOString()
-          );
-          console.log(String(row.dni));
+          console.log(this.getDayOfWeek(new Date(row.fecha_reporte)));
 
           const detail = await prisma.detailReport.findFirst({
             where: {
@@ -577,11 +643,6 @@ class ReportService {
               dia: this.getDayOfWeek(new Date(row.fecha_reporte)),
             },
           });
-          console.log(
-            "detail ================================================"
-          );
-
-          console.log(detail);
 
           const [scheduleStart, scheduleEnd] =
             schedule.content[
@@ -614,7 +675,13 @@ class ReportService {
               ? String(row.hora_fin_refrigerio)
               : "",
             hora_salida: row.hora_salida ? String(row.hora_salida) : "",
+            discount: 0,
           };
+          console.log("==========================");
+          console.log(row.hora_inicio);
+          console.log(row.hora_salida);
+
+          console.log(detail);
 
           // si hay un registro empezamos a condicionar los horarios =============================================
           if (detail) {
@@ -623,9 +690,41 @@ class ReportService {
                 .split(":")
                 .map(Number);
 
-              if (dataStartHour > scheduleHourStart) formatData.tardanza = "si";
-              else if (dataStartHour === scheduleHourStart) {
-                if (dataStartMinute > 0) formatData.tardanza = "si";
+              if (dataStartHour <= 11) {
+                if (dataStartHour > scheduleHourStart) {
+                  formatData.tardanza = "si";
+
+                  formatData.discount = 35;
+                } else {
+                  if (dataStartHour === scheduleHourStart) {
+                    if (Number(dataStartMinute) <= 5) {
+                      formatData.tardanza = "no";
+                    } else if (
+                      Number(dataStartMinute) > 5 &&
+                      Number(dataStartMinute) <= 15
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 5;
+                    } else if (
+                      Number(dataStartMinute) > 15 &&
+                      Number(dataStartMinute) <= 30
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 10;
+                    } else if (
+                      Number(dataStartMinute) > 30 &&
+                      Number(dataStartMinute) <= 59
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 20;
+                    }
+                  } else {
+                    formatData.tardanza = "no";
+                  }
+                }
+                formatData.falta = "no";
+              } else {
+                formatData.tardanza = "si";
               }
             }
             // cuando el usuario tiene una hora de salida
@@ -645,6 +744,7 @@ class ReportService {
               formatData.falta = "si";
               formatData.tardanza = "no";
             } else {
+              console.log("hereeee======================");
               const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
                 .split(":")
                 .map(Number);
@@ -652,17 +752,54 @@ class ReportService {
                 .split(":")
                 .map(Number);
 
-              if (dataStartHour > scheduleHourStart) formatData.falta = "si";
-              else if (dataStartHour === scheduleHourStart) {
-                if (dataStartMinute > 0) formatData.falta = "si";
-              }
+              if (dataStartHour <= 11) {
+                if (dataStartHour > scheduleHourStart) {
+                  formatData.tardanza = "si";
 
-              if (dataEndHour < scheduleHourEnd) {
-                formatData.falta = "si";
-                formatData.tardanza = "no";
-              } else if (dataEndHour === scheduleHourEnd) {
+                  formatData.discount = 35;
+                } else {
+                  if (dataStartHour === scheduleHourStart) {
+                    if (Number(dataStartMinute) <= 5) {
+                      formatData.tardanza = "no";
+                    } else if (
+                      Number(dataStartMinute) > 5 &&
+                      Number(dataStartMinute) <= 15
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 5;
+                    } else if (
+                      Number(dataStartMinute) > 15 &&
+                      Number(dataStartMinute) <= 30
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 10;
+                    } else if (
+                      Number(dataStartMinute) > 30 &&
+                      Number(dataStartMinute) <= 59
+                    ) {
+                      formatData.tardanza = "si";
+                      formatData.discount = 20;
+                    }
+                  } else {
+                    formatData.tardanza = "no";
+                  }
+                }
                 formatData.falta = "no";
+              } else {
+                formatData.tardanza = "si";
               }
+            }
+
+            //- validamos si esta en un fecha donde tiene una escusa para no asistir
+            const responseValidateWorkerInDay = await this.validateDayInWorker(
+              new Date(row.fecha_reporte),
+              worker.content.id
+            );
+
+            if (responseValidateWorkerInDay) {
+              formatData.falta = "no";
+              formatData.tardanza = "no";
+              formatData.discount = 0;
             }
 
             const created = await prisma.detailReport.update({
@@ -682,7 +819,7 @@ class ReportService {
   }
 
   excelSerialDateToJSDate(serial: number): Date {
-    const excelEpoch = new Date("1899-12-31"); // Fecha base de Excel
+    const excelEpoch = new Date("1899-12-30"); // Fecha base de Excel
     const millisecondsInDay = 24 * 60 * 60 * 1000; // Milisegundos en un día
     const offsetDays = Math.floor(serial); // Parte entera del número de serie
 
@@ -706,9 +843,100 @@ class ReportService {
       "sabado",
     ];
 
-    const dayIndex = date.getDay();
+    const dayIndex = date.getDay() + 1;
 
     return daysOfWeek[dayIndex];
+  }
+
+  async validateDayInWorker(fecha_excel: Date, workerId: number) {
+    const incidentResponse = await prisma.incident.findMany({
+      where: {
+        date: fecha_excel,
+      },
+    });
+
+    const medicalRestResponse = await prisma.medicalRest.findMany({
+      where: {
+        worker_id: workerId,
+        AND: [
+          {
+            start_date: {
+              lte: fecha_excel,
+            },
+          },
+          {
+            end_date: {
+              gte: fecha_excel,
+            },
+          },
+        ],
+      },
+    });
+
+    const vacationResponse = await prisma.vacation.findMany({
+      where: {
+        worker_id: workerId,
+        AND: [
+          {
+            start_date: {
+              lte: fecha_excel,
+            },
+          },
+          {
+            end_date: {
+              gte: fecha_excel,
+            },
+          },
+        ],
+      },
+    });
+    // validamos los permisos
+
+    const permissionResponse = await prisma.permissions.findMany({
+      where: {
+        worker_id: workerId,
+        AND: [
+          {
+            start_date: {
+              lte: fecha_excel,
+            },
+          },
+          {
+            end_date: {
+              gte: fecha_excel,
+            },
+          },
+        ],
+      },
+    });
+
+    const licencesResponse = await prisma.licence.findMany({
+      where: {
+        worker_id: workerId,
+        AND: [
+          {
+            start_date: {
+              lte: fecha_excel,
+            },
+          },
+          {
+            end_date: {
+              gte: fecha_excel,
+            },
+          },
+        ],
+      },
+    });
+
+    if (
+      vacationResponse.length > 0 ||
+      permissionResponse.length > 0 ||
+      licencesResponse.length > 0 ||
+      medicalRestResponse.length > 0 ||
+      incidentResponse.length > 0
+    )
+      return true;
+    return false;
   }
 }
 

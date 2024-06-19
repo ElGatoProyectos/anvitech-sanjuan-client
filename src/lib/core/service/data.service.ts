@@ -287,6 +287,8 @@ class DataService {
           },
         });
 
+        // validamos licencias
+
         const licencesResponse = await prisma.licence.findMany({
           where: {
             worker_id: worker.id,
@@ -304,6 +306,8 @@ class DataService {
             ],
           },
         });
+
+        // validamos los descansos medicos
 
         const medicalRestResponse = await prisma.medicalRest.findMany({
           where: {
@@ -323,11 +327,20 @@ class DataService {
           },
         });
 
+        // validamos incidencias
+
+        const incidentResponse = await prisma.incident.findMany({
+          where: {
+            date: dateYesterday,
+          },
+        });
+
         if (
           vacationResponse.length > 0 ||
           permissionResponse.length > 0 ||
           licencesResponse.length > 0 ||
-          medicalRestResponse.length > 0
+          medicalRestResponse.length > 0 ||
+          incidentResponse.length > 0
         ) {
           formatData.falta = "no";
           formatData.tardanza = "no";
@@ -595,11 +608,18 @@ class DataService {
           },
         });
 
+        const incidentResponse = await prisma.incident.findMany({
+          where: {
+            date: dateYesterday,
+          },
+        });
+
         if (
           vacationResponse.length > 0 ||
           permissionResponse.length > 0 ||
           licencesResponse.length > 0 ||
-          medicalRestResponse.length > 0
+          medicalRestResponse.length > 0 ||
+          incidentResponse.length > 0
         ) {
           formatData.falta = "no";
           formatData.tardanza = "no";

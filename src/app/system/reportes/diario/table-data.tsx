@@ -344,7 +344,6 @@ function TableData() {
               <tr>
                 <th className="py-3 pr-6">DNI</th>
                 <th className="py-3 pr-6">Nombres</th>
-                <th className="py-3 pr-6">Departamento</th>
                 <th className="py-3 pr-6">Fecha</th>
                 <th className="py-3 pr-6">Hora inicio</th>
                 <th className="py-3 pr-6">Inicio refrigerio</th>
@@ -352,6 +351,7 @@ function TableData() {
                 <th className="py-3 pr-6">Hora salida</th>
                 <th className="py-3 pr-6">Tardanza</th>
                 <th className="py-3 pr-6">Falta</th>
+                <th className="py-3 pr-6">Descuento</th>
 
                 <th className="py-3 pr-6">Acción</th>
               </tr>
@@ -444,7 +444,7 @@ function TableData() {
                     <td className="pr-6 py-4 whitespace-nowrap">
                       {item.nombre}
                     </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">{item.sede}</td>
+
                     <th className="py-3 pr-6">
                       {formatDate(item.fecha_reporte)}
                     </th>
@@ -465,6 +465,10 @@ function TableData() {
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {item.falta}
+                    </th>
+
+                    <th className="py-3 pr-6" align="center">
+                      {item.discount}
                     </th>
 
                     <td className=" whitespace-nowrap">

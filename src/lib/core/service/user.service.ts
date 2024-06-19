@@ -124,15 +124,15 @@ class UserService {
 
       const exampleData = sheetToJson[0];
 
-      formatUserDTO.parse(exampleData);
+      // formatUserDTO.parse(exampleData);
 
       await Promise.all(
         sheetToJson.map(async (item: any) => {
           const password = bcrypt.hashSync(String(item.dni), 11);
           const format = {
             full_name: item.nombres,
-            dni: String(item.dni),
-            phone: String(item.celular),
+            dni: item.dni,
+            phone: item.celular,
             email: item.correo,
             username: String(item.dni),
             password,
