@@ -1,88 +1,96 @@
 import React, { useState } from "react";
-import Chart from "react-apexcharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-function GraphicLine() {
-  const [series, setSeries] = useState([
-    {
-      name: "Asistencias vs Faltas",
-      data: [70, 100],
-    },
-  ]);
+interface Props {
+  day: string;
+  absences: any;
+}
 
-  const [options, setOptions] = useState<any>({
-    chart: {
-      height: 350,
-      type: "line",
-    },
-    stroke: {
-      curve: "straight",
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: any) {
-        return val;
-      },
-      offsetY: -10,
-      style: {
-        fontSize: "12px",
-        colors: ["#304758"],
-      },
-    },
-    xaxis: {
-      categories: ["Ayer", "Hoy"],
-      position: "bottom",
-      axisBorder: {
-        show: true,
-      },
-      axisTicks: {
-        show: true,
-      },
-      crosshairs: {
-        fill: {
-          type: "gradient",
-          gradient: {
-            colorFrom: "#D8E3F0",
-            colorTo: "#BED1E6",
-            stops: [0, 500],
-            opacityFrom: 0.4,
-            opacityTo: 0.5,
-          },
-        },
-      },
-      tooltip: {
-        enabled: true,
-      },
-    },
-    yaxis: {
-      min: 0,
-      max: 300,
-      axisBorder: {
-        show: true,
-      },
-      axisTicks: {
-        show: true,
-      },
-      labels: {
-        show: true,
-        formatter: function (val: any) {
-          return val;
-        },
-      },
-    },
-    title: {
-      text: "Comparacion de faltas",
-      floating: true,
-      offsetY: 330,
-      align: "center",
-      style: {
-        color: "#444",
-      },
-    },
-  });
+const data_recentOrder = [
+  {
+    day: "lun",
+    absences: 122,
+  },
+  {
+    month: "mar",
+    orders: 52,
+  },
+];
 
+function GraphicLine({ formattedLateness }: { formattedLateness: Props[] }) {
   return (
-    <div className="w-full bg-white p-2 rounded-lg">
-      <Chart options={options} series={series} type="line" />
+    <div className="h-[360px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={formattedLateness}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0,
+          }}
+        >
+          <Tooltip
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div className="rounded-lg border bg-background p-2 shadow-sm">
+                    <div className="grid grid-cols-1 gap-2">
+                      <div className="flex flex-col">
+                        <span className="text-[0.70rem] uppercase text-muted-foreground">
+                          Tardanzas
+                        </span>
+                        <span className="font-bold text-muted-foreground">
+                          {payload[0].value}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            }}
+          />
+          <CartesianGrid
+            horizontal={true}
+            vertical={false}
+            stroke={"hsl(var(--border))"}
+          />
+          <XAxis
+            dataKey="day"
+            tickLine={{ stroke: "none" }}
+            axisLine={{ stroke: "none" }}
+            stroke={"hsl(var(--muted-foreground))"}
+            padding={{ left: 20, right: 30 }}
+          />
+          <YAxis
+            tickLine={{ stroke: "none" }}
+            axisLine={{ stroke: "none" }}
+            stroke={"hsl(var(--muted-foreground))"}
+            padding={{ top: 0, bottom: 20 }}
+          />
+          <Area
+            type="monotone"
+            dataKey="absences"
+            strokeWidth={2}
+            activeDot={{
+              r: 8,
+              style: { fill: "hsl(var(--primary))" },
+            }}
+            stroke="hsl(var(--primary))"
+            fill="hsl(var(--accent))"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   );
 }
