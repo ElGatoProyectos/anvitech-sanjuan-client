@@ -41,9 +41,9 @@ function Dashboard() {
           <Button>Filtrar</Button>
         </div>
       </div>
-      <GraphicBar></GraphicBar>
+      {/* <GraphicBar />
 
-      <GraphicLine></GraphicLine>
+      <GraphicLine/> */}
 
       <div className="bg-white w-full  p-2  rounded-lg">
         <table className="w-full text-left text-sm ">
