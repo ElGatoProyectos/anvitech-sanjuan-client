@@ -14,16 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useWorkerWeek } from "../hooks/useWokersWeek";
 
 function Dashboard() {
   const session = useSession();
+  const { attendanceVsAbsence, formattedLateness } = useWorkerWeek();
 
   return (
-    <div className="grid  grid-cols-2 gap-4 w-full">
+    <div className="grid grid-cols-2 gap-4 w-full">
       <div className="bg-white w-full col-span-2 p-2 rounded-lg flex gap-16 justify-between">
         <div className="flex gap-4">
           <Input type="date"></Input>
-          <Button>Filtrar por semana</Button>
+          <Input type="date"></Input>
+          <Button>Filtrar</Button>
         </div>
         <div className="flex gap-4">
           <Select>
@@ -40,9 +43,9 @@ function Dashboard() {
           <Button>Filtrar</Button>
         </div>
       </div>
-      {/* <GraphicBar />
+      <GraphicBar attendanceVsAbsence={attendanceVsAbsence} />
 
-      <GraphicLine/> */}
+      <GraphicLine formattedLateness={formattedLateness} />
 
       <div className="bg-white w-full  p-2  rounded-lg">
         <table className="w-full text-left text-sm ">
