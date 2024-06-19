@@ -12,22 +12,21 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
     permisos,
   } = content;
 
-  const faltas = reportes.filter((r: any) => r.falta === "si");
-
   const dataGeneral = content.map((row: any) => {
-    const fatas = content.rep;
+    const faltas = row.reportes.filter((r: any) => r.falta === "si");
+
     const formatData = {
       CODTRABA: row.worker.dni,
       NOMBRES: row.worker.full_name,
       CCOSTO: "",
-      DDESCMED: "",
+      DDESCMED: calculateDaysInRange(row.descansos_medico, dateMin, dateMax),
       DFALTAS: faltas.length,
-      DIASTRAB: reportes.length - faltas.length,
-      DLICSGO: faltas.length,
-      DLICCGO: calculateDaysInRange(vacaciones, dateMin, dateMax),
+      DIASTRAB: row.reportes - faltas.length,
+      DLICSGO: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
+      DLICCGO: calculateDaysInRange(row.licencias, dateMin, dateMax),
       DSUBENF: "",
       DSUBMAT: "",
-      DVAC: "",
+      DVAC: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
     };
     return formatData;
   });

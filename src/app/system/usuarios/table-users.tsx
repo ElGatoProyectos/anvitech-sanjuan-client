@@ -42,6 +42,7 @@ function TableUser() {
     email: "",
     phone: "",
     role: "",
+    password: "",
     enabled: true,
   });
 
@@ -213,6 +214,16 @@ function TableUser() {
                 }
                 defaultValue={userSelected.email}
                 type="email"
+              />
+            </div>
+
+            <div className="gap-2">
+              <Label>Password</Label>
+              <Input
+                onChange={(e) =>
+                  setUserSelected({ ...userSelected, password: e.target.value })
+                }
+                type="password"
               />
             </div>
 

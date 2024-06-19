@@ -191,6 +191,11 @@ class DataService {
         //! formatData.sede=dataFiltered[0].device.name,
         dataFiltered.map((item, index) => {
           const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+
+          if (!horaCompleta) {
+            formatData.falta = "si";
+            formatData.discount = 35;
+          }
           const [hour, minutes] = horaCompleta.split(":");
 
           let newHour: number = Number(hour) - 5;
@@ -353,7 +358,7 @@ class DataService {
           formatData.tardanza = "no";
           formatData.discount = 0;
         } else {
-          formatData.falta = "sssss";
+          formatData.falta = "si";
           formatData.discount = 35;
         }
       }

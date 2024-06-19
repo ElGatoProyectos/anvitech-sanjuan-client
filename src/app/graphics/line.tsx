@@ -27,7 +27,7 @@ const data_recentOrder = [
 
 function GraphicLine({ formattedLateness }: { formattedLateness: Props[] }) {
   return (
-    <div className="h-[360px]">
+    <div className="h-full bg-white p-4">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={formattedLateness}

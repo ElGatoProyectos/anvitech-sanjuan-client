@@ -6,6 +6,7 @@ import GraphicBar from "../graphics/bar";
 import GraphicLine from "../graphics/line";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import "../globals.css";
 import {
   Select,
   SelectContent,

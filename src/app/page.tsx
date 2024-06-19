@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import FormAuth from "./auth/form-auth";
 import Link from "next/link";
+import "./globals.css";
 
 export default function Home() {
   return (

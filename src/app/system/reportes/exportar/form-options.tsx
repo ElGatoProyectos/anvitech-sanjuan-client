@@ -118,13 +118,24 @@ function FormOptions() {
         );
 
         console.log(response.data);
-        // exportStartSoft(response.data);
+
+        const newYear = new Date().getFullYear();
+        const month = parseInt(monthSelected, 10) - 1; // Restar 1 porque los meses en JavaScript son de 0 a 11
+
+        // Fecha de inicio del mes
+        const startOfMonth = new Date(newYear, month, 1);
+
+        // Fecha final del mes
+        const endOfMonth = new Date(newYear, month + 1, 0);
+
+        exportStartSoft(response.data, startOfMonth, endOfMonth);
         setOpenFirst(false);
 
         useToastDefault("Ok", "Reporte generado con exito");
       }
       setOpenFirst(false);
     } catch (error) {
+      console.log(error);
       setOpenFirst(false);
 
       useToastDestructive("Error", "Error al generar excel");

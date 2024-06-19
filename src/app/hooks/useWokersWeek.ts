@@ -1,8 +1,25 @@
-import { useState } from "react";
-import workerWeekJSON from "../../../workers-anvitech.json";
+"use client";
 
-export function useWorkerWeek() {
-  const [week, setWeek] = useState(workerWeekJSON);
+import { useEffect, useState } from "react";
+import workerWeekJSON from "../../../workers-anvitech.json";
+import { useToastDestructive } from "./toast.hook";
+import { useSession } from "next-auth/react";
+import { post } from "../http/api.http";
+
+export function useWorkerWeek(date: string) {
+  const [week, setWeek] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const session = useSession();
+
+  const [isFilter, setIsFilter] = useState(false);
+
+  function changeFilter() {
+    setLoading(true);
+    setIsFilter(true);
+    handleFilterDay();
+  }
 
   const filterAttendance = (data: any) => {
     return data.map((item: any) => {
@@ -14,6 +31,7 @@ export function useWorkerWeek() {
           attendance: days[day].falta !== "si",
           lateness: days[day].tardanza === "si",
         }));
+
       return { worker: worker.full_name, attendance };
     });
   };
@@ -32,43 +50,6 @@ export function useWorkerWeek() {
       },
       { attendances: 0, absences: 0 }
     );
-  };
-
-  const countLatenessByDay = (data: any) => {
-    return data.reduce((dayCounts: any, worker: any) => {
-      worker.lateness.forEach((record: any) => {
-        if (!record.lateness) {
-          const day = formatDay(record.day);
-          if (dayCounts[day]) {
-            dayCounts[day] += 1;
-          } else {
-            dayCounts[day] = 1;
-          }
-        }
-      });
-      return dayCounts;
-    }, {});
-  };
-
-  const formatDay = (day: string) => {
-    switch (day) {
-      case "lunes":
-        return "lun";
-      case "martes":
-        return "mar";
-      case "miercoles":
-        return "mie";
-      case "jueves":
-        return "jue";
-      case "viernes":
-        return "vie";
-      case "sabado":
-        return "sab";
-      case "domingo":
-        return "dom";
-      default:
-        return day;
-    }
   };
 
   const filteredWeek = filterAttendance(week);
@@ -103,8 +84,66 @@ export function useWorkerWeek() {
 
   const formattedLateness = formatLatenessData(filteredWeek);
 
+  async function fetchData() {
+    try {
+      const day = new Date().getDate();
+      const month = new Date().getMonth() + 1;
+      const year = new Date().getFullYear();
+      const response = await post(
+        "reports/weekly",
+        { day, month, year },
+        session.data
+      );
+
+      setWeek(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al cargar la informacion");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFilterDay() {
+    try {
+      setLoading(true);
+      const day = new Date(date).getDate();
+      const month = new Date(date).getMonth() + 1;
+      const year = new Date(date).getFullYear();
+      const response = await post(
+        "reports/weekly",
+        { day, month, year },
+        session.data
+      );
+
+      setWeek(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al solicitar los datos");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      console.log(date);
+      if (date === "") {
+        fetchData();
+      } else {
+        handleFilterDay();
+      }
+    }
+  }, [session.status, date]);
+
+  useEffect(() => {
+    if (date !== "") {
+    }
+  }, [isFilter]);
+
   return {
     attendanceVsAbsence,
     formattedLateness,
+    loading,
+    changeFilter,
+    week,
   };
 }

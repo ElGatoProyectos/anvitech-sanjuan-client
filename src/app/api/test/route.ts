@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = await dataService.instanceDataInit(10, 10, 2024, 6);
+    const response = await dataService.instanceDataInit(18, 18, 2024, 6);
     return NextResponse.json(response.content, {
       status: response.statusCode,
     });

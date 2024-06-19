@@ -68,9 +68,15 @@ class UserService {
   async updateUser(data: any, userId: number) {
     try {
       updateUserDTO.parse(data);
+
+      const formatData = {
+        ...data,
+        password: bcrypt.hashSync(data.password, 11),
+      };
+
       const updatedUser = await prisma.user.update({
         where: { id: userId },
-        data,
+        data: formatData,
       });
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
