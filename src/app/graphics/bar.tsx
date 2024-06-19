@@ -1,106 +1,90 @@
-import React, { useState } from "react";
-import Chart from "react-apexcharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-function GraphicBar() {
-  const [series, setSeries] = useState([
+interface Props {
+  attendances: number;
+  absences: number;
+}
+
+function GraphicBar({ attendanceVsAbsence }: { attendanceVsAbsence: Props }) {
+  const workerWeek = [
     {
-      name: "Asistencias vs Faltas",
-      data: [100, 70],
+      tag: "Asistencias",
+      record: attendanceVsAbsence.attendances,
+      asistencias: attendanceVsAbsence.attendances,
     },
-  ]);
-
-  const [options, setOptions] = useState<any>({
-    chart: {
-      height: 350,
-      type: "bar",
+    {
+      tag: "Faltas",
+      record: attendanceVsAbsence.absences,
+      faltas: attendanceVsAbsence.absences,
     },
-    plotOptions: {
-      bar: {
-        borderRadius: 10,
-        dataLabels: {
-          position: "top", // top, center, bottom
-        },
-        colors: {
-          ranges: [
-            {
-              from: 0,
-              to: 70,
-              color: "#FF4560", // Rojo para "Faltas"
-            },
-            {
-              from: 71,
-              to: 100,
-              color: "#00E396", // Verde para "Asistencias"
-            },
-          ],
-        },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: any) {
-        return val;
-      },
-      offsetY: -20,
-      style: {
-        fontSize: "12px",
-        colors: ["#304758"],
-      },
-    },
-    xaxis: {
-      categories: ["Asistencias", "Faltas"],
-      position: "top",
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      crosshairs: {
-        fill: {
-          type: "gradient",
-          gradient: {
-            colorFrom: "#D8E3F0",
-            colorTo: "#BED1E6",
-            stops: [0, 100],
-            opacityFrom: 0.4,
-            opacityTo: 0.5,
-          },
-        },
-      },
-      tooltip: {
-        enabled: true,
-      },
-    },
-    yaxis: {
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      labels: {
-        show: false,
-        formatter: function (val: any) {
-          return val;
-        },
-      },
-    },
-    title: {
-      // text: "Asistencias vs Faltas",
-      floating: true,
-      offsetY: 330,
-      align: "center",
-      style: {
-        color: "#444",
-      },
-    },
-    colors: ["#FF4560", "#00E396"], // This sets a default color array for the series
-  });
+  ];
 
   return (
-    <div className="w-full bg-white p-2 rounded-lg">
-      <Chart options={options} series={series} type="bar" />
+    <div className="h-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={workerWeek}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <Tooltip
+            cursor={{ fill: "hsl(var(--input))", opacity: 0.4 }}
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div className="rounded-lg border bg-background p-2 shadow-sm">
+                    <div className="grid grid-cols-1 gap-2">
+                      <div className="flex flex-col">
+                        <span className="text-[0.70rem] uppercase text-muted-foreground">
+                          N° de {payload[0].name}
+                        </span>
+                        <span className="font-bold text-muted-foreground">
+                          {payload[0].value}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            }}
+          />
+          <XAxis
+            dataKey="region"
+            tickLine={{ stroke: "none" }}
+            axisLine={{ stroke: "none" }}
+            stroke={"hsl(var(--muted-foreground))"}
+            padding={{ left: 20, right: 30 }}
+          />
+          <YAxis
+            tickLine={{ stroke: "none" }}
+            axisLine={{ stroke: "none" }}
+            stroke={"hsl(var(--muted-foreground))"}
+            padding={{ top: 0, bottom: 0 }}
+          />
+          <CartesianGrid
+            horizontal={true}
+            vertical={false}
+            stroke={"hsl(var(--border))"}
+          />
+
+          <Bar dataKey="asistencias" fill="#00E396" />
+          <Bar dataKey="faltas" fill="#FF4560" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }
