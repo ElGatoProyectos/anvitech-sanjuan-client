@@ -652,6 +652,7 @@ class DataService {
           formatData.discount = 35;
         }
       }
+      return formatData;
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }
