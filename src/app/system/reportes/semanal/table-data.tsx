@@ -142,10 +142,14 @@ function TableData() {
 
   async function exportToExcel() {
     try {
-      console.log(workers);
+      setLoading(true);
       downloadExcel(workers);
+      setLoading(false);
+      useToastDefault("Ok", "Reporte generado con exito");
     } catch (error) {
       console.log(error);
+      setLoading(false);
+
       useToastDestructive("Error", "Error al crear el archivo");
     }
   }
@@ -226,6 +230,8 @@ function TableData() {
                 <th className="py-3 pr-6">Miercoles</th>
                 <th className="py-3 pr-6">Jueves</th>
                 <th className="py-3 pr-6">Viernes</th>
+
+                <th className="py-3 pr-6">Descuento</th>
 
                 {/* <th className="py-3 pr-6">Acción</th> */}
               </tr>
@@ -329,6 +335,22 @@ function TableData() {
                         : item.viernes.falta === "si"
                         ? "F"
                         : "OK"}
+                    </th>
+
+                    <th className="py-3 pr-6" align="center">
+                      {item.lunes
+                        ? item.lunes.discount
+                        : 0 + item.martes
+                        ? item.martes.discount
+                        : 0 + item.miercoles
+                        ? item.miercoles.discount
+                        : 0 + item.jueves
+                        ? item.jueves.discount
+                        : 0 + item.viernes
+                        ? item.viernes.discount
+                        : 0 + item.sabado
+                        ? item.sabado.discount
+                        : 0}
                     </th>
 
                     {/* <td className=" whitespace-nowrap">

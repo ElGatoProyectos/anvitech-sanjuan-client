@@ -23,8 +23,7 @@ function Dashboard() {
       <div className="bg-white w-full col-span-2 p-2 rounded-lg flex gap-16 justify-between">
         <div className="flex gap-4">
           <Input type="date"></Input>
-          <Input type="date"></Input>
-          <Button>Filtrar</Button>
+          <Button>Filtrar por semana</Button>
         </div>
         <div className="flex gap-4">
           <Select>

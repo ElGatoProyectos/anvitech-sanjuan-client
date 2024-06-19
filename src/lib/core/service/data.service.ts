@@ -345,7 +345,11 @@ class DataService {
           formatData.falta = "no";
           formatData.tardanza = "no";
           formatData.discount = 0;
+        } else {
+          formatData.falta = "si";
+          formatData.discount = 35;
         }
+        return formatData;
       }
 
       await prisma.detailReport.create({ data: formatData });
@@ -625,23 +629,11 @@ class DataService {
           formatData.tardanza = "no";
           formatData.discount = 0;
         } else {
-          const formatData = {
-            report_id: "",
-            tardanza: "no",
-            falta: "si",
-            dia: day,
-            fecha_reporte: dateToString,
-            dni: worker.dni,
-            nombre: worker.full_name,
-            sede: worker.department,
-            hora_entrada: "",
-            hora_inicio: "",
-            hora_inicio_refrigerio: "",
-            hora_fin_refrigerio: "",
-            hora_salida: "",
-          };
-          return formatData;
+          formatData.falta = "si";
+          formatData.discount = 35;
         }
+
+        return formatData;
       }
     } catch (error) {
       return errorService.handleErrorSchema(error);
