@@ -161,15 +161,13 @@ class DataService {
         (item) => item.employee.workno === worker.dni
       );
 
-      console.log(dataFiltered);
-
       const formatData: any = {
         report_id: report.id,
         tardanza: "no",
         falta: "si",
         dia: day,
         // fecha_reporte: report.date_created.toISOString(),?
-        fecha_reporte: null,
+        fecha_reporte: new Date(yearI, monthI - 1, dayI),
 
         dni: worker.dni,
         nombre: worker.full_name,
@@ -201,43 +199,52 @@ class DataService {
             newHour = 23 - 4 + Number(hour);
           }
 
-          if (newHour <= 11) {
-            formatData.hora_inicio = newHour + ":" + minutes;
-            if (newHour > Number(hourStart)) {
-              formatData.tardanza = "si";
-              formatData.discount = 35;
-            } else {
-              if (newHour === 9) {
-                if (Number(minutes) <= 5) {
-                  formatData.tardanza = "no";
-                } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
-                  formatData.tardanza = "si";
-                  formatData.discount = 5;
-                } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
-                  formatData.tardanza = "si";
-                  formatData.discount = 10;
-                } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
-                  formatData.tardanza = "si";
-                  formatData.discount = 20;
-                }
-              } else {
-                formatData.tardanza = "no";
-              }
-            }
-          } else if (newHour >= 12 && newHour <= 16) {
-            if (formatData.hora_inicio_refrigerio === "") {
-              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
-            } else {
-              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
-            }
-          } else {
-            if (newHour >= Number(hourEnd)) {
-              formatData.falta = "no";
-            } else {
+          if (index === dataFiltered.length - 1) {
+            if (newHour < 16) {
               formatData.falta = "si";
               formatData.tardanza = "no";
+              formatData.discount = 35;
             }
-            formatData.hora_salida = newHour + ":" + minutes;
+          } else {
+            if (newHour <= 11) {
+              formatData.hora_inicio = newHour + ":" + minutes;
+              if (newHour > Number(hourStart)) {
+                formatData.tardanza = "si";
+                formatData.discount = 35;
+              } else {
+                if (newHour === 9) {
+                  if (Number(minutes) <= 5) {
+                    formatData.tardanza = "no";
+                  } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 5;
+                  } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 10;
+                  } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                    formatData.tardanza = "si";
+                    formatData.discount = 20;
+                  }
+                } else {
+                  formatData.tardanza = "no";
+                }
+              }
+            } else if (newHour >= 12 && newHour <= 16) {
+              if (formatData.hora_inicio_refrigerio === "") {
+                formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+              } else {
+                formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+              }
+            } else {
+              if (newHour >= Number(hourEnd)) {
+                formatData.falta = "no";
+              } else {
+                formatData.falta = "si";
+                formatData.tardanza = "no";
+                formatData.discount = 35;
+              }
+              formatData.hora_salida = newHour + ":" + minutes;
+            }
           }
         });
 
@@ -346,10 +353,9 @@ class DataService {
           formatData.tardanza = "no";
           formatData.discount = 0;
         } else {
-          formatData.falta = "si";
+          formatData.falta = "sssss";
           formatData.discount = 35;
         }
-        return formatData;
       }
 
       await prisma.detailReport.create({ data: formatData });
@@ -472,7 +478,7 @@ class DataService {
         hora_inicio_refrigerio: "",
         hora_fin_refrigerio: "",
         hora_salida: "",
-        discount: 0,
+        discount: 35,
       };
       if (dataFiltered.length) {
         const [lunesStart, lunesEnd] = schedule.lunes.split("-");
@@ -489,6 +495,14 @@ class DataService {
 
             if (Number(hour) >= 0 && Number(hour) <= 4) {
               newHour = 23 - 4 + Number(hour);
+            }
+
+            if (index === dataFiltered.length - 1) {
+              if (newHour < 16) {
+                formatData.falta = "si";
+                formatData.tardanza = "no";
+                formatData.discount = 35;
+              }
             }
 
             if (newHour <= 11) {
@@ -526,12 +540,12 @@ class DataService {
               } else {
                 formatData.falta = "si";
                 formatData.tardanza = "no";
+                formatData.discount = 35;
               }
               formatData.hora_salida = newHour + ":" + minutes;
             }
           });
         }
-        return formatData;
       } else {
         const dateYesterday = new Date();
 
@@ -632,8 +646,6 @@ class DataService {
           formatData.falta = "si";
           formatData.discount = 35;
         }
-
-        return formatData;
       }
     } catch (error) {
       return errorService.handleErrorSchema(error);

@@ -63,7 +63,7 @@ function FormUpdateMassive() {
 
         <div className="flex flex-col gap-2  col-span-2">
           <Button disabled={loading} type="submit">
-            Registrar trabajador
+            Modificar datos
           </Button>
         </div>
       </form>

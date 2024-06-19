@@ -211,6 +211,18 @@ class ReportService {
 
       // const resportResponse = await this.findById(reportId);
       // if (!resportResponse.ok) return resportResponse;
+
+      // [
+      //   {
+      //     "worker":{},
+      //     "reports":[{},{},{}],
+      //     "vacaciones":[],
+      //     "descanso_medico":[],
+      //     "licencias":[],
+      //     "permisos":[]
+      //   }
+      // ]
+
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 1);
 
@@ -225,31 +237,109 @@ class ReportService {
 
       const responseWorkers = await workerService.findAll();
 
-      const incidents = await prisma.detailReportIncident.findMany({
-        where: {
-          detailReport: {
-            fecha_reporte: {
-              gte: startDate,
-              lt: endDate,
+      const dataGeneral = await Promise.all(
+        await responseWorkers.content.map(async (worker: any) => {
+          const responseVacations = await prisma.vacation.findMany({
+            where: {
+              worker_id: worker.id,
+              AND: [
+                {
+                  start_date: {
+                    lte: endDate,
+                  },
+                },
+                {
+                  end_date: {
+                    gte: startDate,
+                  },
+                },
+              ],
             },
-          },
-        },
-        include: {
-          detailReport: true,
-          incident: {
-            select: {
-              title: true,
-              description: true,
+          });
+          const responsePermission = await prisma.permissions.findMany({
+            where: {
+              worker_id: worker.id,
+              AND: [
+                {
+                  start_date: {
+                    lte: endDate,
+                  },
+                },
+                {
+                  end_date: {
+                    gte: startDate,
+                  },
+                },
+              ],
             },
-          },
-        },
-      });
+          });
+          const responseMedicalRest = await prisma.medicalRest.findMany({
+            where: {
+              worker_id: worker.id,
+              AND: [
+                {
+                  start_date: {
+                    lte: endDate,
+                  },
+                },
+                {
+                  end_date: {
+                    gte: startDate,
+                  },
+                },
+              ],
+            },
+          });
+          const responseLicenses = await prisma.licence.findMany({
+            where: {
+              worker_id: worker.id,
+              AND: [
+                {
+                  start_date: {
+                    lte: endDate,
+                  },
+                },
+                {
+                  end_date: {
+                    gte: startDate,
+                  },
+                },
+              ],
+            },
+          });
 
-      return httpResponse.http200("Report success", {
-        data: detailReports,
-        workers: responseWorkers.content,
-        incidents,
-      });
+          const responseReports = await prisma.detailReport.findMany({
+            where: {
+              dni: worker.dni,
+              AND: [
+                {
+                  fecha_reporte: {
+                    lte: endDate,
+                  },
+                },
+                {
+                  fecha_reporte: {
+                    gte: startDate,
+                  },
+                },
+              ],
+            },
+          });
+
+          const formatData = {
+            worker,
+            reportes: responseReports,
+            vacaciones: responseVacations,
+            descansos_medico: responseMedicalRest,
+            licencias: responseLicenses,
+            permisos: responsePermission,
+          };
+
+          return formatData;
+        })
+      );
+
+      return httpResponse.http200("Report success", dataGeneral);
     } catch (error) {
       console.log(error);
       return errorService.handleErrorSchema(error);
@@ -275,8 +365,10 @@ class ReportService {
 
   async generateReportForDayNoToday(day: number, month: number, year: number) {
     try {
-      const startDate = new Date(year, month - 1, day);
-      const endDate = new Date(year, month - 1, day + 1);
+      const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+
+      // End date at the beginning of the next day
+      const endDate = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0));
 
       const data = await prisma.detailReport.findMany({
         where: {
@@ -372,6 +464,7 @@ class ReportService {
         hora_salida: dataTemporalHours.hora_salida,
         tardanza: "no",
         falta: "no",
+        discount: 0,
       };
 
       // cuando el usuario tiene una hora de entrada
@@ -384,10 +477,41 @@ class ReportService {
           .map(Number);
 
         // aqui cambie la falta por tardanza
-        if (dataStartHour > scheduleStartHour) formatData.tardanza = "si";
-        else if (dataStartHour === scheduleStartHour) {
-          if (dataStartMinute > 0) formatData.tardanza = "si";
+        if (dataStartHour <= 11) {
+          if (dataStartHour > scheduleStartHour) {
+            formatData.tardanza = "si";
+
+            formatData.discount = 35;
+          } else {
+            if (dataStartHour === scheduleStartHour) {
+              if (Number(dataStartMinute) <= 5) {
+                formatData.tardanza = "no";
+              } else if (
+                Number(dataStartMinute) > 5 &&
+                Number(dataStartMinute) <= 15
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 5;
+              } else if (
+                Number(dataStartMinute) > 15 &&
+                Number(dataStartMinute) <= 30
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 10;
+              } else if (
+                Number(dataStartMinute) > 30 &&
+                Number(dataStartMinute) <= 59
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 20;
+              }
+            } else {
+              formatData.tardanza = "no";
+            }
+          }
+          formatData.falta = "no";
         }
+        formatData.falta = "si";
       }
       // cuando el usuario tiene una hora de salida
       else if (
@@ -402,13 +526,18 @@ class ReportService {
           formatData.falta = "si";
           formatData.tardanza = "no";
         } else if (dataEndHour === scheduleEndHour) {
-          if (dataTemporalHours.hora_inicio === "") formatData.tardanza = "si";
+          if (dataTemporalHours.hora_inicio === "") {
+            formatData.tardanza = "si";
+            formatData.discount = 35;
+          }
           formatData.falta = "no";
         }
       } else if (dataStart === "" && dataEnd === "") {
         formatData.falta = "si";
         formatData.tardanza = "no";
+        formatData.discount = 35;
       } else {
+        // ====================caso donde tienen hora_inicio y hora_fin ============================
         const [dataStartHour, dataStartMinute] = dataTemporalHours.hora_inicio
           .split(":")
           .map(Number);
@@ -416,9 +545,42 @@ class ReportService {
           .split(":")
           .map(Number);
 
-        if (dataStartHour > scheduleStartHour) formatData.falta = "si";
-        else if (dataStartHour === scheduleStartHour) {
-          if (dataStartMinute > 0) formatData.falta = "si";
+        console.log(dataStartHour, dataEndHour);
+
+        if (dataStartHour <= 11) {
+          if (dataStartHour > scheduleStartHour) {
+            formatData.tardanza = "si";
+            formatData.discount = 35;
+          } else {
+            if (dataStartHour === scheduleStartHour) {
+              if (Number(dataStartMinute) <= 5) {
+                formatData.tardanza = "no";
+              } else if (
+                Number(dataStartMinute) > 5 &&
+                Number(dataStartMinute) <= 15
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 5;
+              } else if (
+                Number(dataStartMinute) > 15 &&
+                Number(dataStartMinute) <= 30
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 10;
+              } else if (
+                Number(dataStartMinute) > 30 &&
+                Number(dataStartMinute) <= 59
+              ) {
+                formatData.tardanza = "si";
+                formatData.discount = 20;
+              }
+            } else {
+              formatData.tardanza = "no";
+            }
+          }
+          formatData.falta = "no";
+        } else {
+          formatData.tardanza = "si";
         }
 
         if (dataEndHour < scheduleEndHour) {
@@ -428,6 +590,8 @@ class ReportService {
           formatData.falta = "no";
         }
       }
+
+      console.log(formatData);
       const updated = await prisma.detailReport.update({
         where: { id: detailReportId },
         data: formatData,
@@ -504,6 +668,7 @@ class ReportService {
             if (dataStartHour <= 11) {
               if (dataStartHour > scheduleHourStart) {
                 formatData.tardanza = "si";
+
                 formatData.discount = 35;
               } else {
                 if (dataStartHour === scheduleHourStart) {
@@ -532,6 +697,7 @@ class ReportService {
                   formatData.tardanza = "no";
                 }
               }
+              formatData.falta = "no";
             } else {
               formatData.tardanza = "si";
             }
@@ -553,6 +719,7 @@ class ReportService {
             formatData.falta = "si";
             formatData.tardanza = "no";
           } else {
+            console.log("hereeee======================");
             const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
               .split(":")
               .map(Number);
@@ -633,17 +800,18 @@ class ReportService {
 
       await Promise.all(
         sheetToJson.map(async (row: any, index) => {
+          console.log(row);
           const worker = await workerService.findByDNI(String(row.dni));
           const schedule = await scheduleService.findScheduleForWorker(
             worker.content.id
           );
 
-          console.log(this.getDayOfWeek(new Date(row.fecha_reporte)));
-
           const detail = await prisma.detailReport.findFirst({
             where: {
               dni: String(row.dni),
-              dia: this.getDayOfWeek(new Date(row.fecha_reporte)),
+              dia: this.getDayOfWeek(
+                this.excelSerialDateToJSDate(row.fecha_reporte)
+              ),
             },
           });
 

@@ -2,22 +2,29 @@ import { reportService } from "@/lib/core/service/report.service";
 import * as XLSX from "xlsx";
 
 //- esta funcion se filtra por mes, debemos recibir el numero del mes donde estamos
-export function exportStartSoft(content: any) {
-  const { workers, data, incidents } = content;
+export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
+  const {
+    worker,
+    reportes,
+    vacaciones,
+    descansos_medico,
+    licencias,
+    permisos,
+  } = content;
 
-  const dataGeneral = workers.map((worker: any) => {
-    const workerDataFiltered = data.filter(
-      (item: any) => item.dni === worker.dni && item.falta === "si"
-    );
+  const faltas = reportes.filter((r: any) => r.falta === "si");
+
+  const dataGeneral = content.map((row: any) => {
+    const fatas = content.rep;
     const formatData = {
-      CODTRABA: worker.dni,
-      NOMBRES: worker.full_name,
+      CODTRABA: row.worker.dni,
+      NOMBRES: row.worker.full_name,
       CCOSTO: "",
       DDESCMED: "",
-      DFALTAS: workerDataFiltered.length,
-      DIASTRAB: "",
-      DLICSGO: "",
-      DLICCGO: "",
+      DFALTAS: faltas.length,
+      DIASTRAB: reportes.length - faltas.length,
+      DLICSGO: faltas.length,
+      DLICCGO: calculateDaysInRange(vacaciones, dateMin, dateMax),
       DSUBENF: "",
       DSUBMAT: "",
       DVAC: "",
@@ -29,6 +36,27 @@ export function exportStartSoft(content: any) {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
   XLSX.writeFile(workbook, "reporte-startsoft.xlsx");
+}
+
+function calculateDaysInRange(dataArr: any[], dateMin: Date, dateMax: Date) {
+  let totalDays = 0;
+
+  dataArr.forEach((vacation: any) => {
+    const vacationStart = new Date(vacation.start_date);
+    const vacationEnd = new Date(vacation.end_date);
+
+    const start = vacationStart > dateMin ? vacationStart : dateMin;
+    const end = vacationEnd < dateMax ? vacationEnd : dateMax;
+
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+
+    if (startTime <= endTime) {
+      const daysInRange = (endTime - startTime) / (1000 * 60 * 60 * 24) + 1;
+      totalDays += daysInRange;
+    }
+  });
+  return totalDays;
 }
 
 export function exportNormal(content: any) {

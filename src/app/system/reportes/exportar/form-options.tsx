@@ -117,7 +117,8 @@ function FormOptions() {
           session.data
         );
 
-        exportStartSoft(response.data);
+        console.log(response.data);
+        // exportStartSoft(response.data);
         setOpenFirst(false);
 
         useToastDefault("Ok", "Reporte generado con exito");
