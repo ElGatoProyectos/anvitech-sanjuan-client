@@ -21,7 +21,7 @@ function FormRegisterMedicalRestMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/massive-vacation", formData, session.data);
+      await postImage("workers/permissions/file", formData, session.data);
       setLoading(false);
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
@@ -45,8 +45,8 @@ function FormRegisterMedicalRestMassive() {
           <Link
             target="_blank"
             download
-            as="/files/formato_vacaciones_masivas.xlsx"
-            href="/files/formato_vacaciones_masivas.xlsx"
+            as="/files/formato_permiso_carga_masiva.xlsx"
+            href="/files/formato_permiso_carga_masiva.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato
@@ -55,6 +55,7 @@ function FormRegisterMedicalRestMassive() {
         <div className="flex flex-col gap-2  col-span-2">
           <Label>Archivo</Label>
           <Input
+            required
             type="file"
             accept=".xlsx"
             onChange={(e: any) => setFile(e.target.files[0])}

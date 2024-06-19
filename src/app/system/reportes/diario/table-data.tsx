@@ -578,10 +578,10 @@ function TableData() {
                 Guardar cambios
               </Button>
             </div>
+            {/* se borro la opcion de agregar incidencias ya que esto se registrar en el detalle de trabajador */}
+            {/* <hr className="col-span-2" /> */}
 
-            <hr className="col-span-2" />
-
-            <div className="col-span-2">
+            {/* <div className="col-span-2">
               <Label>Seleccione un incidente</Label>
               <Select onValueChange={(e) => setIncidentSelected(e)}>
                 <SelectTrigger className="w-full">
@@ -634,7 +634,7 @@ function TableData() {
               <Button size={"sm"} onClick={handleAddIncident}>
                 Registrar incidencia
               </Button>
-            </div>
+            </div> */}
           </div>
         </DialogContent>
       </Dialog>

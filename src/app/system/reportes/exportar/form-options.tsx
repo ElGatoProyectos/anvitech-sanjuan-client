@@ -135,7 +135,9 @@ function FormOptions() {
       setOpenFirst(true);
       const response = await post("reports/export", dateLimits, session.data);
 
-      exportStartSoft(response.data);
+      console.log(response.data);
+
+      exportNormal(response.data);
       setOpenFirst(false);
 
       useToastDefault("Ok", "Reporte generado con exito");

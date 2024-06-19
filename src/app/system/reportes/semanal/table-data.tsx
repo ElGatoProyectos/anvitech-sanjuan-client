@@ -130,8 +130,6 @@ function TableData() {
         session.data
       );
 
-      console.log(response.data);
-
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -144,7 +142,7 @@ function TableData() {
 
   async function exportToExcel() {
     try {
-      ("use server");
+      console.log(workers);
       downloadExcel(workers);
     } catch (error) {
       console.log(error);
@@ -210,7 +208,7 @@ function TableData() {
           </div>
 
           <div className="flex justify-end gap-4 p-2 border rounded-lg">
-            <Button onClick={exportToExcel}>
+            <Button onClick={exportToExcel} disabled={loading}>
               Exportar reporte <FileSpreadsheet className="ml-2" size={20} />
             </Button>
           </div>

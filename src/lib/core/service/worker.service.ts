@@ -8,11 +8,14 @@ import {
 } from "../functions/date-transform";
 import { createWorkerDTO } from "../schemas/worker.dto";
 import { scheduleService } from "./schedule.service";
+import { reportService } from "./report.service";
 
 class WorkerService {
   async findAll() {
     try {
-      const workers = await prisma.worker.findMany();
+      const workers = await prisma.worker.findMany({
+        where: { enabled: "si" },
+      });
       return httpResponse.http200("All workers", workers);
     } catch (error) {
       return errorService.handleErrorSchema(error);
@@ -239,6 +242,219 @@ class WorkerService {
       return httpResponse.http200("Worker updated", updated);
     } catch (error) {
       console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async registerTerminationMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          console.log(item);
+          const dateFormat = excelSerialDateToJSDate(item.fecha_cese);
+
+          if (item.dni === "" || item.fecha_cese === "")
+            throw new Error("Error in service");
+
+          await prisma.worker.update({
+            where: { dni: String(item.dni) },
+            data: {
+              termination_date: dateFormat,
+              reason: item.motivo,
+              enabled: "no",
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Updated");
+    } catch (error) {
+      console.log(error);
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async updateSupervisorMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          if (item.dni === "") throw new Error("Error in service");
+
+          await prisma.worker.update({
+            where: { dni: String(item.dni) },
+            data: {
+              supervisor: item.supervisor,
+              coordinator: item.coordinador,
+              management: item.generate_comercial,
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Updated");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async registerVacationMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          if (
+            item.dni === "" ||
+            item.fecha_inicio === "" ||
+            item.fecha_fin === ""
+          )
+            throw new Error("Error in service");
+          const worker = await workerService.findByDNI(String(item.dni));
+          await prisma.vacation.create({
+            data: {
+              worker_id: worker.content.id,
+              start_date: reportService.excelSerialDateToJSDate(
+                item.fecha_inicio
+              ),
+              end_date: reportService.excelSerialDateToJSDate(item.fecha_fin),
+              reason: item.contexto,
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Register vacation successfull!");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async registerLincensesMasive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          if (
+            item.dni === "" ||
+            item.fecha_inicio === "" ||
+            item.fecha_fin === ""
+          )
+            throw new Error("Error in service");
+          const worker = await workerService.findByDNI(String(item.dni));
+          await prisma.licence.create({
+            data: {
+              worker_id: worker.content.id,
+              start_date: reportService.excelSerialDateToJSDate(
+                item.fecha_inicio
+              ),
+              end_date: reportService.excelSerialDateToJSDate(item.fecha_fin),
+              reason: item.contexto,
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Register vacation successfull!");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async registerMedicalRestMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          if (
+            item.dni === "" ||
+            item.fecha_inicio === "" ||
+            item.fecha_fin === ""
+          )
+            throw new Error("Error in service");
+          const worker = await workerService.findByDNI(String(item.dni));
+          await prisma.medicalRest.create({
+            data: {
+              worker_id: worker.content.id,
+              start_date: reportService.excelSerialDateToJSDate(
+                item.fecha_inicio
+              ),
+              end_date: reportService.excelSerialDateToJSDate(item.fecha_fin),
+              reason: item.contexto,
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Register vacation successfull!");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async registerPermissionsMassive(file: File) {
+    try {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(sheet);
+
+      await Promise.all(
+        sheetToJson.map(async (item: any) => {
+          if (
+            item.dni === "" ||
+            item.fecha_inicio === "" ||
+            item.fecha_fin === ""
+          )
+            throw new Error("Error in service");
+          const worker = await workerService.findByDNI(String(item.dni));
+          await prisma.permissions.create({
+            data: {
+              worker_id: worker.content.id,
+              start_date: reportService.excelSerialDateToJSDate(
+                item.fecha_inicio
+              ),
+              end_date: reportService.excelSerialDateToJSDate(item.fecha_fin),
+              reason: item.contexto,
+            },
+          });
+        })
+      );
+      return httpResponse.http200("Register vacation successfull!");
+    } catch (error) {
       return errorService.handleErrorSchema(error);
     }
   }

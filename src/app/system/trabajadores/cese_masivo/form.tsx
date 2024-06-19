@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
 import { post, postImage } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import Link from "next/link";
 import React, { FormEvent, useState } from "react";
 
 function FormRegisterTerminationMassive() {
-  const [file, setFile] = useState<any>();
+  const [file, setFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const session = useSession();
 
@@ -21,8 +21,9 @@ function FormRegisterTerminationMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/mass-dismissal", formData, session.data);
+      await postImage("workers/termination/file", formData, session.data);
       setLoading(false);
+      useToastDefault("Ok", "Registros realizados con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
@@ -43,8 +44,8 @@ function FormRegisterTerminationMassive() {
           <Link
             target="_blank"
             download
-            as="/files/formato_cese_masivo.xlsx"
-            href="/files/formato_cese_masivo.xlsx"
+            as="/files/formato_cese_carga_masivo.xlsx"
+            href="/files/formato_cese_carga_masivo.xlsx"
             className="underline text-blue-600"
           >
             Descargar formato
@@ -53,6 +54,7 @@ function FormRegisterTerminationMassive() {
         <div className="flex flex-col gap-2  col-span-2">
           <Label>Archivo</Label>
           <Input
+            required
             type="file"
             accept=".xlsx"
             onChange={(e: any) => setFile(e.target.files[0])}

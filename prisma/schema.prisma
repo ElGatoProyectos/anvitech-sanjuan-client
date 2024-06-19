@@ -103,7 +103,7 @@ model Schedule {
 
 model TypeSchedule {
   id        Int    @id @default(autoincrement())
-  name      String
+  name      String @unique
   lunes     String
   martes    String
   miercoles String

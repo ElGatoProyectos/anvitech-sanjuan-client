@@ -261,13 +261,14 @@ class ReportService {
       const data = await prisma.detailReport.findMany({
         where: {
           fecha_reporte: {
-            lte: dateMin,
-            gte: dateMax,
+            gte: dateMin,
+            lte: dateMax,
           },
         },
       });
       return httpResponse.http200("All data", data);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -305,6 +306,7 @@ class ReportService {
             jueves: {},
             viernes: {},
             sabado: {},
+            domingo: {},
           };
 
           for (let i = 0; i < days.length; i++) {
@@ -314,12 +316,13 @@ class ReportService {
               where: { fecha_reporte: day, dni: worker.dni },
             });
 
-            if (i === 0) formatData.lunes = data;
-            else if (i === 1) formatData.martes = data;
-            else if (i === 2) formatData.miercoles = data;
-            else if (i === 3) formatData.jueves = data;
-            else if (i === 4) formatData.viernes = data;
-            else if (i === 5) formatData.sabado = data;
+            if (i === 0) formatData.sabado = data ? data : null;
+            else if (i === 1) formatData.domingo = data ? data : null;
+            else if (i === 2) formatData.lunes = data ? data : null;
+            else if (i === 3) formatData.martes = data ? data : null;
+            else if (i === 4) formatData.miercoles = data ? data : null;
+            else if (i === 5) formatData.jueves = data ? data : null;
+            else if (i === 6) formatData.viernes = data ? data : null;
           }
 
           return formatData;
