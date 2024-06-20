@@ -43,6 +43,7 @@ model DetailReport {
   fecha_reporte          DateTime
   dni                    String
   nombre                 String
+  supervisor             String?
   sede                   String
   hora_entrada           String?
   hora_inicio            String?
@@ -61,15 +62,18 @@ model DetailReport {
 model Worker {
   id Int @id @default(autoincrement())
 
-  full_name        String
-  dni              String        @unique
-  type_dni         String?
-  type_contract    String?
-  department       String
-  position         String
-  supervisor       String?
-  coordinator      String?
-  management       String?
+  full_name     String
+  dni           String  @unique
+  type_dni      String?
+  type_contract String?
+  department    String
+  position      String
+  supervisor    String?
+  coordinator   String?
+  management    String?
+  company       String?
+  company_ruc   String?
+
   hire_date        DateTime
   termination_date DateTime?
   reason           String?

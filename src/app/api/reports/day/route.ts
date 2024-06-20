@@ -8,7 +8,7 @@ export async function GET() {
     const currentDay = currentDate.getDate();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
-    console.log(currentDay, currentMonth, currentYear);
+
     const response = await dataService.instanceDataInit(
       currentDay,
       currentDay,

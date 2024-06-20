@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { getId, post, putId } from "@/app/http/api.http";
+import { get, getId, post, putId } from "@/app/http/api.http";
 import { useUpdatedStore } from "@/app/store/zustand";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +25,32 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import React, { FormEvent, useEffect, useState } from "react";
+
+const companies = [
+  {
+    name: "INTEGRAL NORTE SAC",
+    ruc: "20605413740",
+  },
+  {
+    name: "INTEGRAL PRO SAC",
+    ruc: "20605413944",
+  },
+  {
+    name: "INTEGRAL ORIENTE SAC",
+    ruc: "20609799065",
+  },
+  {
+    name: "INTEGRAL SUR SAC",
+    ruc: "20609802805",
+  },
+  {
+    name: "DIGITAL MAX SAC",
+    ruc: "20600665341",
+  },
+];
 
 function UpdateDataWorker({ id }: { id: string }) {
   // todo  define states
@@ -35,6 +59,9 @@ function UpdateDataWorker({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [worker, setWorker] = useState<any>({});
   const session = useSession();
+
+  const [terminations, setTerminations] = useState<any[]>([]);
+  const [supervisors, setSupervisors] = useState<any[]>([]);
 
   const [termination, setTermination] = useState({
     termination_date: "",
@@ -57,21 +84,19 @@ function UpdateDataWorker({ id }: { id: string }) {
   async function handleUpdate(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      console.log(worker);
+      const formatData = {
+        ...worker,
+        company: worker.company.split("-")[0],
+        company_ruc: worker.company.split("-")[1],
+      };
 
-      await putId("workers", worker, Number(id), session.data);
+      await putId("workers", formatData, Number(id), session.data);
 
       useToastDefault("Ok", "Modificacion realizada con exito");
     } catch (error) {
       useToastDestructive("Error", "Error al modificar trabajador");
     }
   }
-
-  useEffect(() => {
-    if (session.status === "authenticated") {
-      fetchDataWorker(id);
-    }
-  }, [session.status, updatedAction]);
 
   function formatDateToInput(dateString: string) {
     const date = new Date(dateString);
@@ -119,6 +144,32 @@ function UpdateDataWorker({ id }: { id: string }) {
       setLoading(false);
     }
   }
+
+  async function fetchTerminations() {
+    try {
+      const response = await get("terminations", session.data);
+      setTerminations(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer los motivos de cese");
+    }
+  }
+
+  async function fetchSupervisors() {
+    try {
+      const response = await get("workers/supervisor", session.data);
+      setSupervisors(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer los supervisores");
+    }
+  }
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      fetchDataWorker(id);
+      fetchTerminations();
+      fetchSupervisors();
+    }
+  }, [session.status, updatedAction]);
 
   //- component
   return (
@@ -184,36 +235,90 @@ function UpdateDataWorker({ id }: { id: string }) {
                 </div>
                 <div className="flex flex-col gap-3">
                   <Label>Supervisor</Label>
-                  <Input
+
+                  <Autocomplete
+                    label="Seleccione uno"
+                    className="w-full"
+                    defaultInputValue={worker.supervisor}
+                    onInputChange={(value) =>
+                      setWorker({ ...worker, supervisor: value })
+                    }
+                  >
+                    {supervisors.map((item, idx) => (
+                      <AutocompleteItem key={idx} value={item.full_name}>
+                        {item.full_name}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
+                  {/* <Input
                     defaultValue={worker.supervisor}
                     onChange={(e) =>
                       setWorker({ ...worker, position: e.target.value })
                     }
-                  ></Input>
+                  ></Input> */}
                 </div>
 
                 <div className="flex flex-col gap-3">
                   <Label>Coordinador</Label>
-                  <Input
-                    defaultValue={worker.coordinator}
-                    onChange={(e) =>
-                      setWorker({ ...worker, position: e.target.value })
+                  <Autocomplete
+                    label="Seleccione uno"
+                    className="w-full"
+                    defaultInputValue={worker.coordinator}
+                    onInputChange={(value) =>
+                      setWorker({ ...worker, coordinator: value })
                     }
-                  ></Input>
+                  >
+                    {supervisors.map((item, idx) => (
+                      <AutocompleteItem key={idx} value={item.full_name}>
+                        {item.full_name}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
                 </div>
 
                 <div className="flex flex-col gap-3">
                   <Label>Gestor comercial</Label>
-                  <Input
-                    defaultValue={worker.management}
-                    onChange={(e) =>
-                      setWorker({ ...worker, position: e.target.value })
+                  <Autocomplete
+                    label="Seleccione uno"
+                    className="w-full"
+                    defaultInputValue={worker.management}
+                    onInputChange={(value) =>
+                      setWorker({ ...worker, management: value })
                     }
-                  ></Input>
+                  >
+                    {supervisors.map((item, idx) => (
+                      <AutocompleteItem key={idx} value={item.full_name}>
+                        {item.full_name}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
+                <Label>Empresa</Label>
+                <Select
+                  value={worker.company}
+                  onValueChange={(e) => setWorker({ ...worker, company: e })}
+                >
+                  <SelectTrigger className="w-full ">
+                    <SelectValue>{worker.company}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {companies.map((company, index) => (
+                        <SelectItem
+                          value={company.name + "-" + company.ruc}
+                          key={index}
+                        >
+                          {company.name + "-" + company.ruc}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex flex-col gap-3">
                 <Label>Tipo contratacion</Label>
                 <Select
@@ -316,7 +421,30 @@ function UpdateDataWorker({ id }: { id: string }) {
             </div>
             <div>
               <Label>Ingrese el motivo</Label>
-              <Textarea
+
+              <Select
+                onValueChange={(value) =>
+                  setTermination({
+                    ...termination,
+                    reason: value,
+                  })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione un motivo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {terminations.map((item, index) => (
+                      <SelectItem value={item.title} key={index}>
+                        {item.title}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              {/* <Textarea
                 defaultValue={worker.reason}
                 onChange={(e) =>
                   setTermination({
@@ -324,7 +452,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     reason: e.target.value,
                   })
                 }
-              ></Textarea>
+              ></Textarea> */}
             </div>
           </div>
           <DialogFooter>

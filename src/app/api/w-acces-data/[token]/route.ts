@@ -6,20 +6,20 @@ export async function GET(
   context: { params: { token: string } }
 ) {
   try {
-    // validar token
-
     const date = new Date();
-    const response = await dataService.instanceDataInit(
+    await dataService.instanceDataInit(
       date.getDate() - 1,
       date.getDate() - 1,
       2024,
       6
     );
-    return NextResponse.json(response.content, {
-      status: response.statusCode,
-    });
+    return NextResponse.json(
+      { message: "Api executed successfull" },
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

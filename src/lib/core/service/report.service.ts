@@ -363,6 +363,7 @@ class ReportService {
     }
   }
 
+  // busca todos los reportes no importa si el trabajador ya este inactivo o activo
   async generateReportForDayNoToday(day: number, month: number, year: number) {
     try {
       const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
@@ -373,8 +374,8 @@ class ReportService {
       const data = await prisma.detailReport.findMany({
         where: {
           fecha_reporte: {
-            gte: startDate, // Greater than or equal to the start of the day
-            lt: endDate, // Less than the start of the next day
+            gte: startDate,
+            lt: endDate,
           },
         },
       });
@@ -423,6 +424,7 @@ class ReportService {
 
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
+      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

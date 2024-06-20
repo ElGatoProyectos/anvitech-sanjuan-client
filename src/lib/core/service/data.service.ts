@@ -171,7 +171,7 @@ class DataService {
 
         dni: worker.dni,
         nombre: worker.full_name,
-
+        supervisor: worker.supervisor,
         sede: worker.department,
         hora_entrada: "",
         hora_inicio: "",
@@ -477,7 +477,7 @@ class DataService {
         nombre: worker.full_name,
         // sede: dataFiltered[0].device.name,
         sede: worker.department,
-
+        supervisor: worker.supervisor,
         hora_entrada: "",
         hora_inicio: "",
         hora_inicio_refrigerio: "",

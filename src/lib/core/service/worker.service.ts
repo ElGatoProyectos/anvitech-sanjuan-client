@@ -229,7 +229,7 @@ class WorkerService {
 
   async updateWorker(data: any, workerId: number) {
     try {
-      const { hire_date, ...restData } = data;
+      const { hire_date, id, ...restData } = data;
 
       const formatData = {
         ...restData,
@@ -454,6 +454,16 @@ class WorkerService {
         })
       );
       return httpResponse.http200("Register vacation successfull!");
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async findSupervisors() {
+    try {
+      const workers = await prisma.worker.findMany();
+
+      return httpResponse.http200("All workers", workers);
     } catch (error) {
       return errorService.handleErrorSchema(error);
     }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import workerWeekJSON from "../../../workers-anvitech.json";
 import { useToastDestructive } from "./toast.hook";
 import { useSession } from "next-auth/react";
-import { post } from "../http/api.http";
+import { get, post } from "../http/api.http";
 
 export function useWorkerWeek(date: string) {
   const [week, setWeek] = useState([]);
@@ -14,6 +14,8 @@ export function useWorkerWeek(date: string) {
   const session = useSession();
 
   const [isFilter, setIsFilter] = useState(false);
+
+  const [dataDepartments, setDataDepartments] = useState<any[]>([]);
 
   function changeFilter() {
     setLoading(true);
@@ -57,13 +59,13 @@ export function useWorkerWeek(date: string) {
 
   const formatLatenessData = (filteredWeek: any) => {
     const latenessCounts: { [day: string]: number } = {
+      sabado: 0,
+      domingo: 0,
       lunes: 0,
       martes: 0,
       miercoles: 0,
       jueves: 0,
       viernes: 0,
-      sabado: 0,
-      domingo: 0,
     };
 
     filteredWeek.forEach((worker: any) => {
@@ -122,10 +124,18 @@ export function useWorkerWeek(date: string) {
       setLoading(false);
     }
   }
+  async function fetchDepartments() {
+    try {
+      const response = await get("workers/departments", session.data);
+      setDataDepartments(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al solicitar los datos");
+    }
+  }
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      console.log(date);
+      fetchDepartments();
       if (date === "") {
         fetchData();
       } else {
@@ -145,5 +155,6 @@ export function useWorkerWeek(date: string) {
     loading,
     changeFilter,
     week,
+    dataDepartments,
   };
 }

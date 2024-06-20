@@ -65,6 +65,8 @@ function TableData() {
 
   const [actionActive, setActionActive] = useState(false);
 
+  const [supervisors, setSupervisors] = useState<any[]>([]);
+
   // modals =======================
   const [openModalAlert, setOpenModalAlert] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
@@ -129,11 +131,30 @@ function TableData() {
     }
   }
 
+  async function fetchSupervisors() {
+    try {
+      const response = await get("workers/supervisor", session.data);
+      setSupervisors(response.data);
+    } catch (error) {
+      useToastDestructive("Error", "Error al traer los supervisores");
+    }
+  }
+
   function handleSelectDepartment(value: string) {
     if (value === "all") {
       setWorkersFiltered(workers);
     } else {
       const filtered = workers.filter((item) => item.sede === value);
+      setWorkersFiltered(filtered);
+    }
+    setCurrentPage(1);
+  }
+
+  function handleSelectSupervisor(value: string) {
+    if (value === "all") {
+      setWorkersFiltered(workers);
+    } else {
+      const filtered = workers.filter((item) => item.supervisor === value);
       setWorkersFiltered(filtered);
     }
     setCurrentPage(1);
@@ -282,6 +303,7 @@ function TableData() {
       fetchReport();
       fetDepartments();
       fetchIncidents();
+      fetchSupervisors();
     }
   }, [session.status, loadingUpdateHours]);
 
@@ -292,14 +314,34 @@ function TableData() {
   return (
     <div>
       <div className=" flex flex-col ">
-        <div className="grid grid-cols-3  gap-8  ">
-          <div className="flex gap-4 p-2 border rounded-lg">
+        <div className="flex  gap-8  w-full ">
+          <div className="flex gap-4 p-2 border rounded-lg  w-full">
             <Input
               placeholder="Buscar por DNI"
               onChange={handleChangeInput}
             ></Input>
+            <Select onValueChange={(e) => handleSelectSupervisor(e)}>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Supervisor" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {session.status === "authenticated" || loading ? (
+                    supervisors.map((item, index) => (
+                      <SelectItem value={item.full_name} key={index}>
+                        {item.full_name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectLabel>Cargando...</SelectLabel>
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
             <Select onValueChange={(e) => handleSelectDepartment(e)}>
-              <SelectTrigger className="min-w-[50%]">
+              <SelectTrigger className="">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>
