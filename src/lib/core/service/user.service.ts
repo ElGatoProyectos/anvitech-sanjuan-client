@@ -21,6 +21,15 @@ class UserService {
     }
   }
 
+  async findByDni(dni: string) {
+    try {
+      const user = await prisma.user.findFirst({ where: { dni } });
+      return httpResponse.http200("User found", user);
+    } catch (error) {
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async findById(id: number) {
     try {
       const user = await prisma.user.findFirst({ where: { id } });
@@ -100,26 +109,38 @@ class UserService {
       const { validate } = data;
       if (validate === "1234abc") {
         const admin = {
-          full_name: "Usuario admin",
-          dni: "12345678",
-          email: data.email,
-          password: bcrypt.hashSync("12345678", 11),
-          username: "12345678",
+          full_name: "REBECA BEATRIZ TUMBA PEREZ",
+          dni: "72913930",
+          email: "admin@gmail.com",
+          password: bcrypt.hashSync("72913930", 11),
+          username: "72913930",
+          enabled: true,
+          role: "admin",
+        };
+
+        const admin2 = {
+          full_name: "JOSE FERNANDO ROJAS RUIZ",
+          dni: "45843270",
+          email: "admin@gmail.com",
+          password: bcrypt.hashSync("45843270", 11),
+          username: "45843270",
           enabled: true,
           role: "admin",
         };
 
         const superadmin = {
-          full_name: "Usuario super admin",
-          dni: "87654321",
-          email: data.email,
-          password: bcrypt.hashSync("87654321", 11),
-          username: "87654321",
+          full_name: "ELVA HONORIO ROJAS",
+          dni: "10160437",
+          email: "elva.honorio@digimax.pe",
+          password: bcrypt.hashSync("10160437", 11),
+          username: "10160437",
           enabled: true,
           role: "superadmin",
         };
 
         await prisma.user.create({ data: admin });
+        await prisma.user.create({ data: admin2 });
+
         await prisma.user.create({ data: superadmin });
       }
 
