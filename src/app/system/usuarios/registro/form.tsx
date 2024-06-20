@@ -62,7 +62,10 @@ function Form() {
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="user">Usuario</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
+
+                {session.data?.user.role === "superadmin" && (
+                  <SelectItem value="admin">Administrador</SelectItem>
+                )}
               </SelectGroup>
             </SelectContent>
           </Select>

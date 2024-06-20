@@ -43,7 +43,7 @@ function FormIncidents() {
             onChange={(e) =>
               setIncident({ ...incident, title: e.target.value })
             }
-            disabled={session.data?.user.role !== "admin"}
+            disabled={session.data?.user.role === "user"}
           ></Input>
         </div>
         <div className="flex flex-col gap-2">
@@ -53,14 +53,15 @@ function FormIncidents() {
             onChange={(e) =>
               setIncident({ ...incident, description: e.target.value })
             }
-            disabled={session.data?.user.role !== "admin"}
+            disabled={session.data?.user.role === "user"}
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          {session.data?.user.role === "admin" && (
-            <Button disabled={loading}>Registrar incidente</Button>
-          )}
+          {session.data?.user.role === "admin" ||
+            (session.data?.user.role === "superadmin" && (
+              <Button disabled={loading}>Registrar incidente</Button>
+            ))}
         </div>
       </form>
     </div>

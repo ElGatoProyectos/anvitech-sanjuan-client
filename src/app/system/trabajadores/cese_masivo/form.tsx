@@ -36,40 +36,41 @@ function FormRegisterTerminationMassive() {
         <h1 className="text-lg font-semibold">Registrar ceses masivos</h1>
       </div>
 
-      {session.data?.user.role === "admin" && (
-        <form
-          onSubmit={handleRegistrarDataMassive}
-          className="flex flex-col gap-8"
-        >
-          <div>
-            👉
-            <Link
-              target="_blank"
-              download
-              as="/files/formato_cese_carga_masivo.xlsx"
-              href="/files/formato_cese_carga_masivo.xlsx"
-              className="underline text-blue-600"
-            >
-              Descargar formato
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Archivo</Label>
-            <Input
-              required
-              type="file"
-              accept=".xlsx"
-              onChange={(e: any) => setFile(e.target.files[0])}
-            />
-          </div>
+      {session.data?.user.role === "admin" ||
+        (session.data?.user.role === "superadmin" && (
+          <form
+            onSubmit={handleRegistrarDataMassive}
+            className="flex flex-col gap-8"
+          >
+            <div>
+              👉
+              <Link
+                target="_blank"
+                download
+                as="/files/formato_cese_carga_masivo.xlsx"
+                href="/files/formato_cese_carga_masivo.xlsx"
+                className="underline text-blue-600"
+              >
+                Descargar formato
+              </Link>
+            </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Archivo</Label>
+              <Input
+                required
+                type="file"
+                accept=".xlsx"
+                onChange={(e: any) => setFile(e.target.files[0])}
+              />
+            </div>
 
-          <div className="flex flex-col gap-2  col-span-2">
-            <Button disabled={loading} type="submit">
-              Registrar masivamente
-            </Button>
-          </div>
-        </form>
-      )}
+            <div className="flex flex-col gap-2  col-span-2">
+              <Button disabled={loading} type="submit">
+                Registrar masivamente
+              </Button>
+            </div>
+          </form>
+        ))}
     </div>
   );
 }

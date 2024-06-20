@@ -143,11 +143,12 @@ function LicencesWorker({ id }: { id: string }) {
           <Button onClick={() => setOpenModalHistory(true)}>
             Mostrar todas las permisos
           </Button>
-          {session.data?.user.role === "admin" && (
-            <Button onClick={() => setOpenModal(true)}>
-              Registrar licencia
-            </Button>
-          )}
+          {session.data?.user.role === "admin" ||
+            (session.data?.user.role === "superadmin" && (
+              <Button onClick={() => setOpenModal(true)}>
+                Registrar licencia
+              </Button>
+            ))}
         </div>
       </div>
 

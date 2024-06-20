@@ -40,7 +40,11 @@ class AuthService {
     try {
       const { user } = session;
 
-      if (user.role === "user" || user.role === "admin") {
+      if (
+        user.role === "user" ||
+        user.role === "admin" ||
+        user.role === "superadmin"
+      ) {
         const responseUser = await userService.findById(user.id);
 
         if (!responseUser.ok || responseUser.content.enabled === "0")

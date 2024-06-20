@@ -49,14 +49,15 @@ function FormIncidents() {
             onChange={(e) =>
               setTermination({ ...termination, title: e.target.value })
             }
-            disabled={session.data?.user.role !== "admin"}
+            disabled={session.data?.user.role === "user"}
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          {session.data?.user.role === "admin" && (
-            <Button disabled={loading}>Registrar motivo</Button>
-          )}
+          {session.data?.user.role === "admin" ||
+            (session.data?.user.role === "superadmin" && (
+              <Button disabled={loading}>Registrar motivo</Button>
+            ))}
         </div>
       </form>
     </div>

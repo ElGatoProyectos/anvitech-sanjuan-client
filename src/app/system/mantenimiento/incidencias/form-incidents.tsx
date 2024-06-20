@@ -48,7 +48,7 @@ function FormIncidents() {
               onChange={(e) =>
                 setIncident({ ...incident, title: e.target.value })
               }
-              disabled={session.data?.user.role !== "admin"}
+              disabled={session.data?.user.role === "user"}
             ></Input>
           </div>
 
@@ -59,7 +59,7 @@ function FormIncidents() {
               onChange={(e) =>
                 setIncident({ ...incident, date: e.target.value })
               }
-              disabled={session.data?.user.role !== "admin"}
+              disabled={session.data?.user.role === "user"}
             ></Input>
           </div>
         </div>
@@ -71,12 +71,12 @@ function FormIncidents() {
             onChange={(e) =>
               setIncident({ ...incident, description: e.target.value })
             }
-            disabled={session.data?.user.role !== "admin"}
+            disabled={session.data?.user.role === "user"}
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button disabled={loading || session.data?.user.role !== "admin"}>
+          <Button disabled={loading || session.data?.user.role === "user"}>
             Registrar incidente
           </Button>
         </div>

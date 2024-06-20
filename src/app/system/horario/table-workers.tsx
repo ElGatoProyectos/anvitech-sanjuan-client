@@ -140,7 +140,6 @@ function TableWorkers() {
               <th className="py-3 pr-6">Miercoles</th>
               <th className="py-3 pr-6">Jueves</th>
               <th className="py-3 pr-6">Viernes</th>
-              <th className="py-3 pr-6">Viernes</th>
               <th className="py-3 pr-6">Sabado</th>
               <th className="py-3 pr-6">Detalle</th>
             </tr>
@@ -188,7 +187,6 @@ function TableWorkers() {
                   <td>{item.jueves}</td>
                   <td>{item.viernes}</td>
                   <td>{item.sabado}</td>
-                  <td></td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Link

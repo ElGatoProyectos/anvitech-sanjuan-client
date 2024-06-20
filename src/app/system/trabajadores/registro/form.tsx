@@ -17,7 +17,10 @@ function Form() {
   async function handleRegisterData(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      if (session.data?.user.role === "admin") {
+      if (
+        session.data?.user.role === "admin" ||
+        session.data?.user.role === "superadmin"
+      ) {
         setLoading(true);
         await post("workers", dataWorker, session.data);
         setLoading(false);
@@ -33,88 +36,89 @@ function Form() {
         <h1 className="text-lg font-semibold">Registrar trabajador</h1>
       </div>
 
-      {session.data?.user.role === "admin" && (
-        <form
-          action=""
-          onSubmit={handleRegisterData}
-          className="flex flex-col gap-8"
-        >
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Nombres completos</Label>
-            <Input
-              type="text"
-              onChange={(e) =>
-                setDataWorker({
-                  ...dataWorker,
-                  full_name: e.target.value.toUpperCase(),
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>DNI</Label>
-            <Input
-              onChange={(e) =>
-                setDataWorker({ ...dataWorker, dni: e.target.value })
-              }
-            />
-          </div>
+      {session.data?.user.role === "admin" ||
+        (session.data?.user.role === "superadmin" && (
+          <form
+            action=""
+            onSubmit={handleRegisterData}
+            className="flex flex-col gap-8"
+          >
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Nombres completos</Label>
+              <Input
+                type="text"
+                onChange={(e) =>
+                  setDataWorker({
+                    ...dataWorker,
+                    full_name: e.target.value.toUpperCase(),
+                  })
+                }
+              />
+            </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>DNI</Label>
+              <Input
+                onChange={(e) =>
+                  setDataWorker({ ...dataWorker, dni: e.target.value })
+                }
+              />
+            </div>
 
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Departamento</Label>
-            <Input
-              type="text"
-              onChange={(e) =>
-                setDataWorker({
-                  ...dataWorker,
-                  department: e.target.value.toUpperCase(),
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Posición</Label>
-            <Input
-              type="text"
-              onChange={(e) =>
-                setDataWorker({
-                  ...dataWorker,
-                  position: e.target.value.toUpperCase(),
-                })
-              }
-            />
-          </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Departamento</Label>
+              <Input
+                type="text"
+                onChange={(e) =>
+                  setDataWorker({
+                    ...dataWorker,
+                    department: e.target.value.toUpperCase(),
+                  })
+                }
+              />
+            </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Posición</Label>
+              <Input
+                type="text"
+                onChange={(e) =>
+                  setDataWorker({
+                    ...dataWorker,
+                    position: e.target.value.toUpperCase(),
+                  })
+                }
+              />
+            </div>
 
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Supervisor</Label>
-            <Input
-              type="text"
-              onChange={(e) =>
-                setDataWorker({
-                  ...dataWorker,
-                  coordinator: e.target.value.toUpperCase(),
-                })
-              }
-            />
-          </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Supervisor</Label>
+              <Input
+                type="text"
+                onChange={(e) =>
+                  setDataWorker({
+                    ...dataWorker,
+                    coordinator: e.target.value.toUpperCase(),
+                  })
+                }
+              />
+            </div>
 
-          <div className="flex flex-col gap-2  col-span-2">
-            <Label>Fecha de contratación</Label>
-            <Input
-              type="date"
-              onChange={(e) =>
-                setDataWorker({ ...dataWorker, hire_date: e.target.value })
-              }
-            />
-          </div>
+            <div className="flex flex-col gap-2  col-span-2">
+              <Label>Fecha de contratación</Label>
+              <Input
+                type="date"
+                onChange={(e) =>
+                  setDataWorker({ ...dataWorker, hire_date: e.target.value })
+                }
+              />
+            </div>
 
-          <div className="flex flex-col gap-2  col-span-2">
-            <Button disabled={loading} type="submit">
-              Registrar trabajador
-            </Button>
-          </div>
-        </form>
-      )}
+            <div className="flex flex-col gap-2  col-span-2">
+              <Button disabled={loading} type="submit">
+                Registrar trabajador
+              </Button>
+            </div>
+          </form>
+        ))}
     </div>
   );
 }

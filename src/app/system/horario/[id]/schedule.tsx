@@ -181,7 +181,10 @@ function ScheduleWorker({ id }: { id: string }) {
 
   async function handleSubmit() {
     try {
-      if (session.data?.user.role === "admin") {
+      if (
+        session.data?.user.role === "admin" ||
+        session.data?.user.role === "superadmin"
+      ) {
         setLoading(true);
         await post(
           "schedule",
@@ -314,11 +317,12 @@ function ScheduleWorker({ id }: { id: string }) {
           </div>
 
           <div>
-            {session.data?.user.role === "admin" && (
-              <Button disabled={loading} onClick={handleSubmit}>
-                Guardar cambios
-              </Button>
-            )}
+            {session.data?.user.role === "admin" ||
+              (session.data?.user.role === "superadmin" && (
+                <Button disabled={loading} onClick={handleSubmit}>
+                  Guardar cambios
+                </Button>
+              ))}
           </div>
         </div>
       </div>

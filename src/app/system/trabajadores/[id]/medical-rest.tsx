@@ -144,11 +144,12 @@ function MedicalRestWorker({ id }: { id: string }) {
             Mostrar todas las permisos
           </Button>
 
-          {session.data?.user.role === "admin" && (
-            <Button onClick={() => setOpenModal(true)}>
-              Registrar descanso
-            </Button>
-          )}
+          {session.data?.user.role === "admin" ||
+            (session.data?.user.role === "superadmin" && (
+              <Button onClick={() => setOpenModal(true)}>
+                Registrar descanso
+              </Button>
+            ))}
         </div>
       </div>
 

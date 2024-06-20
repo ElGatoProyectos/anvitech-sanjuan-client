@@ -174,78 +174,79 @@ function Sidebar() {
           </li>
 
           {/* usuarios -------------------------------------------------------------- */}
-          {session.data?.user.role === "admin" && (
-            <li>
-              <Link
-                onClick={() => setIsExpandedUsers(!isExpandedUser)}
-                href={"#"}
-                className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
-                  pathname.includes("/system/usuarios")
-                    ? activePath
-                    : inactivePath
-                } transition-all`}
-              >
-                <span className="inline-flex justify-center items-center ml-4">
-                  <ListTodo size={20} />
-                </span>
-                <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
-                  Usuarios{" "}
-                  {isExpandedUser ? (
-                    <ChevronUp size={20} />
-                  ) : (
-                    <ChevronDown size={20} />
-                  )}
-                </span>
-              </Link>
+          {session.data?.user.role === "admin" ||
+            (session.data?.user.role === "superadmin" && (
+              <li>
+                <Link
+                  onClick={() => setIsExpandedUsers(!isExpandedUser)}
+                  href={"#"}
+                  className={`relative flex flex-row items-center h-11 focus:outline-none  text-gray-600  border-l-4   pr-6 ${
+                    pathname.includes("/system/usuarios")
+                      ? activePath
+                      : inactivePath
+                  } transition-all`}
+                >
+                  <span className="inline-flex justify-center items-center ml-4">
+                    <ListTodo size={20} />
+                  </span>
+                  <span className="ml-2 text-sm tracking-wide truncate w-full flex justify-between">
+                    Usuarios{" "}
+                    {isExpandedUser ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
+                  </span>
+                </Link>
 
-              {isExpandedUser && (
-                <ul className="ml-10 mt-2">
-                  <li>
-                    <Link
-                      href={"/system/usuarios"}
-                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                        pathname === "/system/usuarios"
-                          ? activePath
-                          : inactivePath
-                      } transition-all`}
-                    >
-                      <span className="ml-2 text-sm tracking-wide truncate">
-                        Lista general
-                      </span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={"/system/usuarios/registro"}
-                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                        pathname === "/system/usuarios/registro"
-                          ? activePath
-                          : inactivePath
-                      } transition-all`}
-                    >
-                      <span className="ml-2 text-sm tracking-wide truncate">
-                        Registro unitario
-                      </span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={"/system/usuarios/registro_masivo"}
-                      className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
-                        pathname === "/system/usuarios/registro_masivo"
-                          ? activePath
-                          : inactivePath
-                      } transition-all`}
-                    >
-                      <span className="ml-2 text-sm tracking-wide truncate">
-                        Registro masivo
-                      </span>
-                    </Link>
-                  </li>
-                </ul>
-              )}
-            </li>
-          )}
+                {isExpandedUser && (
+                  <ul className="ml-10 mt-2">
+                    <li>
+                      <Link
+                        href={"/system/usuarios"}
+                        className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                          pathname === "/system/usuarios"
+                            ? activePath
+                            : inactivePath
+                        } transition-all`}
+                      >
+                        <span className="ml-2 text-sm tracking-wide truncate">
+                          Lista general
+                        </span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={"/system/usuarios/registro"}
+                        className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                          pathname === "/system/usuarios/registro"
+                            ? activePath
+                            : inactivePath
+                        } transition-all`}
+                      >
+                        <span className="ml-2 text-sm tracking-wide truncate">
+                          Registro unitario
+                        </span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={"/system/usuarios/registro_masivo"}
+                        className={`relative flex flex-row items-center h-9 focus:outline-none  pr-6 ${
+                          pathname === "/system/usuarios/registro_masivo"
+                            ? activePath
+                            : inactivePath
+                        } transition-all`}
+                      >
+                        <span className="ml-2 text-sm tracking-wide truncate">
+                          Registro masivo
+                        </span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            ))}
           {/* 
           //- seccion trabajadores ------------------------------------------- */}
           <li>
