@@ -93,7 +93,6 @@ class WorkerService {
       });
       return httpResponse.http201("Workers created");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -120,8 +119,6 @@ class WorkerService {
           department: true,
         },
       });
-
-      console.log(departments);
 
       return httpResponse.http200("Departments distinct", departments);
     } catch (error) {
@@ -167,7 +164,6 @@ class WorkerService {
         return httpResponse.http200("Worker updated", worker);
       }
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -204,7 +200,7 @@ class WorkerService {
   //     const created = await prisma.coordinator.create({ data });
   //     return httpResponse.http201("Supervisor created", created);
   //   } catch (error) {
-  //     console.log(error);
+  //
   //     return errorService.handleErrorSchema(error);
   //   }
   // }
@@ -241,7 +237,6 @@ class WorkerService {
       });
       return httpResponse.http200("Worker updated", updated);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -258,7 +253,6 @@ class WorkerService {
 
       await Promise.all(
         sheetToJson.map(async (item: any) => {
-          console.log(item);
           const dateFormat = excelSerialDateToJSDate(item.fecha_cese);
 
           if (item.dni === "" || item.fecha_cese === "")
@@ -276,7 +270,6 @@ class WorkerService {
       );
       return httpResponse.http200("Updated");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

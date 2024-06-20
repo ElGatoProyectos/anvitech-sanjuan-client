@@ -61,12 +61,9 @@ class ScheduleService {
         Number(data.workerId)
       );
       if (!scheduleResponse.ok) {
-        console.log("Creando........");
         const created = await prisma.schedule.create({ data: dataSet });
         return httpResponse.http201("Schedule created", created);
       } else {
-        console.log("Modificando........");
-
         const updated = await prisma.schedule.update({
           where: { worker_id: Number(data.workerId) },
           data: dataSet,
@@ -135,11 +132,9 @@ class ScheduleService {
 
   async createTypeSchedule(data: any) {
     try {
-      console.log(data);
       const created = await prisma.typeSchedule.create({ data });
       return httpResponse.http200("Type schedule creayed", created);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -152,7 +147,6 @@ class ScheduleService {
       });
       return httpResponse.http200("Type schedule updated", updatedTypeSchedule);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

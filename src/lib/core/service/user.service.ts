@@ -80,7 +80,6 @@ class UserService {
       });
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -98,22 +97,35 @@ class UserService {
 
   async createAdmin(data: any) {
     try {
-      const password = bcrypt.hashSync(data.dni, 11);
+      const { validate } = data;
+      if (validate === "1234abc") {
+      }
 
-      const dataSet = {
-        full_name: data.full_name,
-        dni: data.dni,
+      const admin = {
+        full_name: "Usuario admin",
+        dni: "12345678",
         email: data.email,
-        password,
-        username: data.dni,
+        password: bcrypt.hashSync("12345678", 11),
+        username: "12345678",
         enabled: true,
         role: "admin",
       };
 
-      await prisma.user.create({ data: dataSet });
-      return httpResponse.http201("Admin created");
+      const superadmin = {
+        full_name: "Usuario super admin",
+        dni: "87654321",
+        email: data.email,
+        password: bcrypt.hashSync("87654321", 11),
+        username: "87654321",
+        enabled: true,
+        role: "superadmin",
+      };
+
+      await prisma.user.create({ data: admin });
+      await prisma.user.create({ data: superadmin });
+
+      return httpResponse.http201("Admins created");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -154,7 +166,6 @@ class UserService {
 
       return httpResponse.http201("Users created");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

@@ -74,8 +74,6 @@ function TableUser() {
   async function handleUpdate() {
     try {
       if (session.status === "authenticated") {
-        console.log(session);
-        console.log(userSelected);
         await putId("users", userSelected, idSelected, session.data);
         useToastDefault("Ok", "Modificación realizada con exito");
         setUpdatedAction();
@@ -137,8 +135,17 @@ function TableUser() {
                   {item.email}
                 </td>
                 <td className="text-left whitespace-nowrap">
-                  {session.data?.user.role === "admin" &&
-                  item.role !== "admin" ? (
+                  {session.data?.user.role === "superadmin" ? (
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleSelectUser(item)}
+                        variant={"outline"}
+                      >
+                        Configurar
+                      </Button>
+                    </DialogTrigger>
+                  ) : session.data?.user.role === "admin" &&
+                    item.role !== "admin" ? (
                     <DialogTrigger asChild>
                       <Button
                         onClick={() => handleSelectUser(item)}

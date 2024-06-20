@@ -24,7 +24,6 @@ function FormRegisterUserMassive() {
       setLoading(false);
       useToastDefault("Ok", "Registro masivo realizado con exito");
     } catch (error) {
-      console.log(error);
       useToastDestructive("Error", "Error al procesar el archivo excel");
       setLoading(false);
     }

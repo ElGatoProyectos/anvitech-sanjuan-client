@@ -4,7 +4,7 @@ import { workerService } from "@/lib/core/service/worker.service";
 
 export async function GET(request: NextRequest) {
   try {
-    const responseAuth = await validationAuthV2(request, "admin");
+    const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
 
     const response = await workerService.findSupervisors();
@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

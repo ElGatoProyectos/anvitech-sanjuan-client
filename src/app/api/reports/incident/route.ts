@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
     if (responseAuth.status !== 200) return responseAuth;
     const body = await request.json();
 
-    console.log(body);
     const responseDetail = await reportService.addIncident(
       Number(body.detailReportId),
       Number(body.incidentId)

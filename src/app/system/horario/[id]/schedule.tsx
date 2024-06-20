@@ -80,7 +80,7 @@ function ScheduleWorker({ id }: { id: string }) {
   async function fetchDataWorker() {
     try {
       const response = await getId("workers", Number(id), session.data);
-      console.log(response.data);
+
       setDataWorker(response.data);
     } catch (error) {
       useToastDestructive(
@@ -181,15 +181,17 @@ function ScheduleWorker({ id }: { id: string }) {
 
   async function handleSubmit() {
     try {
-      setLoading(true);
-      await post(
-        "schedule",
-        { workerId: id, schedule, comments },
-        session.data
-      );
+      if (session.data?.user.role === "admin") {
+        setLoading(true);
+        await post(
+          "schedule",
+          { workerId: id, schedule, comments },
+          session.data
+        );
 
-      useToastDefault("Ok", "Modificación realizada con éxito");
-      setLoading(false);
+        useToastDefault("Ok", "Modificación realizada con éxito");
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
       useToastDestructive("Error", "Error al registrar horario");
@@ -312,9 +314,11 @@ function ScheduleWorker({ id }: { id: string }) {
           </div>
 
           <div>
-            <Button disabled={loading} onClick={handleSubmit}>
-              Guardar cambios
-            </Button>
+            {session.data?.user.role === "admin" && (
+              <Button disabled={loading} onClick={handleSubmit}>
+                Guardar cambios
+              </Button>
+            )}
           </div>
         </div>
       </div>

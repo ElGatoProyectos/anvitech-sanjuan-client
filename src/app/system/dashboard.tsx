@@ -38,11 +38,9 @@ function Dashboard() {
     week,
   } = useWorkerWeek(date);
 
-  console.log(week);
-
   return (
     <div className="grid grid-cols-2 gap-4 w-full">
-      <div className="bg-white w-full col-span-2 p-2 rounded-lg flex gap-16 justify-end">
+      <div className="bg-white w-full col-span-2  p-2 rounded-lg flex gap-16 justify-end">
         <div className="flex gap-4">
           <Input type="date" onChange={(e) => setDate(e.target.value)}></Input>
 
@@ -72,7 +70,7 @@ function Dashboard() {
 
       <GraphicLine formattedLateness={formattedLateness} />
 
-      <div className="bg-white w-full  p-2  rounded-lg">
+      <div className="bg-white w-full  p-2  rounded-lg xl:col-span-1 col-span-2">
         <table className="w-full text-left text-sm " cellPadding={2} border={1}>
           <thead>
             <tr>
@@ -105,7 +103,7 @@ function Dashboard() {
         </table>
       </div>
 
-      <div className="bg-white w-full  p-2  rounded-lg">
+      <div className="bg-white w-full  p-2  rounded-lg xl:col-span-1 col-span-2">
         <table className="w-full text-left text-sm  " cellPadding={2}>
           <thead>
             <tr>

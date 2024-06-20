@@ -75,8 +75,6 @@ function TableData() {
         session.data
       );
 
-      console.log(response.data);
-
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -147,7 +145,6 @@ function TableData() {
       setLoading(false);
       useToastDefault("Ok", "Reporte generado con exito");
     } catch (error) {
-      console.log(error);
       setLoading(false);
 
       useToastDestructive("Error", "Error al crear el archivo");

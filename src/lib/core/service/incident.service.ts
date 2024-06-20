@@ -33,7 +33,6 @@ class IncidentService {
 
       return httpResponse.http201("Incidente created", created);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -51,7 +50,6 @@ class IncidentService {
       });
       return httpResponse.http200("Incident updated", updated);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -62,7 +60,6 @@ class IncidentService {
 
       return httpResponse.http200("Incidentes found", incidents);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

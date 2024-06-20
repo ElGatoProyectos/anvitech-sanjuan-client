@@ -98,7 +98,7 @@ function ModalDetailReport({
   async function fetchIncidentsDetail(detailId: number) {
     try {
       const response = await getId("reports/incident/", detailId, session.data);
-      console.log(response);
+
       setincidentsForDetail(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer la información");
@@ -114,7 +114,6 @@ function ModalDetailReport({
         session.data
       );
 
-      console.log(response.data);
       setDataDetail(response.data);
       setLoadingDetailIncidents(false);
     } catch (error) {

@@ -21,11 +21,13 @@ function FormIncidents() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      setLoading(true);
-      await post("incidents", incident, session.data);
-      setUpdatedAction();
-      setIncident({ title: "", description: "" });
-      setLoading(false);
+      if (session.data?.user.role === "admin") {
+        setLoading(true);
+        await post("incidents", incident, session.data);
+        setUpdatedAction();
+        setIncident({ title: "", description: "" });
+        setLoading(false);
+      }
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
       setLoading(false);
@@ -41,6 +43,7 @@ function FormIncidents() {
             onChange={(e) =>
               setIncident({ ...incident, title: e.target.value })
             }
+            disabled={session.data?.user.role !== "admin"}
           ></Input>
         </div>
         <div className="flex flex-col gap-2">
@@ -50,11 +53,14 @@ function FormIncidents() {
             onChange={(e) =>
               setIncident({ ...incident, description: e.target.value })
             }
+            disabled={session.data?.user.role !== "admin"}
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button disabled={loading}>Registrar incidente</Button>
+          {session.data?.user.role === "admin" && (
+            <Button disabled={loading}>Registrar incidente</Button>
+          )}
         </div>
       </form>
     </div>

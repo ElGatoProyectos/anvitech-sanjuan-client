@@ -48,7 +48,6 @@ function CardHeaderWorker() {
       exportAllWorkers(response.data);
       setLoading(false);
     } catch (error) {
-      console.log(error);
       useToastDestructive("Error", "Error al generar el excel");
     }
   }

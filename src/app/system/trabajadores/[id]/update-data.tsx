@@ -73,7 +73,7 @@ function UpdateDataWorker({ id }: { id: string }) {
   async function fetchDataWorker(id: string) {
     try {
       const response = await getId("workers", Number(id), session.data);
-      console.log(response.data);
+
       setWorker(response.data);
       setLoading(false);
     } catch (error) {
@@ -90,9 +90,11 @@ function UpdateDataWorker({ id }: { id: string }) {
         company_ruc: worker.company.split("-")[1],
       };
 
-      await putId("workers", formatData, Number(id), session.data);
+      if (session.data?.user.role === "admin") {
+        await putId("workers", formatData, Number(id), session.data);
 
-      useToastDefault("Ok", "Modificacion realizada con exito");
+        useToastDefault("Ok", "Modificacion realizada con exito");
+      }
     } catch (error) {
       useToastDestructive("Error", "Error al modificar trabajador");
     }
@@ -194,6 +196,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                       setWorker({ ...worker, type_dni: e.target.value })
                     }
                     defaultValue={worker.type_dni}
+                    disabled={session.data?.user.role !== "admin"}
                   ></Input>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -203,6 +206,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                       setWorker({ ...worker, dni: e.target.value })
                     }
                     defaultValue={worker.dni}
+                    disabled={session.data?.user.role !== "admin"}
                   ></Input>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -212,6 +216,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     onChange={(e) =>
                       setWorker({ ...worker, full_name: e.target.value })
                     }
+                    disabled={session.data?.user.role !== "admin"}
                   ></Input>
                 </div>
 
@@ -222,6 +227,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     onChange={(e) =>
                       setWorker({ ...worker, department: e.target.value })
                     }
+                    disabled={session.data?.user.role !== "admin"}
                   ></Input>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -231,6 +237,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     onChange={(e) =>
                       setWorker({ ...worker, position: e.target.value })
                     }
+                    disabled={session.data?.user.role !== "admin"}
                   ></Input>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -243,6 +250,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     onInputChange={(value) =>
                       setWorker({ ...worker, supervisor: value })
                     }
+                    isDisabled={session.data?.user.role !== "admin"}
                   >
                     {supervisors.map((item, idx) => (
                       <AutocompleteItem key={idx} value={item.full_name}>
@@ -261,6 +269,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                 <div className="flex flex-col gap-3">
                   <Label>Coordinador</Label>
                   <Autocomplete
+                    isDisabled={session.data?.user.role !== "admin"}
                     label="Seleccione uno"
                     className="w-full"
                     defaultInputValue={worker.coordinator}
@@ -285,6 +294,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                     onInputChange={(value) =>
                       setWorker({ ...worker, management: value })
                     }
+                    isDisabled={session.data?.user.role !== "admin"}
                   >
                     {supervisors.map((item, idx) => (
                       <AutocompleteItem key={idx} value={item.full_name}>
@@ -301,6 +311,7 @@ function UpdateDataWorker({ id }: { id: string }) {
                 <Select
                   value={worker.company}
                   onValueChange={(e) => setWorker({ ...worker, company: e })}
+                  disabled={session.data?.user.role !== "admin"}
                 >
                   <SelectTrigger className="w-full ">
                     <SelectValue>{worker.company}</SelectValue>
@@ -322,6 +333,7 @@ function UpdateDataWorker({ id }: { id: string }) {
               <div className="flex flex-col gap-3">
                 <Label>Tipo contratacion</Label>
                 <Select
+                  disabled={session.data?.user.role !== "admin"}
                   value={worker.type_contract}
                   onValueChange={(e) =>
                     setWorker({ ...worker, type_contract: e })
@@ -345,6 +357,7 @@ function UpdateDataWorker({ id }: { id: string }) {
               <div className="flex flex-col gap-3">
                 <Label>Fecha de ingreso</Label>
                 <Input
+                  disabled={session.data?.user.role !== "admin"}
                   type="date"
                   defaultValue={formatDateToInput(worker.hire_date)}
                   onChange={(e) =>
@@ -363,6 +376,7 @@ function UpdateDataWorker({ id }: { id: string }) {
               <div className="flex flex-col gap-3">
                 <Label>Estado</Label>
                 <Select
+                  disabled={session.data?.user.role !== "admin"}
                   value={worker.enabled}
                   onValueChange={(e) => setWorker({ ...worker, enabled: e })}
                 >
@@ -380,14 +394,18 @@ function UpdateDataWorker({ id }: { id: string }) {
                 </Select>
               </div>
               <div className="flex gap-4">
-                <Button type="submit">Guardar cambios</Button>
-                <Button
-                  type="button"
-                  onClick={() => setOpenModalTermination(true)}
-                  variant={"outline"}
-                >
-                  Fecha de cese
-                </Button>
+                {session.data?.user.role === "admin" && (
+                  <>
+                    <Button type="submit">Guardar cambios</Button>
+                    <Button
+                      type="button"
+                      onClick={() => setOpenModalTermination(true)}
+                      variant={"outline"}
+                    >
+                      Fecha de cese
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </>

@@ -13,7 +13,6 @@ class LicenceService {
       const created = await prisma.licence.create({ data: formatData });
       return httpResponse.http201("Lincence created", created);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -30,7 +29,6 @@ class LicenceService {
 
       return httpResponse.http200("Licences", data);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

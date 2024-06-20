@@ -47,13 +47,15 @@ function TableIncidents() {
 
   async function handleUpdateTermination() {
     try {
-      await putId(
-        "terminations",
-        terminationSelected,
-        terminationId,
-        session.data
-      );
-      setUpdatedAction();
+      if (session.data?.user.role === "admin") {
+        await putId(
+          "terminations",
+          terminationSelected,
+          terminationId,
+          session.data
+        );
+        setUpdatedAction();
+      }
     } catch (error) {
       useToastDestructive("Error", "Error al modificar");
     }
@@ -118,12 +120,14 @@ function TableIncidents() {
                   <td className="pr-6 py-4 whitespace-nowrap ">{item.title}</td>
                   <td className="pr-6 py-4 whitespace-nowrap ">
                     <DialogTrigger asChild>
-                      <Button
-                        size={"sm"}
-                        onClick={() => handleIncidentSelected(item)}
-                      >
-                        Detalle
-                      </Button>
+                      {session.data?.user.role === "admin" && (
+                        <Button
+                          size={"sm"}
+                          onClick={() => handleIncidentSelected(item)}
+                        >
+                          Detalle
+                        </Button>
+                      )}
                     </DialogTrigger>
                   </td>
                 </tr>

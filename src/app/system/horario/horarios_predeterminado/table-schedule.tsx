@@ -64,11 +64,13 @@ function TableSchedule() {
 
   async function handleUpdate() {
     try {
-      setLoading(true);
-      const { id, ...dataSet } = typeScheduleSelected;
-      await putId("schedule/type", dataSet, id, session.data);
-      setNewFetch(!newFetch);
-      setLoading(false);
+      if (session.data?.user.role === "admin") {
+        setLoading(true);
+        const { id, ...dataSet } = typeScheduleSelected;
+        await putId("schedule/type", dataSet, id, session.data);
+        setNewFetch(!newFetch);
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
 
@@ -107,6 +109,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, name: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -116,6 +119,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, lunes: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -125,6 +129,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, martes: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -134,6 +139,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, miercoles: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -143,6 +149,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, jueves: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -152,6 +159,7 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, viernes: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
@@ -161,10 +169,13 @@ function TableSchedule() {
               onChange={(e) =>
                 setNewSchedule({ ...newSchedule, sabado: e.target.value })
               }
+              disabled={session.data?.user.role !== "admin"}
             ></Input>
           </div>
           <div>
-            <Button disabled={loading}>Registrar</Button>
+            {session.data?.user.role === "admin" && (
+              <Button disabled={loading}>Registrar</Button>
+            )}
           </div>
         </form>
       </div>

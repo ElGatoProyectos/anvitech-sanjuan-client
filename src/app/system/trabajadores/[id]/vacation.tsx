@@ -144,9 +144,12 @@ function VacationWorker({ id }: { id: string }) {
           <Button onClick={() => setOpenModalHistory(true)}>
             Mostrar todas las vaciones
           </Button>
-          <Button onClick={() => setOpenModal(true)}>
-            Registrar vacaciones
-          </Button>
+
+          {session.data?.user.role === "admin" && (
+            <Button onClick={() => setOpenModal(true)}>
+              Registrar vacaciones
+            </Button>
+          )}
         </div>
       </div>
 

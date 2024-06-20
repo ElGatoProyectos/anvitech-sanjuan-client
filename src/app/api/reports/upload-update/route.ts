@@ -8,18 +8,11 @@ export async function POST(request: NextRequest) {
     if (responseAuth.status !== 200) return responseAuth;
     const body = await request.formData();
     const file = body.get("file") as File;
-
-    console.log(file);
-
     const responseData = await reportService.uploadUpdateReportMassive(file);
-
-    console.log(responseData);
-
     return NextResponse.json(responseData.content, {
       status: responseData.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

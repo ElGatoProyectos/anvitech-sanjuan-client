@@ -21,11 +21,13 @@ function FormIncidents() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      setLoading(true);
-      await post("terminations", termination, session.data);
-      setUpdatedAction();
-      setTermination({ title: "" });
-      setLoading(false);
+      if (session.data?.user.role === "admin") {
+        setLoading(true);
+        await post("terminations", termination, session.data);
+        setUpdatedAction();
+        setTermination({ title: "" });
+        setLoading(false);
+      }
     } catch (error) {
       useToastDestructive("Error", "Error al procesar el formulario");
       setLoading(false);
@@ -47,11 +49,14 @@ function FormIncidents() {
             onChange={(e) =>
               setTermination({ ...termination, title: e.target.value })
             }
+            disabled={session.data?.user.role !== "admin"}
           ></Textarea>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button disabled={loading}>Registrar motivo</Button>
+          {session.data?.user.role === "admin" && (
+            <Button disabled={loading}>Registrar motivo</Button>
+          )}
         </div>
       </form>
     </div>

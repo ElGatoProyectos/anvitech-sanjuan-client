@@ -25,7 +25,6 @@ class DataService {
       const max = maxDay ?? saturday;
       const year = selectedYear ?? dataYear;
       const month = selectedMonth ?? dataMonth;
-      console.log("============", min, max, year, month);
 
       /// obtener el token para hacer la peticion post
 
@@ -98,7 +97,6 @@ class DataService {
           selectedYear,
           selectedMonth
         );
-        console.log("=================" + dayString + "======================");
 
         ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
         // todo todo ok
@@ -144,8 +142,6 @@ class DataService {
     yearI: number
   ) {
     try {
-      console.log("filter and register!!!!!");
-
       /// con este horario validamos las horas, ya tenemos el day
       const responseSchedule = await scheduleService.findScheduleForWorker(
         worker.id
@@ -410,8 +406,6 @@ class DataService {
           selectedYear,
           selectedMonth
         );
-
-        console.log(dayString);
 
         const responseDataForDay = await this.captureDataForDay(
           token,

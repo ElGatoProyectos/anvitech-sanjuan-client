@@ -47,7 +47,6 @@ class VacationService {
       const vacations = await prisma.vacation.create({ data: formatData });
       return httpResponse.http200("All vacations", vacations);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

@@ -5,7 +5,7 @@ import { reportService } from "@/lib/core/service/report.service";
 
 export async function POST(request: NextRequest) {
   try {
-    const responseAuth = await validationAuthV2(request, "admin");
+    const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
 
     const body = await request.json();
@@ -14,14 +14,6 @@ export async function POST(request: NextRequest) {
     const monthBody = Number(body.month);
     const yearBody = Number(body.year);
 
-    // const allDays = await dataService.getDaysBetweenMondayAndSaturday(
-    //   dayBody,
-    //   monthBody,
-    //   yearBody
-    // );
-
-    console.log(dayBody, monthBody, yearBody);
-
     const allDays = await dataService.getDaysFromLastSaturdayToThisFriday(
       dayBody,
       monthBody,
@@ -29,8 +21,6 @@ export async function POST(request: NextRequest) {
     );
 
     // deberia hbaer un metodo el cual  al pasarle un fecha, la reciba y devuelva de sabado a viernes y eso deberia ser el allDays
-
-    console.log(allDays);
 
     const responseData = await reportService.generateReportForWeek(allDays);
 

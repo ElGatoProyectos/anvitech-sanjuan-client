@@ -30,8 +30,6 @@ function TableReports() {
   const indexOfFirst = indexOfLast - reportsPerPage;
   const currentReports = reportsFiltered.slice(indexOfFirst, indexOfLast);
 
-  console.log(currentReports);
-
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   async function fetchDataReports() {

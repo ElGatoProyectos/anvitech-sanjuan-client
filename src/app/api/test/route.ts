@@ -11,7 +11,6 @@ export async function GET() {
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

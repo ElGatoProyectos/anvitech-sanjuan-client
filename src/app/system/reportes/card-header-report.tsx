@@ -45,8 +45,6 @@ function CardHeaderReport() {
         { username: session.data?.user.username, password },
         session.data
       );
-
-      console.log(response);
     } catch (error) {
       useToastDestructive("Error", "Error al ejecutar la accion");
     }

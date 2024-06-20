@@ -95,7 +95,6 @@ function ScheduleWorker({ id }: { id: string }) {
       useToastDestructive("Error", "Error al traer la información");
     }
   }
-  console.log(schedule);
 
   function handleSelectDay(e: any) {
     const day = schedule.find((x) => x.name === e);

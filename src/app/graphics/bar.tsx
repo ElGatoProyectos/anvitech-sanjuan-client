@@ -64,7 +64,7 @@ function GraphicBar({ week }: { week: any }) {
   }, [week]);
 
   return (
-    <div className="h-[30rem] bg-white p-4">
+    <div className="h-[30rem] bg-white p-4 xl:col-span-1 col-span-2">
       <div className="mb-4">
         <span className="font-semibold">Asistencias vs faltas</span>
       </div>

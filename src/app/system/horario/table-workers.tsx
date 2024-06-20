@@ -61,7 +61,7 @@ function TableWorkers() {
   async function fetchDepartments() {
     try {
       const response = await get("workers/departments", session.data);
-      console.log(response.data);
+
       setDepartments(response.data);
     } catch (error) {
       useToastDestructive("Error", "Hubo un error al traer la información");

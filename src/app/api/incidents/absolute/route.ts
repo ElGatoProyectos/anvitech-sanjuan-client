@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
       status: responseCreate.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });
@@ -35,7 +34,6 @@ export async function GET(request: NextRequest) {
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

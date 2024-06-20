@@ -58,7 +58,6 @@ function MedicalRestWorker({ id }: { id: string }) {
         session.data
       );
 
-      console.log(response.data);
       setDataPermissionMin(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer los descansos");
@@ -144,7 +143,12 @@ function MedicalRestWorker({ id }: { id: string }) {
           <Button onClick={() => setOpenModalHistory(true)}>
             Mostrar todas las permisos
           </Button>
-          <Button onClick={() => setOpenModal(true)}>Registrar descanso</Button>
+
+          {session.data?.user.role === "admin" && (
+            <Button onClick={() => setOpenModal(true)}>
+              Registrar descanso
+            </Button>
+          )}
         </div>
       </div>
 

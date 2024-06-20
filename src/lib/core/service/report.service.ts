@@ -95,7 +95,6 @@ class ReportService {
       });
       return httpResponse.http200("All details report", details);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -107,7 +106,6 @@ class ReportService {
       });
       return httpResponse.http200("All details report", detail);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -146,7 +144,6 @@ class ReportService {
       });
       return httpResponse.http201("Incident created", updated);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -167,7 +164,6 @@ class ReportService {
       });
       return httpResponse.http201("Incident detail deleted", deleted);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -182,7 +178,6 @@ class ReportService {
       });
       return httpResponse.http200("All incidents for detail", incidents);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -341,7 +336,6 @@ class ReportService {
 
       return httpResponse.http200("Report success", dataGeneral);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -358,7 +352,6 @@ class ReportService {
       });
       return httpResponse.http200("All data", data);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -424,7 +417,6 @@ class ReportService {
 
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -434,8 +426,6 @@ class ReportService {
       // capturamos el horario del trabajador
 
       const { dataTemporalHours, dataDetail } = data;
-
-      console.log(dataTemporalHours);
 
       const workerResponse = await workerService.findByDNI(dataDetail.dni);
       if (!workerResponse.ok) return workerResponse;
@@ -547,8 +537,6 @@ class ReportService {
           .split(":")
           .map(Number);
 
-        console.log(dataStartHour, dataEndHour);
-
         if (dataStartHour <= 11) {
           if (dataStartHour > scheduleStartHour) {
             formatData.tardanza = "si";
@@ -593,14 +581,12 @@ class ReportService {
         }
       }
 
-      console.log(formatData);
       const updated = await prisma.detailReport.update({
         where: { id: detailReportId },
         data: formatData,
       });
       return httpResponse.http200("Detail report updated", updated);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -721,7 +707,6 @@ class ReportService {
             formatData.falta = "si";
             formatData.tardanza = "no";
           } else {
-            console.log("hereeee======================");
             const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
               .split(":")
               .map(Number);
@@ -785,7 +770,6 @@ class ReportService {
       );
       return httpResponse.http200("Ok", "Reports upload");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }
@@ -802,7 +786,6 @@ class ReportService {
 
       await Promise.all(
         sheetToJson.map(async (row: any, index) => {
-          console.log(row);
           const worker = await workerService.findByDNI(String(row.dni));
           const schedule = await scheduleService.findScheduleForWorker(
             worker.content.id
@@ -850,11 +833,6 @@ class ReportService {
             hora_salida: row.hora_salida ? String(row.hora_salida) : "",
             discount: 0,
           };
-          console.log("==========================");
-          console.log(row.hora_inicio);
-          console.log(row.hora_salida);
-
-          console.log(detail);
 
           // si hay un registro empezamos a condicionar los horarios =============================================
           if (detail) {
@@ -917,7 +895,6 @@ class ReportService {
               formatData.falta = "si";
               formatData.tardanza = "no";
             } else {
-              console.log("hereeee======================");
               const [dataStartHour, dataStartMinute] = String(row.hora_inicio)
                 .split(":")
                 .map(Number);
@@ -986,7 +963,6 @@ class ReportService {
       );
       return httpResponse.http200("Ok", "Reports upload");
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

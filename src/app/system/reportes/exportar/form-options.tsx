@@ -117,8 +117,6 @@ function FormOptions() {
           session.data
         );
 
-        console.log(response.data);
-
         const newYear = new Date().getFullYear();
         const month = parseInt(monthSelected, 10) - 1; // Restar 1 porque los meses en JavaScript son de 0 a 11
 
@@ -135,7 +133,6 @@ function FormOptions() {
       }
       setOpenFirst(false);
     } catch (error) {
-      console.log(error);
       setOpenFirst(false);
 
       useToastDestructive("Error", "Error al generar excel");
@@ -146,8 +143,6 @@ function FormOptions() {
     try {
       setOpenFirst(true);
       const response = await post("reports/export", dateLimits, session.data);
-
-      console.log(response.data);
 
       exportNormal(response.data);
       setOpenFirst(false);
@@ -165,9 +160,7 @@ function FormOptions() {
     try {
       const response = await get("reports", session.data);
       setDataReports(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   const [open, setOpen] = useState(false);

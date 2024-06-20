@@ -7,7 +7,7 @@ export async function GET(
   context: { params: { id: number } }
 ) {
   try {
-    const responseAuth = await validationAuthV2(request, "admin");
+    const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
 
     const response = await licenceService.findByWorker(
@@ -18,7 +18,6 @@ export async function GET(
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

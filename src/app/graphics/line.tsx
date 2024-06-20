@@ -27,7 +27,7 @@ const data_recentOrder = [
 
 function GraphicLine({ formattedLateness }: { formattedLateness: Props[] }) {
   return (
-    <div className="h-[30rem] bg-white p-4">
+    <div className="h-[30rem] bg-white p-4 xl:col-span-1 col-span-2">
       <div>
         <span className="font-semibold">Linea de tiempo de tardanzas</span>
       </div>

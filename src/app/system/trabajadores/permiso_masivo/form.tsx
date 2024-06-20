@@ -34,37 +34,40 @@ function FormRegisterPermissionsMassive() {
       <div className="mb-8">
         <h1 className="text-lg font-semibold">Registrar permisos masivos</h1>
       </div>
-      <form
-        onSubmit={handleRegistrarDataMassive}
-        className="flex flex-col gap-8"
-      >
-        <div>
-          👉
-          <Link
-            target="_blank"
-            download
-            as="/files/formato_vacaciones_masivas.xlsx"
-            href="/files/formato_vacaciones_masivas.xlsx"
-            className="underline text-blue-600"
-          >
-            Descargar formato
-          </Link>
-        </div>
-        <div className="flex flex-col gap-2  col-span-2">
-          <Label>Archivo</Label>
-          <Input
-            type="file"
-            accept=".xlsx"
-            onChange={(e: any) => setFile(e.target.files[0])}
-          />
-        </div>
 
-        <div className="flex flex-col gap-2  col-span-2">
-          <Button disabled={loading} type="submit">
-            Registrar masivamente
-          </Button>
-        </div>
-      </form>
+      {session.data?.user.role === "admin" && (
+        <form
+          onSubmit={handleRegistrarDataMassive}
+          className="flex flex-col gap-8"
+        >
+          <div>
+            👉
+            <Link
+              target="_blank"
+              download
+              as="/files/formato_vacaciones_masivas.xlsx"
+              href="/files/formato_vacaciones_masivas.xlsx"
+              className="underline text-blue-600"
+            >
+              Descargar formato
+            </Link>
+          </div>
+          <div className="flex flex-col gap-2  col-span-2">
+            <Label>Archivo</Label>
+            <Input
+              type="file"
+              accept=".xlsx"
+              onChange={(e: any) => setFile(e.target.files[0])}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2  col-span-2">
+            <Button disabled={loading} type="submit">
+              Registrar masivamente
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

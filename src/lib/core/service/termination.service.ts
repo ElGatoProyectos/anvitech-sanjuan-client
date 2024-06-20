@@ -17,7 +17,6 @@ class TerminationService {
       const terminations = await prisma.typeTermination.create({ data });
       return httpResponse.http200("Termination created", terminations);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

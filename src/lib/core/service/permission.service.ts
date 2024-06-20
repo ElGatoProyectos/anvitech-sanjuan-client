@@ -45,7 +45,6 @@ class PermissionService {
       const vacations = await prisma.permissions.create({ data: formatData });
       return httpResponse.http200("Permission created", vacations);
     } catch (error) {
-      console.log(error);
       return errorService.handleErrorSchema(error);
     }
   }

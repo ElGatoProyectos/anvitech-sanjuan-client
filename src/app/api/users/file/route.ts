@@ -12,13 +12,11 @@ export async function POST(request: NextRequest) {
     const file = body.get("file") as File;
 
     const response = await userService.registerMassive(file);
-    console.log(response);
 
     return NextResponse.json(response, {
       status: 200,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

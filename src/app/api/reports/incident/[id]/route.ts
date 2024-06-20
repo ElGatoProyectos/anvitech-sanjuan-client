@@ -7,7 +7,6 @@ export async function GET(
   context: { params: { id: number } }
 ) {
   try {
-    console.log("hereeeeeeee");
     const responseAuth = await validationAuthV2(request, "user");
     if (responseAuth.status !== 200) return responseAuth;
     const responseDetail = await reportService.findIncidentsForDetail(
@@ -18,7 +17,6 @@ export async function GET(
       status: responseDetail.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });
@@ -40,7 +38,6 @@ export async function DELETE(
       status: responseDetail.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

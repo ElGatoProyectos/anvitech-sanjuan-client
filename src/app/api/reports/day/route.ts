@@ -1,9 +1,13 @@
 import { dataService } from "@/lib/core/service/data.service";
 import { reportService } from "@/lib/core/service/report.service";
 import { NextRequest, NextResponse } from "next/server";
+import { validationAuthV2 } from "../../utils/handleValidation";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const responseAuth = await validationAuthV2(request, "user");
+    if (responseAuth.status !== 200) return responseAuth;
+
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
     const currentMonth = currentDate.getMonth() + 1;
@@ -20,7 +24,6 @@ export async function GET() {
       status: response.statusCode,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });
@@ -66,7 +69,6 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.log(error);
     return NextResponse.json(error, {
       status: 500,
     });

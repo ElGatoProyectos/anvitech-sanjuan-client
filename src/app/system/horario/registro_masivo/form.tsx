@@ -35,39 +35,42 @@ function Form() {
       <div className="mb-8">
         <h1 className="text-lg font-semibold">Registrar horarios masivos</h1>
       </div>
-      <form
-        onSubmit={handleRegistrarDataMassive}
-        className="flex flex-col gap-8"
-      >
-        <div>
-          Recuerde que el archivo debe tener un formato único, valide el formato
-          descargando la muestra.
-          <Link
-            target="_blank"
-            download
-            as="/files/formato_horario_carga_masiva.xlsx"
-            href="/files/formato_horario_carga_masiva.xlsx"
-            className="underline text-blue-600"
-          >
-            Descargar formato
-          </Link>
-        </div>
-        <div className="flex flex-col gap-2  col-span-2">
-          <Label>Archivo</Label>
-          <Input
-            required
-            type="file"
-            accept=".xlsx"
-            onChange={(e: any) => setFile(e.target.files[0])}
-          />
-        </div>
 
-        <div className="flex flex-col gap-2  col-span-2">
-          <Button disabled={loading} type="submit">
-            Registrar trabajador
-          </Button>
-        </div>
-      </form>
+      {session.data?.user.role === "admin" && (
+        <form
+          onSubmit={handleRegistrarDataMassive}
+          className="flex flex-col gap-8"
+        >
+          <div>
+            Recuerde que el archivo debe tener un formato único, valide el
+            formato descargando la muestra.
+            <Link
+              target="_blank"
+              download
+              as="/files/formato_horario_carga_masiva.xlsx"
+              href="/files/formato_horario_carga_masiva.xlsx"
+              className="underline text-blue-600"
+            >
+              Descargar formato
+            </Link>
+          </div>
+          <div className="flex flex-col gap-2  col-span-2">
+            <Label>Archivo</Label>
+            <Input
+              required
+              type="file"
+              accept=".xlsx"
+              onChange={(e: any) => setFile(e.target.files[0])}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2  col-span-2">
+            <Button disabled={loading} type="submit">
+              Registrar trabajador
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

@@ -40,7 +40,7 @@ function FormAuth() {
     try {
       // const response = await axios.get("/api/data");
       const res = await axios.get("/api/test-date");
-      console.log(res);
+
       // getExcelFromApi();
     } catch (error) {}
   }

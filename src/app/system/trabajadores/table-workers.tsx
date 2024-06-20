@@ -61,7 +61,7 @@ function TableWorkers() {
   async function fetchDepartments() {
     try {
       const response = await get("workers/departments", session.data);
-      console.log(response.data);
+
       setDepartments(response.data);
     } catch (error) {
       useToastDestructive("Error", "Hubo un error al traer la información");
@@ -90,7 +90,6 @@ function TableWorkers() {
   }
 
   function handleChangeSelectEnbabled(value: string) {
-    console.log(value);
     if (value === "1") {
       const filtered = workers.filter((item) => item.enabled === "si");
       setWorkersFiltered(filtered);

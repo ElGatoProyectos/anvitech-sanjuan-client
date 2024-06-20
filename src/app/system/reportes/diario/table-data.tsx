@@ -94,15 +94,11 @@ function TableData() {
       const month = x.getMonth() + 1;
       const year = x.getFullYear();
 
-      console.log(day, month, year);
-
       const response = await post(
         "reports/day",
         { day, month, year },
         session.data
       );
-
-      console.log(response.data);
 
       setWorkers(response.data);
       setWorkersFiltered(response.data);
@@ -175,7 +171,6 @@ function TableData() {
     try {
       let x = new Date(date);
 
-      console.log(x);
       const day = x.getDate() + 1;
       const month = x.getMonth() + 1;
       const year = x.getFullYear();
@@ -188,7 +183,6 @@ function TableData() {
         session.data
       );
 
-      console.log(response.data);
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -248,7 +242,6 @@ function TableData() {
       ("use server");
       downloadExcel(workers);
     } catch (error) {
-      console.log(error);
       useToastDestructive("Error", "Error al crear el archivo");
     }
   }
@@ -518,12 +511,14 @@ function TableData() {
                     </th>
 
                     <td className=" whitespace-nowrap">
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleOpenModalPrev(item)}
-                      >
-                        <Settings size={20} />
-                      </Button>
+                      {session.data?.user.role === "admin" && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleOpenModalPrev(item)}
+                        >
+                          <Settings size={20} />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))
