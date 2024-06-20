@@ -99,30 +99,29 @@ class UserService {
     try {
       const { validate } = data;
       if (validate === "1234abc") {
+        const admin = {
+          full_name: "Usuario admin",
+          dni: "12345678",
+          email: data.email,
+          password: bcrypt.hashSync("12345678", 11),
+          username: "12345678",
+          enabled: true,
+          role: "admin",
+        };
+
+        const superadmin = {
+          full_name: "Usuario super admin",
+          dni: "87654321",
+          email: data.email,
+          password: bcrypt.hashSync("87654321", 11),
+          username: "87654321",
+          enabled: true,
+          role: "superadmin",
+        };
+
+        await prisma.user.create({ data: admin });
+        await prisma.user.create({ data: superadmin });
       }
-
-      const admin = {
-        full_name: "Usuario admin",
-        dni: "12345678",
-        email: data.email,
-        password: bcrypt.hashSync("12345678", 11),
-        username: "12345678",
-        enabled: true,
-        role: "admin",
-      };
-
-      const superadmin = {
-        full_name: "Usuario super admin",
-        dni: "87654321",
-        email: data.email,
-        password: bcrypt.hashSync("87654321", 11),
-        username: "87654321",
-        enabled: true,
-        role: "superadmin",
-      };
-
-      await prisma.user.create({ data: admin });
-      await prisma.user.create({ data: superadmin });
 
       return httpResponse.http201("Admins created");
     } catch (error) {
