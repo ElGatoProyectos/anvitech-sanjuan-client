@@ -1,8 +1,13 @@
 import { dataService } from "@/lib/core/service/data.service";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  context: { params: { token: string } }
+) {
   try {
+    // validar token
+
     const date = new Date();
     const response = await dataService.instanceDataInit(
       date.getDate() - 1,

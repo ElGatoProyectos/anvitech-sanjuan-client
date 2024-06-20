@@ -70,7 +70,7 @@ function Dashboard() {
             <tr>
               <th>NOMBRES</th>
               <th>DNI</th>
-              <th>FALTAS</th>
+              <th>TARDANZAS</th>
             </tr>
           </thead>
           <tbody>
