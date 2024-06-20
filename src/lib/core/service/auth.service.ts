@@ -28,7 +28,7 @@ class AuthService {
     try {
       const { user } = session;
 
-      if (user.role === "admin") {
+      if (user.role === "admin" || user.role === "superadmin") {
         return httpResponse.http200("Authentication ok", null);
       } else return httpResponse.http401("Error in authentication");
     } catch (error) {
