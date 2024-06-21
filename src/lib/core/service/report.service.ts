@@ -27,6 +27,7 @@ class ReportService {
       const report = await prisma.report.create({ data: dataSet });
       return httpResponse.http200("Report created ok", report);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -52,7 +53,7 @@ class ReportService {
 
   //     await prisma.detailReport.create({ data: dataDetail });
   //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
+  //     await prisma.$disconnect(); return errorService.handleErrorSchema(error);
   //   }
   // }
 
@@ -65,6 +66,7 @@ class ReportService {
       const reports = await prisma.report.findMany();
       return httpResponse.http200("All reports", reports);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -75,6 +77,7 @@ class ReportService {
       if (!detail) return httpResponse.http404("Report not found");
       return httpResponse.http200("Report found", detail);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -95,6 +98,7 @@ class ReportService {
       });
       return httpResponse.http200("All details report", details);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -106,6 +110,7 @@ class ReportService {
       });
       return httpResponse.http200("All details report", detail);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -124,6 +129,7 @@ class ReportService {
       });
       return httpResponse.http200("Detail updated", updated);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -144,6 +150,7 @@ class ReportService {
       });
       return httpResponse.http201("Incident created", updated);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -164,6 +171,7 @@ class ReportService {
       });
       return httpResponse.http201("Incident detail deleted", deleted);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -178,6 +186,7 @@ class ReportService {
       });
       return httpResponse.http200("All incidents for detail", incidents);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -336,6 +345,7 @@ class ReportService {
 
       return httpResponse.http200("Report success", dataGeneral);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -352,6 +362,7 @@ class ReportService {
       });
       return httpResponse.http200("All data", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -374,6 +385,7 @@ class ReportService {
       });
       return httpResponse.http200("Report day created", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -417,6 +429,7 @@ class ReportService {
 
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -585,8 +598,10 @@ class ReportService {
         where: { id: detailReportId },
         data: formatData,
       });
+      await prisma.$disconnect();
       return httpResponse.http200("Detail report updated", updated);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -768,8 +783,10 @@ class ReportService {
           await prisma.detailReport.create({ data: formatData });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Ok", "Reports upload");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -961,8 +978,10 @@ class ReportService {
           // si hay un registro empezamos a condicionar los horarios =============================================
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Ok", "Reports upload");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -1076,6 +1095,8 @@ class ReportService {
         ],
       },
     });
+
+    await prisma.$disconnect();
 
     if (
       vacationResponse.length > 0 ||

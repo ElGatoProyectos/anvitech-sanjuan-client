@@ -16,8 +16,10 @@ class WorkerService {
       const workers = await prisma.worker.findMany({
         where: { enabled: "si" },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("All workers", workers);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -26,8 +28,10 @@ class WorkerService {
     try {
       const worker = await prisma.worker.findFirst({ where: { id } });
       if (!worker) return httpResponse.http404("Worker not found");
+      await prisma.$disconnect();
       return httpResponse.http200("Worker found", worker);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -91,8 +95,11 @@ class WorkerService {
         };
         await scheduleService.createScheduleMassive(wFormat);
       });
+
+      await prisma.$disconnect();
       return httpResponse.http201("Workers created");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -105,8 +112,10 @@ class WorkerService {
         hire_date: formatDateForPrisma(data.hire_date),
       };
       const created = await prisma.worker.create({ data: formatData });
+      await prisma.$disconnect();
       return httpResponse.http201("Worker created", created);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -119,9 +128,10 @@ class WorkerService {
           department: true,
         },
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Departments distinct", departments);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -131,9 +141,10 @@ class WorkerService {
       const worker = await prisma.worker.findFirst({
         where: { dni },
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Departments distinct", worker);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -160,68 +171,14 @@ class WorkerService {
             enabled: "no",
           },
         });
-
+        await prisma.$disconnect();
         return httpResponse.http200("Worker updated", worker);
       }
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
-
-  // ==============================
-
-  // async findAllSupervisor() {
-  //   try {
-  //     const data = await prisma.supervisor.findMany();
-  //     return httpResponse.http200("All supervisors", data);
-  //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-  // async createSupervisor(data: any) {
-  //   try {
-  //     const created = await prisma.supervisor.create({ data });
-  //     return httpResponse.http201("Supervisor created", created);
-  //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-
-  // async findAllCoordinator() {
-  //   try {
-  //     const data = await prisma.coordinator.findMany();
-  //     return httpResponse.http200("All coordinators", data);
-  //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-  // async createCoordinator(data: any) {
-  //   try {
-  //     const created = await prisma.coordinator.create({ data });
-  //     return httpResponse.http201("Supervisor created", created);
-  //   } catch (error) {
-  //
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-
-  // async findAllManagement() {
-  //   try {
-  //     const data = await prisma.management.findMany();
-  //     return httpResponse.http200("All managements", data);
-  //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-
-  // async createManagement(data: any) {
-  //   try {
-  //     const created = await prisma.management.create({ data });
-  //     return httpResponse.http201("Supervisor created", created);
-  //   } catch (error) {
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
 
   async updateWorker(data: any, workerId: number) {
     try {
@@ -235,8 +192,10 @@ class WorkerService {
         where: { id: workerId },
         data: formatData,
       });
+      await prisma.$disconnect();
       return httpResponse.http200("Worker updated", updated);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -268,8 +227,10 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Updated");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -298,8 +259,10 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Updated");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -335,8 +298,10 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Register vacation successfull!");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -372,8 +337,10 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Register vacation successfull!");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -409,8 +376,10 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Register vacation successfull!");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -446,8 +415,11 @@ class WorkerService {
           });
         })
       );
+      await prisma.$disconnect();
       return httpResponse.http200("Register vacation successfull!");
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -455,9 +427,12 @@ class WorkerService {
   async findSupervisors() {
     try {
       const workers = await prisma.worker.findMany();
-
+      await prisma.$disconnect();
       return httpResponse.http200("All workers", workers);
     } catch (error) {
+      await prisma.$disconnect();
+
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

@@ -17,9 +17,10 @@ class PermissionService {
         },
         take: 5,
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Permissions", vacations);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -29,8 +30,10 @@ class PermissionService {
       const vacations = await prisma.permissions.findMany({
         where: { worker_id: workerId },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("All permissions", vacations);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -43,8 +46,10 @@ class PermissionService {
         end_date: new Date(data.end_date),
       };
       const vacations = await prisma.permissions.create({ data: formatData });
+      await prisma.$disconnect();
       return httpResponse.http200("Permission created", vacations);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

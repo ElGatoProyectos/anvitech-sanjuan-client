@@ -161,30 +161,6 @@ model MedicalRest {
   reason     String?
 }
 
-// estos 4 se van
-// model Supervisor {
-//   id        Int    @id @default(autoincrement())
-//   full_name String
-// }
-
-// model Coordinator {
-//   id        Int    @id @default(autoincrement())
-//   full_name String
-// }
-
-// model Management {
-//   id        Int    @id @default(autoincrement())
-//   full_name String
-// }
-
-// model IncidentAbsolute {
-//   id          Int      @id @default(autoincrement())
-//   date        DateTime
-//   description String
-// }
-
-// aqui deberia agregar  otro tipo de incidencia que seria general, que cuando se registre pida fecha, para que este marque por defecto a todos
-
 model DetailReportIncident {
   id               Int          @id @default(autoincrement())
   created_date     DateTime     @default(now())

@@ -15,8 +15,11 @@ class UserService {
   async findAll() {
     try {
       const users = await prisma.user.findMany();
+      await prisma.$disconnect();
       return httpResponse.http200("Users found", users);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -24,8 +27,11 @@ class UserService {
   async findByDni(dni: string) {
     try {
       const user = await prisma.user.findFirst({ where: { dni } });
+      await prisma.$disconnect();
       return httpResponse.http200("User found", user);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -34,8 +40,11 @@ class UserService {
     try {
       const user = await prisma.user.findFirst({ where: { id } });
       if (!user) return httpResponse.http404("User not found");
+      await prisma.$disconnect();
       return httpResponse.http200("User found", user);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -46,8 +55,11 @@ class UserService {
         where: { username },
       });
       if (!user) return httpResponse.http400("User not found");
+      await prisma.$disconnect();
       return httpResponse.http200("User found", user);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -68,8 +80,11 @@ class UserService {
         role: "user",
       };
       const created = await prisma.user.create({ data: dataSet });
+      await prisma.$disconnect();
       return httpResponse.http201("User created ok!", created);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -87,8 +102,11 @@ class UserService {
         where: { id: userId },
         data: formatData,
       });
+      await prisma.$disconnect();
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -98,8 +116,11 @@ class UserService {
       const deleted = await prisma.user.delete({
         where: { id: userId },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("User deleted ok!", deleted);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -143,9 +164,11 @@ class UserService {
 
         await prisma.user.create({ data: superadmin });
       }
-
+      await prisma.$disconnect();
       return httpResponse.http201("Admins created");
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -183,9 +206,11 @@ class UserService {
           });
         })
       );
-
+      await prisma.$disconnect();
       return httpResponse.http201("Users created");
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

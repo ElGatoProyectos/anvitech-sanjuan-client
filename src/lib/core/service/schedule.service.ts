@@ -13,8 +13,11 @@ class ScheduleService {
           worker: true,
         },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("All schedules", schedules);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -26,8 +29,11 @@ class ScheduleService {
       });
 
       if (!schedule) return httpResponse.http404("Schedule not found");
+      await prisma.$disconnect();
       return httpResponse.http200("Schedule worker", schedule);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -35,8 +41,11 @@ class ScheduleService {
   async createScheduleMassive(data: any) {
     try {
       const created = await prisma.schedule.create({ data });
+      await prisma.$disconnect();
       return httpResponse.http200("Schedule created", created);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -68,9 +77,12 @@ class ScheduleService {
           where: { worker_id: Number(data.workerId) },
           data: dataSet,
         });
+        await prisma.$disconnect();
         return httpResponse.http201("Schedule updated", updated);
       }
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -112,9 +124,11 @@ class ScheduleService {
           });
         })
       );
-
+      await prisma.$disconnect();
       return httpResponse.http201("Workers updated");
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -124,8 +138,11 @@ class ScheduleService {
   async findTypeSchedule() {
     try {
       const typesSchedules = await prisma.typeSchedule.findMany();
+      await prisma.$disconnect();
       return httpResponse.http200("All types schedules", typesSchedules);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -133,8 +150,11 @@ class ScheduleService {
   async createTypeSchedule(data: any) {
     try {
       const created = await prisma.typeSchedule.create({ data });
+      await prisma.$disconnect();
       return httpResponse.http200("Type schedule creayed", created);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -145,8 +165,11 @@ class ScheduleService {
         where: { id: typScheduleId },
         data,
       });
+      await prisma.$disconnect();
       return httpResponse.http200("Type schedule updated", updatedTypeSchedule);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

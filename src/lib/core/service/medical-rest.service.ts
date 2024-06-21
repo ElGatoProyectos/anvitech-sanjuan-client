@@ -11,8 +11,10 @@ class MedicalRestService {
         end_date: new Date(data.end_date),
       };
       const created = await prisma.medicalRest.create({ data: formatData });
+      await prisma.$disconnect();
       return httpResponse.http201("Medical rest created", created);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -26,9 +28,10 @@ class MedicalRestService {
         },
         take: 5,
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Medical rest ", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -38,8 +41,10 @@ class MedicalRestService {
       const data = await prisma.medicalRest.findMany({
         where: { worker_id: workerId },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("All Medical rest ", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

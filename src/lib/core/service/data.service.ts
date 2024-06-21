@@ -63,6 +63,7 @@ class DataService {
         );
       }
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -126,8 +127,11 @@ class DataService {
         pos++;
       }
 
+      await prisma.$disconnect();
+
       return httpResponse.http200("Report created", "Report created");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -160,7 +164,7 @@ class DataService {
       const formatData: any = {
         report_id: report.id,
         tardanza: "no",
-        falta: "si",
+        falta: "no",
         dia: day,
         // fecha_reporte: report.date_created.toISOString(),?
         fecha_reporte: new Date(yearI, monthI - 1, dayI),
@@ -364,6 +368,7 @@ class DataService {
 
       /// no se cuantos objetos haya dentro del array, pero se que tengo que ordenarlos en base a la fecha
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -431,8 +436,11 @@ class DataService {
         totalData.push(...reportForDay);
       }
 
+      await prisma.$disconnect();
+
       return httpResponse.http200("Report created", totalData);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -652,6 +660,7 @@ class DataService {
       }
       return formatData;
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -703,6 +712,7 @@ class DataService {
 
       return httpResponse.http200("Data for day", dataList);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

@@ -19,9 +19,12 @@ class VacationService {
         },
         take: 5,
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Vacations", vacations);
     } catch (error) {
+      await prisma.$disconnect();
+
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -31,8 +34,13 @@ class VacationService {
       const vacations = await prisma.vacation.findMany({
         where: { worker_id: workerId },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("All vacations", vacations);
     } catch (error) {
+      await prisma.$disconnect();
+
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -45,8 +53,11 @@ class VacationService {
         end_date: new Date(data.end_date),
       };
       const vacations = await prisma.vacation.create({ data: formatData });
+      await prisma.$disconnect();
       return httpResponse.http200("All vacations", vacations);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -85,8 +96,11 @@ class VacationService {
         })
       );
 
+      await prisma.$disconnect();
       return httpResponse.http200("Register vacations ok");
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

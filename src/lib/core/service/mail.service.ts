@@ -26,6 +26,7 @@ class MailService {
         html: startTemplate + password + endTemplate,
       });
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -62,8 +63,11 @@ class MailService {
         return httpResponse.http200("Reset password ok");
       }
 
+      await prisma.$disconnect();
+
       return httpResponse.http401("Error");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

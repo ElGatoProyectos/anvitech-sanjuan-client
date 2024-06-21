@@ -20,6 +20,7 @@ class AuthService {
         message: "Error in auth",
       });
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -32,6 +33,7 @@ class AuthService {
         return httpResponse.http200("Authentication ok", null);
       } else return httpResponse.http401("Error in authentication");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -52,6 +54,7 @@ class AuthService {
         else return httpResponse.http200("Authentication ok");
       } else return httpResponse.http401("Error in authentication");
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

@@ -6,8 +6,11 @@ class TerminationService {
   async findAll() {
     try {
       const terminations = await prisma.typeTermination.findMany();
+      await prisma.$disconnect();
       return httpResponse.http200("All terminations", terminations);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -15,8 +18,11 @@ class TerminationService {
   async create(data: any) {
     try {
       const terminations = await prisma.typeTermination.create({ data });
+      await prisma.$disconnect();
       return httpResponse.http200("Termination created", terminations);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -27,8 +33,11 @@ class TerminationService {
         where: { id: terminationId },
         data,
       });
+      await prisma.$disconnect();
       return httpResponse.http200("Update termination", terminations);
     } catch (error) {
+      await prisma.$disconnect();
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

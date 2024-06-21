@@ -11,8 +11,10 @@ class LicenceService {
         end_date: new Date(data.end_date),
       };
       const created = await prisma.licence.create({ data: formatData });
+      await prisma.$disconnect();
       return httpResponse.http201("Lincence created", created);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -26,9 +28,10 @@ class LicenceService {
         },
         take: 5,
       });
-
+      await prisma.$disconnect();
       return httpResponse.http200("Licences", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -38,8 +41,10 @@ class LicenceService {
       const data = await prisma.permissions.findMany({
         where: { worker_id: workerId },
       });
+      await prisma.$disconnect();
       return httpResponse.http200("All licences", data);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
