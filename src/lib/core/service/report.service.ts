@@ -131,6 +131,7 @@ class ReportService {
         where: { id: detailReportId },
         data: { tardanza: "no", falta: "no" },
       });
+      await prisma.$disconnect();
 
       const updated = await prisma.detailReportIncident.create({
         data: {
@@ -153,10 +154,13 @@ class ReportService {
       const reporseDetail = await prisma.detailReportIncident.findFirst({
         where: { id: detailId },
       });
+      await prisma.$disconnect();
+
       await prisma.detailReport.update({
         where: { id: reporseDetail?.detail_report_id },
         data: { falta: "si" },
       });
+      await prisma.$disconnect();
 
       const deleted = await prisma.detailReportIncident.delete({
         where: { id: detailId },
@@ -188,6 +192,7 @@ class ReportService {
     }
   }
 
+  //ok
   getMondayAndSaturdayDates() {
     const now = new Date();
     const dayOfWeek = now.getDay();
@@ -206,24 +211,9 @@ class ReportService {
     };
   }
 
+  //ok
   async dataForStartSoft(month: number, year: number) {
     try {
-      // Consultar registros de la tabla 'detailReport' utilizando los IDs obtenidos
-
-      // const resportResponse = await this.findById(reportId);
-      // if (!resportResponse.ok) return resportResponse;
-
-      // [
-      //   {
-      //     "worker":{},
-      //     "reports":[{},{},{}],
-      //     "vacaciones":[],
-      //     "descanso_medico":[],
-      //     "licencias":[],
-      //     "permisos":[]
-      //   }
-      // ]
-
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 1);
 
@@ -235,8 +225,10 @@ class ReportService {
           },
         },
       });
+      await prisma.$disconnect();
 
       const responseWorkers = await workerService.findAll();
+      await prisma.$disconnect();
 
       const dataGeneral = await Promise.all(
         await responseWorkers.content.map(async (worker: any) => {
@@ -257,6 +249,8 @@ class ReportService {
               ],
             },
           });
+          await prisma.$disconnect();
+
           const responsePermission = await prisma.permissions.findMany({
             where: {
               worker_id: worker.id,
@@ -274,6 +268,8 @@ class ReportService {
               ],
             },
           });
+          await prisma.$disconnect();
+
           const responseMedicalRest = await prisma.medicalRest.findMany({
             where: {
               worker_id: worker.id,
@@ -291,6 +287,8 @@ class ReportService {
               ],
             },
           });
+          await prisma.$disconnect();
+
           const responseLicenses = await prisma.licence.findMany({
             where: {
               worker_id: worker.id,
@@ -308,6 +306,7 @@ class ReportService {
               ],
             },
           });
+          await prisma.$disconnect();
 
           const responseReports = await prisma.detailReport.findMany({
             where: {
@@ -326,6 +325,7 @@ class ReportService {
               ],
             },
           });
+          await prisma.$disconnect();
 
           const formatData = {
             worker,
@@ -348,6 +348,7 @@ class ReportService {
     }
   }
 
+  // ok
   async dataForExportNormal(dateMin: Date, dateMax: Date) {
     try {
       const data = await prisma.detailReport.findMany({
@@ -392,47 +393,108 @@ class ReportService {
     }
   }
 
+  // async generateReportForWeek(days: string[]) {
+  //   try {
+  //     const { content: workers } = await workerService.findAll();
+  //     await prisma.$disconnect();
+
+  //     const response = await Promise.all(
+  //       workers.map(async (worker: any) => {
+  //         const formatData = {
+  //           worker,
+  //           lunes: {},
+  //           martes: {},
+  //           miercoles: {},
+  //           jueves: {},
+  //           viernes: {},
+  //           sabado: {},
+  //           domingo: {},
+  //         };
+
+  //         for (let i = 0; i < days.length; i++) {
+  //           const day = days[i];
+
+  //           const data: any = await prisma.detailReport.findFirst({
+  //             where: { fecha_reporte: day, dni: worker.dni },
+  //           });
+  //           await prisma.$disconnect();
+
+  //           if (i === 0) formatData.sabado = data ? data : null;
+  //           else if (i === 1) formatData.domingo = data ? data : null;
+  //           else if (i === 2) formatData.lunes = data ? data : null;
+  //           else if (i === 3) formatData.martes = data ? data : null;
+  //           else if (i === 4) formatData.miercoles = data ? data : null;
+  //           else if (i === 5) formatData.jueves = data ? data : null;
+  //           else if (i === 6) formatData.viernes = data ? data : null;
+  //         }
+
+  //         return formatData;
+  //       })
+  //     );
+  //     await prisma.$disconnect();
+
+  //     return httpResponse.http200("Report weekly", response);
+  //   } catch (error) {
+  //     await prisma.$disconnect();
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+
+  //ok
   async generateReportForWeek(days: string[]) {
     try {
       const { content: workers } = await workerService.findAll();
-
-      const response = await Promise.all(
-        workers.map(async (worker: any) => {
-          const formatData = {
-            worker,
-            lunes: {},
-            martes: {},
-            miercoles: {},
-            jueves: {},
-            viernes: {},
-            sabado: {},
-            domingo: {},
-          };
-
-          for (let i = 0; i < days.length; i++) {
-            const day = days[i];
-
-            const data: any = await prisma.detailReport.findFirst({
-              where: { fecha_reporte: day, dni: worker.dni },
-            });
-
-            if (i === 0) formatData.sabado = data ? data : null;
-            else if (i === 1) formatData.domingo = data ? data : null;
-            else if (i === 2) formatData.lunes = data ? data : null;
-            else if (i === 3) formatData.martes = data ? data : null;
-            else if (i === 4) formatData.miercoles = data ? data : null;
-            else if (i === 5) formatData.jueves = data ? data : null;
-            else if (i === 6) formatData.viernes = data ? data : null;
-          }
-
-          return formatData;
-        })
-      );
       await prisma.$disconnect();
 
+      // Obtener todos los reportes de una sola vez
+      const reports = await prisma.detailReport.findMany({
+        where: {
+          fecha_reporte: {
+            in: days,
+          },
+          dni: {
+            in: workers.map((worker: any) => worker.dni),
+          },
+        },
+      });
+
+      await prisma.$disconnect();
+
+      const response = workers.map((worker: any) => {
+        const formatData: any = {
+          worker,
+          lunes: null,
+          martes: null,
+          miercoles: null,
+          jueves: null,
+          viernes: null,
+          sabado: null,
+          domingo: null,
+        };
+
+        // Filtrar y asignar los reportes correspondientes a cada día
+        for (let i = 0; i < days.length; i++) {
+          const day = days[i];
+          const data = reports.find(
+            (report: any) =>
+              new Date(report.fecha_reporte).toISOString() === day &&
+              report.dni === worker.dni
+          );
+
+          if (i === 0) formatData.sabado = data || null;
+          else if (i === 1) formatData.domingo = data || null;
+          else if (i === 2) formatData.lunes = data || null;
+          else if (i === 3) formatData.martes = data || null;
+          else if (i === 4) formatData.miercoles = data || null;
+          else if (i === 5) formatData.jueves = data || null;
+          else if (i === 6) formatData.viernes = data || null;
+        }
+
+        return formatData;
+      });
+      await prisma.$disconnect();
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -449,6 +511,8 @@ class ReportService {
       const schedule = await prisma.schedule.findFirst({
         where: { worker_id: workerResponse.content.id },
       });
+
+      await prisma.$disconnect();
 
       if (!schedule) return httpResponse.http400("Schedule not found");
 
@@ -784,6 +848,7 @@ class ReportService {
           }
 
           await prisma.detailReport.create({ data: formatData });
+          await prisma.$disconnect();
         })
       );
       await prisma.$disconnect();
@@ -819,6 +884,8 @@ class ReportService {
               ),
             },
           });
+
+          await prisma.$disconnect();
 
           const [scheduleStart, scheduleEnd] =
             schedule.content[
@@ -1026,6 +1093,8 @@ class ReportService {
       },
     });
 
+    await prisma.$disconnect();
+
     const medicalRestResponse = await prisma.medicalRest.findMany({
       where: {
         worker_id: workerId,
@@ -1043,6 +1112,7 @@ class ReportService {
         ],
       },
     });
+    await prisma.$disconnect();
 
     const vacationResponse = await prisma.vacation.findMany({
       where: {
@@ -1061,6 +1131,8 @@ class ReportService {
         ],
       },
     });
+    await prisma.$disconnect();
+
     // validamos los permisos
 
     const permissionResponse = await prisma.permissions.findMany({
@@ -1080,6 +1152,7 @@ class ReportService {
         ],
       },
     });
+    await prisma.$disconnect();
 
     const licencesResponse = await prisma.licence.findMany({
       where: {

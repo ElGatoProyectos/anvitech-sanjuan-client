@@ -135,7 +135,7 @@ export function useWorkerWeek(date: string) {
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      fetchDepartments();
+      // fetchDepartments();
       if (date === "") {
         fetchData();
       } else {
