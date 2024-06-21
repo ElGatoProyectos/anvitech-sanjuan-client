@@ -511,7 +511,7 @@ function TableData() {
                     </th>
 
                     <td className=" whitespace-nowrap">
-                      {session.data?.user.role === "admin" && (
+                      {session.data?.user.role !== "user" && (
                         <Button
                           variant="secondary"
                           onClick={() => handleOpenModalPrev(item)}

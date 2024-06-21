@@ -206,6 +206,7 @@ class DataService {
               formatData.tardanza = "no";
               formatData.discount = 35;
             }
+            formatData.hora_salida = newHour + ":" + minutes;
           } else {
             if (newHour <= 11) {
               formatData.hora_inicio = newHour + ":" + minutes;
@@ -496,13 +497,16 @@ class DataService {
               newHour = 23 - 4 + Number(hour);
             }
 
-            if (index === dataFiltered.length - 1) {
-              if (newHour < 16) {
-                formatData.falta = "si";
-                formatData.tardanza = "no";
-                formatData.discount = 35;
-              }
-            }
+            // if (index === dataFiltered.length - 1) {
+            //   if (newHour < 16) {
+            //     formatData.falta = "si";
+            //     formatData.tardanza = "no";
+            //     formatData.discount = 35;
+            //   }else{
+            //   formatData.hora_salida = newHour + ":" + minutes;
+
+            //   }
+            // }
 
             if (newHour <= 11) {
               formatData.hora_inicio = newHour + ":" + minutes;
