@@ -59,6 +59,8 @@ class MailService {
           data: { password: newPasswordHash },
         });
 
+        await prisma.$disconnect();
+
         await this.sendMail(superadmin.email, newPassowrd);
         return httpResponse.http200("Reset password ok");
       }

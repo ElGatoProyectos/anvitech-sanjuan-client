@@ -24,7 +24,6 @@ class VacationService {
     } catch (error) {
       await prisma.$disconnect();
 
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -40,7 +39,6 @@ class VacationService {
     } catch (error) {
       await prisma.$disconnect();
 
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -56,7 +54,6 @@ class VacationService {
       await prisma.$disconnect();
       return httpResponse.http200("All vacations", vacations);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -99,7 +96,6 @@ class VacationService {
       await prisma.$disconnect();
       return httpResponse.http200("Register vacations ok");
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

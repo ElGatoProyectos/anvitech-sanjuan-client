@@ -10,7 +10,6 @@ class TerminationService {
       return httpResponse.http200("All terminations", terminations);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -21,7 +20,6 @@ class TerminationService {
       await prisma.$disconnect();
       return httpResponse.http200("Termination created", terminations);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -36,7 +34,6 @@ class TerminationService {
       await prisma.$disconnect();
       return httpResponse.http200("Update termination", terminations);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

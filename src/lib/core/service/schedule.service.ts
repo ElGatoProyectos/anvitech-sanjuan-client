@@ -17,7 +17,6 @@ class ScheduleService {
       return httpResponse.http200("All schedules", schedules);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -33,7 +32,6 @@ class ScheduleService {
       return httpResponse.http200("Schedule worker", schedule);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -44,7 +42,6 @@ class ScheduleService {
       await prisma.$disconnect();
       return httpResponse.http200("Schedule created", created);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -81,7 +78,6 @@ class ScheduleService {
         return httpResponse.http201("Schedule updated", updated);
       }
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -128,7 +124,6 @@ class ScheduleService {
       return httpResponse.http201("Workers updated");
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -142,7 +137,6 @@ class ScheduleService {
       return httpResponse.http200("All types schedules", typesSchedules);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -153,7 +147,6 @@ class ScheduleService {
       await prisma.$disconnect();
       return httpResponse.http200("Type schedule creayed", created);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -168,7 +161,6 @@ class ScheduleService {
       await prisma.$disconnect();
       return httpResponse.http200("Type schedule updated", updatedTypeSchedule);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

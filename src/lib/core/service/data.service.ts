@@ -44,6 +44,8 @@ class DataService {
           responseReport.content
         );
 
+        await prisma.$disconnect();
+
         return httpResponse.http200(
           "Report generado satisfactoriamente",
           responseDetail.content
@@ -56,6 +58,8 @@ class DataService {
           Number(year),
           Number(month)
         );
+
+        await prisma.$disconnect();
 
         return httpResponse.http200(
           "Report generado satisfactoriamente",
@@ -210,7 +214,7 @@ class DataService {
               formatData.tardanza = "no";
               formatData.discount = 35;
             }
-            formatData.hora_salida = newHour + ":" + minutes;
+            formatData.inicio = newHour + ":" + minutes;
           } else {
             if (newHour <= 11) {
               formatData.hora_inicio = newHour + ":" + minutes;
@@ -365,6 +369,7 @@ class DataService {
       }
 
       await prisma.detailReport.create({ data: formatData });
+      await prisma.$disconnect();
 
       /// no se cuantos objetos haya dentro del array, pero se que tengo que ordenarlos en base a la fecha
     } catch (error) {
@@ -658,6 +663,7 @@ class DataService {
           formatData.discount = 35;
         }
       }
+      await prisma.$disconnect();
       return formatData;
     } catch (error) {
       await prisma.$disconnect();
@@ -709,6 +715,8 @@ class DataService {
           break;
         }
       }
+
+      await prisma.$disconnect();
 
       return httpResponse.http200("Data for day", dataList);
     } catch (error) {

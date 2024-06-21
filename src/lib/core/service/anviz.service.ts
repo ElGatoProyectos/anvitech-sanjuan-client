@@ -23,7 +23,6 @@ class AnvizService {
         token: response.data.payload.token,
       });
     } catch (error) {
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -61,7 +60,6 @@ class AnvizService {
       });
       return httpResponse.http200("Fetch ok!", response.data);
     } catch (error) {
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }

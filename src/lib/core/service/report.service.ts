@@ -25,37 +25,14 @@ class ReportService {
         name: "Report " + numberPos,
       };
       const report = await prisma.report.create({ data: dataSet });
+      await prisma.$disconnect();
+
       return httpResponse.http200("Report created ok", report);
     } catch (error) {
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
-
-  // async createReportDetail(dataDetail: any, reportId: number, day: string) {
-  //   try {
-  //     const dataTemporal = {
-  //       uuid: "65638685461972376eb766c4261406cfc5f320272dee536c7c0ee8fc94768d71",
-  //       checktype: 0,
-  //       checktime: "2024-02-07T18:51:46+00:00",
-  //       device: {
-  //         serial_number: "0300100024030014",
-  //         name: "014-MARIACOBOS-LIMANORTE",
-  //       },
-  //       employee: {
-  //         first_name: "ANDERSON ",
-  //         last_name: "GALVEZ TICLLACURI",
-  //         workno: "70976827",
-  //         department: "INTEGRAL PRO SAC - SEDE LIMA NORTE",
-  //         job_title: "ASESOR DE VENTAS CAMPO",
-  //       },
-  //     };
-
-  //     await prisma.detailReport.create({ data: dataDetail });
-  //   } catch (error) {
-  //     await prisma.$disconnect(); return errorService.handleErrorSchema(error);
-  //   }
-  // }
 
   async generateReportDetail(dataGeneralAniz: any[], reportId: number) {
     // todo mapeo de la informacion y registro de la misma en base al id del reporte
@@ -64,6 +41,8 @@ class ReportService {
   async findAll() {
     try {
       const reports = await prisma.report.findMany();
+      await prisma.$disconnect();
+
       return httpResponse.http200("All reports", reports);
     } catch (error) {
       await prisma.$disconnect();
@@ -75,6 +54,8 @@ class ReportService {
     try {
       const detail = await prisma.report.findFirst({ where: { id: reportId } });
       if (!detail) return httpResponse.http404("Report not found");
+      await prisma.$disconnect();
+
       return httpResponse.http200("Report found", detail);
     } catch (error) {
       await prisma.$disconnect();
@@ -83,11 +64,14 @@ class ReportService {
   }
 
   private async findLast() {
-    return await prisma.report.findFirst({
+    const data = await prisma.report.findFirst({
       orderBy: {
         id: "desc",
       },
     });
+    await prisma.$disconnect();
+
+    return data;
   }
 
   /// not used
@@ -96,6 +80,8 @@ class ReportService {
       const details = await prisma.detailReport.findMany({
         where: { report_id: id },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("All details report", details);
     } catch (error) {
       await prisma.$disconnect();
@@ -108,6 +94,8 @@ class ReportService {
       const detail = await prisma.detailReport.findMany({
         where: { report_id: reportId, dni: workerDNI },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("All details report", detail);
     } catch (error) {
       await prisma.$disconnect();
@@ -127,6 +115,8 @@ class ReportService {
           hora_salida: { set: dataHours.hora_salida },
         },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("Detail updated", updated);
     } catch (error) {
       await prisma.$disconnect();
@@ -148,6 +138,8 @@ class ReportService {
           incident_id: incidentId,
         },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http201("Incident created", updated);
     } catch (error) {
       await prisma.$disconnect();
@@ -169,6 +161,9 @@ class ReportService {
       const deleted = await prisma.detailReportIncident.delete({
         where: { id: detailId },
       });
+
+      await prisma.$disconnect();
+
       return httpResponse.http201("Incident detail deleted", deleted);
     } catch (error) {
       await prisma.$disconnect();
@@ -184,6 +179,8 @@ class ReportService {
           incident: true,
         },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("All incidents for detail", incidents);
     } catch (error) {
       await prisma.$disconnect();
@@ -342,6 +339,7 @@ class ReportService {
           return formatData;
         })
       );
+      await prisma.$disconnect();
 
       return httpResponse.http200("Report success", dataGeneral);
     } catch (error) {
@@ -360,6 +358,8 @@ class ReportService {
           },
         },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("All data", data);
     } catch (error) {
       await prisma.$disconnect();
@@ -383,6 +383,8 @@ class ReportService {
           },
         },
       });
+      await prisma.$disconnect();
+
       return httpResponse.http200("Report day created", data);
     } catch (error) {
       await prisma.$disconnect();
@@ -426,6 +428,7 @@ class ReportService {
           return formatData;
         })
       );
+      await prisma.$disconnect();
 
       return httpResponse.http200("Report weekly", response);
     } catch (error) {

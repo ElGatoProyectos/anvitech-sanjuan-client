@@ -59,7 +59,6 @@ class UserService {
       return httpResponse.http200("User found", user);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -84,7 +83,6 @@ class UserService {
       return httpResponse.http201("User created ok!", created);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -106,7 +104,6 @@ class UserService {
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -119,7 +116,6 @@ class UserService {
       await prisma.$disconnect();
       return httpResponse.http200("User deleted ok!", deleted);
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
@@ -168,7 +164,6 @@ class UserService {
       return httpResponse.http201("Admins created");
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -209,7 +204,6 @@ class UserService {
       await prisma.$disconnect();
       return httpResponse.http201("Users created");
     } catch (error) {
-      await prisma.$disconnect();
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

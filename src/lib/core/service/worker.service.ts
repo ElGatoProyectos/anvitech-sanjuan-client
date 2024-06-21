@@ -419,7 +419,6 @@ class WorkerService {
       return httpResponse.http200("Register vacation successfull!");
     } catch (error) {
       await prisma.$disconnect();
-      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
@@ -430,8 +429,6 @@ class WorkerService {
       await prisma.$disconnect();
       return httpResponse.http200("All workers", workers);
     } catch (error) {
-      await prisma.$disconnect();
-
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
