@@ -9,6 +9,7 @@ import { incidentService } from "./incident.service";
 import { scheduleService } from "./schedule.service";
 import { formatSheduleDto } from "../schemas/shedule.dto";
 import { formatReportFileDTO } from "../schemas/report.dto";
+import { getRawData } from "@/lib/mysql";
 
 class ReportService {
   async generateReport() {
@@ -393,111 +394,119 @@ class ReportService {
     }
   }
 
-  // async generateReportForWeek(days: string[]) {
-  //   try {
-  //     const { content: workers } = await workerService.findAll();
-  //     await prisma.$disconnect();
-
-  //     const response = await Promise.all(
-  //       workers.map(async (worker: any) => {
-  //         const formatData = {
-  //           worker,
-  //           lunes: {},
-  //           martes: {},
-  //           miercoles: {},
-  //           jueves: {},
-  //           viernes: {},
-  //           sabado: {},
-  //           domingo: {},
-  //         };
-
-  //         for (let i = 0; i < days.length; i++) {
-  //           const day = days[i];
-
-  //           const data: any = await prisma.detailReport.findFirst({
-  //             where: { fecha_reporte: day, dni: worker.dni },
-  //           });
-  //           await prisma.$disconnect();
-
-  //           if (i === 0) formatData.sabado = data ? data : null;
-  //           else if (i === 1) formatData.domingo = data ? data : null;
-  //           else if (i === 2) formatData.lunes = data ? data : null;
-  //           else if (i === 3) formatData.martes = data ? data : null;
-  //           else if (i === 4) formatData.miercoles = data ? data : null;
-  //           else if (i === 5) formatData.jueves = data ? data : null;
-  //           else if (i === 6) formatData.viernes = data ? data : null;
-  //         }
-
-  //         return formatData;
-  //       })
-  //     );
-  //     await prisma.$disconnect();
-
-  //     return httpResponse.http200("Report weekly", response);
-  //   } catch (error) {
-  //     await prisma.$disconnect();
-  //     return errorService.handleErrorSchema(error);
-  //   }
-  // }
-
-  //ok
   async generateReportForWeek(days: string[]) {
     try {
       const { content: workers } = await workerService.findAll();
       await prisma.$disconnect();
 
-      // Obtener todos los reportes de una sola vez
-      const reports = await prisma.detailReport.findMany({
-        where: {
-          fecha_reporte: {
-            in: days,
-          },
-          dni: {
-            in: workers.map((worker: any) => worker.dni),
-          },
-        },
-      });
+      const response = await Promise.all(
+        workers.map(async (worker: any) => {
+          const formatData = {
+            worker,
+            lunes: {},
+            martes: {},
+            miercoles: {},
+            jueves: {},
+            viernes: {},
+            sabado: {},
+            domingo: {},
+          };
 
+          for (let i = 0; i < days.length; i++) {
+            const day = days[i];
+
+            const data: any = await prisma.detailReport.findFirst({
+              where: { fecha_reporte: day, dni: worker.dni },
+            });
+            await prisma.$disconnect();
+
+            if (i === 0) formatData.sabado = data ? data : null;
+            else if (i === 1) formatData.domingo = data ? data : null;
+            else if (i === 2) formatData.lunes = data ? data : null;
+            else if (i === 3) formatData.martes = data ? data : null;
+            else if (i === 4) formatData.miercoles = data ? data : null;
+            else if (i === 5) formatData.jueves = data ? data : null;
+            else if (i === 6) formatData.viernes = data ? data : null;
+          }
+
+          return formatData;
+        })
+      );
       await prisma.$disconnect();
 
-      const response = workers.map((worker: any) => {
-        const formatData: any = {
-          worker,
-          lunes: null,
-          martes: null,
-          miercoles: null,
-          jueves: null,
-          viernes: null,
-          sabado: null,
-          domingo: null,
-        };
-
-        // Filtrar y asignar los reportes correspondientes a cada día
-        for (let i = 0; i < days.length; i++) {
-          const day = days[i];
-          const data = reports.find(
-            (report: any) =>
-              new Date(report.fecha_reporte).toISOString() === day &&
-              report.dni === worker.dni
-          );
-
-          if (i === 0) formatData.sabado = data || null;
-          else if (i === 1) formatData.domingo = data || null;
-          else if (i === 2) formatData.lunes = data || null;
-          else if (i === 3) formatData.martes = data || null;
-          else if (i === 4) formatData.miercoles = data || null;
-          else if (i === 5) formatData.jueves = data || null;
-          else if (i === 6) formatData.viernes = data || null;
-        }
-
-        return formatData;
-      });
-      await prisma.$disconnect();
       return httpResponse.http200("Report weekly", response);
     } catch (error) {
+      await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }
   }
+
+  //ok
+  // async generateReportForWeek(days: string[]) {
+  //   try {
+  //     // Obtener todos los trabajadores habilitados
+  //     const workers = await getRawData(
+  //       "SELECT * FROM worker WHERE enabled = 'si'",
+  //       []
+  //     );
+
+  //     // Obtener los dni de los trabajadores
+  //     const dniList = workers.map((worker: any) => worker.dni);
+
+  //     // Formatear la lista de dni para la consulta SQL
+  //     const dniListString = dniList.map((dni: any) => `'${dni}'`).join(", ");
+
+  //     // Formatear la lista de días para la consulta SQL
+  //     const daysString = days.map((day) => `'${day}'`).join(", ");
+
+  //     // Obtener todos los reportes que coincidan con los días y los dni
+  //     const reportsQuery = `
+  //       SELECT *
+  //       FROM detailReport
+  //       WHERE fecha_reporte IN (${daysString})
+  //       AND dni IN (${dniListString})
+  //     `;
+
+  //     const reports = await getRawData(reportsQuery, []);
+
+  //     // Procesar los reportes y los trabajadores para crear el formato necesario
+  //     const response = workers.map((worker: any) => {
+  //       const formatData = {
+  //         worker,
+  //         lunes: {},
+  //         martes: {},
+  //         miercoles: {},
+  //         jueves: {},
+  //         viernes: {},
+  //         sabado: {},
+  //         domingo: {},
+  //       };
+
+  //       days.forEach((day, i) => {
+  //         const report = reports.find((r: any) => {
+  //           const reportDate = new Date(r.fecha_reporte)
+  //             .toISOString()
+  //             .split("T")[0];
+  //           const targetDate = new Date(day).toISOString().split("T")[0];
+  //           return reportDate === targetDate && r.dni === worker.dni;
+  //         });
+  //         if (i === 0) formatData.sabado = report || null;
+  //         else if (i === 1) formatData.domingo = report || null;
+  //         else if (i === 2) formatData.lunes = report || null;
+  //         else if (i === 3) formatData.martes = report || null;
+  //         else if (i === 4) formatData.miercoles = report || null;
+  //         else if (i === 5) formatData.jueves = report || null;
+  //         else if (i === 6) formatData.viernes = report || null;
+  //       });
+
+  //       return formatData;
+  //     });
+
+  //     return httpResponse.http200("Report weekly", response);
+  //   } catch (error) {
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
 
   async updateDetailReport(data: any, detailReportId: number) {
     try {
