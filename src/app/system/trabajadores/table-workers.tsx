@@ -270,21 +270,6 @@ function TableWorkers() {
           currentPage={currentPage}
         />
       </div>
-
-      <Dialog open={loading}>
-        <DialogContent className="sm:max-w-[425px]">
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4"></div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="secondary">
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

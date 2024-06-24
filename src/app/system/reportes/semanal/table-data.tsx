@@ -88,6 +88,8 @@ function TableData() {
       setWorkersFiltered(response.data);
       setLoading(false);
     } catch (error) {
+      setLoading(false);
+
       useToastDestructive("Error", "Error al traer el reporte");
     }
   }
@@ -384,7 +386,7 @@ function TableData() {
         </div>
       </div>
 
-      <Modal isOpen={isOpen || loading} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
