@@ -88,6 +88,7 @@ export function useWorkerWeek(date: string) {
 
   async function fetchData() {
     try {
+      setLoading(true);
       const day = new Date().getDate();
       const month = new Date().getMonth() + 1;
       const year = new Date().getFullYear();

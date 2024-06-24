@@ -36,8 +36,17 @@ import { format } from "date-fns";
 import { headers } from "next/headers";
 import { downloadExcel } from "./export";
 import ModalDetailReport from "./modal-detail";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  Spinner,
+  useDisclosure,
+} from "@nextui-org/react";
 
 function TableData() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const [workers, setWorkers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,8 +106,11 @@ function TableData() {
   function handleSelectDepartment(value: string) {
     if (value === "all") {
       setWorkersFiltered(workers);
+      console.log(workers);
     } else {
-      const filtered = workers.filter((item) => item.sede === value);
+      const filtered = workers.filter(
+        (item) => item.worker.department === value
+      );
       setWorkersFiltered(filtered);
     }
     setCurrentPage(1);
@@ -106,10 +118,13 @@ function TableData() {
 
   function handleChangeInput(e: ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
+    console.log(workers);
     if (value === "") {
       setWorkersFiltered(workers);
     } else {
-      const filtered = workers.filter((item) => item.dni.includes(value));
+      const filtered = workers.filter((item) =>
+        item.worker.dni.includes(value)
+      );
       setWorkersFiltered(filtered);
     }
     setCurrentPage(1);
@@ -166,7 +181,7 @@ function TableData() {
   return (
     <div>
       <div className=" flex flex-col ">
-        <div className="grid grid-cols-3  gap-8  ">
+        <div className="grid lg:grid-cols-3 grid-cols-1  gap-8  ">
           <div className="flex gap-4 p-2 border rounded-lg">
             <Input
               placeholder="Buscar por DNI"
@@ -335,21 +350,17 @@ function TableData() {
                     </th>
 
                     <th className="py-3 pr-6" align="center">
-                      {item.lunes
-                        ? item.lunes.discount
-                        : 0 + item.martes
-                        ? item.martes.discount
-                        : 0 + item.miercoles
-                        ? item.miercoles.discount
-                        : 0 + item.jueves
-                        ? item.jueves.discount
-                        : 0 + item.viernes
-                        ? item.viernes.discount
-                        : 0 + item.sabado
-                        ? item.sabado.discount
-                        : 0}
+                      {[
+                        "sabado",
+                        "lunes",
+                        "martes",
+                        "miercoles",
+                        "jueves",
+                        "viernes",
+                      ]
+                        .map((day) => (item[day] ? item[day].discount : 0))
+                        .reduce((total, discount) => total + discount, 0)}
                     </th>
-
                     {/* <td className=" whitespace-nowrap">
                       <Button
                         variant="secondary"
@@ -372,6 +383,19 @@ function TableData() {
           />
         </div>
       </div>
+
+      <Modal isOpen={isOpen || loading} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Traendo la informacion, espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       {/* {worker && (
         <ModalDetailReport
           worker={worker}

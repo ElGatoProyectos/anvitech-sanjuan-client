@@ -6,7 +6,7 @@ function Page() {
       <div className="items-start justify-between md:flex">
         <div className="max-w-lg">
           <h3 className="text-gray-800 text-lg font-semibold sm:text-xl">
-            Reporte diario
+            Reporte semanal
           </h3>
         </div>
       </div>

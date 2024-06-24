@@ -4,6 +4,12 @@ import { useToastDestructive } from "@/app/hooks/toast.hook";
 import { get } from "@/app/http/api.http";
 import { useUpdatedStore } from "@/app/store/zustand";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -120,14 +126,14 @@ function TableWorkers() {
 
   return (
     <div className=" w-full flex flex-col mt-4">
-      <div className="flex gap-4">
+      <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-4">
         <Input
           placeholder="Buscar por DNI"
           onChange={handleChangeInput}
         ></Input>
 
         <Select onValueChange={(e) => handleSelectTypeContract(e)}>
-          <SelectTrigger className="w-[50%]">
+          <SelectTrigger className="">
             <SelectValue placeholder="Tipo de trabajador" />
           </SelectTrigger>
           <SelectContent>
@@ -139,7 +145,7 @@ function TableWorkers() {
           </SelectContent>
         </Select>
         <Select onValueChange={(e) => handleSelectDepartment(e)}>
-          <SelectTrigger className="w-[50%]">
+          <SelectTrigger className="">
             <SelectValue placeholder="Departamento" />
           </SelectTrigger>
           <SelectContent>
@@ -159,7 +165,7 @@ function TableWorkers() {
         </Select>
 
         <Select onValueChange={handleChangeSelectEnbabled}>
-          <SelectTrigger className="w-[50%]">
+          <SelectTrigger className="">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
@@ -264,6 +270,21 @@ function TableWorkers() {
           currentPage={currentPage}
         />
       </div>
+
+      <Dialog open={loading}>
+        <DialogContent className="sm:max-w-[425px]">
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4"></div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

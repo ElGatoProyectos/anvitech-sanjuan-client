@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -43,8 +45,19 @@ import { format } from "date-fns";
 import { headers } from "next/headers";
 import { downloadExcel } from "./export";
 import { Label } from "@/components/ui/label";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Spinner,
+  useDisclosure,
+} from "@nextui-org/react";
 
 function TableData() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const [workers, setWorkers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +113,8 @@ function TableData() {
         session.data
       );
 
+      console.log(response.data);
+
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -151,6 +166,17 @@ function TableData() {
       setWorkersFiltered(workers);
     } else {
       const filtered = workers.filter((item) => item.supervisor === value);
+      setWorkersFiltered(filtered);
+    }
+    setCurrentPage(1);
+  }
+
+  function handleSelectStatus(value: string) {
+    console.log(workers);
+    if (value === "all") {
+      setWorkersFiltered(workers);
+    } else {
+      const filtered = workers.filter((item) => item.worker_status === value);
       setWorkersFiltered(filtered);
     }
     setCurrentPage(1);
@@ -307,7 +333,7 @@ function TableData() {
   return (
     <div>
       <div className=" flex flex-col ">
-        <div className="flex  gap-8  w-full ">
+        <div className="grid xl:grid-cols-2 grid-cols-1   gap-4  w-full ">
           <div className="flex gap-4 p-2 border rounded-lg  w-full">
             <Input
               placeholder="Buscar por DNI"
@@ -352,27 +378,41 @@ function TableData() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex gap-4 p-2 border rounded-lg">
-            <div>
-              <Input
-                type="date"
-                onChange={(e) => setDate(e.target.value)}
-              ></Input>
-            </div>
-            <Button
-              className="mt-0"
-              onClick={handleChangeDay}
-              disabled={loading}
-            >
-              Aplicar fecha
-            </Button>
-          </div>
 
-          <div className="flex justify-end gap-4 p-2 border rounded-lg">
-            <Button onClick={exportToExcel}>
-              Exportar reporte <FileSpreadsheet className="ml-2" size={20} />
-            </Button>
+            <Select onValueChange={(e) => handleSelectStatus(e)}>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="si">Activo</SelectItem>
+                  <SelectItem value="no">Inactivo</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-between gap-4 p-2 border rounded-lg ">
+            <div className="flex gap-4">
+              <div>
+                <Input
+                  type="date"
+                  onChange={(e) => setDate(e.target.value)}
+                ></Input>
+              </div>
+              <Button
+                className="mt-0"
+                onClick={handleChangeDay}
+                disabled={loading}
+              >
+                Aplicar fecha
+              </Button>
+            </div>
+            <div>
+              <Button onClick={exportToExcel}>
+                Exportar reporte <FileSpreadsheet className="ml-2" size={20} />
+              </Button>
+            </div>
           </div>
         </div>
         <div className="p-2">
@@ -500,10 +540,10 @@ function TableData() {
                       {item.hora_salida}
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      {item.tardanza}
+                      {item.tardanza === "si" ? "T" : "-"}
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      {item.falta}
+                      {item.falta === "si" ? "F" : "-"}
                     </th>
 
                     <th className="py-3 pr-6" align="center">
@@ -552,6 +592,19 @@ function TableData() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Modal isOpen={isOpen || loading} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Traendo la informacion, espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       <Dialog open={openModalEdit} onOpenChange={() => setOpenModalEdit(false)}>
         <DialogContent className="sm:max-w-xl">

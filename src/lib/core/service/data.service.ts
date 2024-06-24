@@ -114,19 +114,84 @@ class DataService {
 
         /// filtrar la data para que se registre por usuario
         const workers = await workerService.findAll();
+        await prisma.$disconnect();
 
         /// iteración de trabajadores para obtener sus datos y analizar en base a eso
-        const responseMap = workers.content.map(async (worker: any) => {
-          await this.filterAndRegisterForUser(
-            responseDataForDay.content,
-            worker,
-            dayString,
-            report,
-            day,
-            selectedMonth,
-            selectedYear
-          );
-        });
+        /// antes de pasar a esto deberia haber un filtro de validar si el registro.dni existe en la base de datos, si no existe, hacemos otro proceso que registre al trabajador en la bd y luego el reporte
+
+        const processedWorknos = new Set<string>();
+
+        await Promise.all(
+          responseDataForDay.content.map(async (row: any) => {
+            const workno = row.employee.workno;
+
+            // Verifica si el workno ya ha sido procesado
+            if (processedWorknos.has(workno)) {
+              return; // Si ya ha sido procesado, salta este ciclo
+            }
+
+            // Marca este workno como procesado
+            processedWorknos.add(workno);
+
+            const rowState = responseDataForDay.content.filter(
+              (item: any) => item.employee.workno === workno
+            );
+
+            // Validar que el trabajador cuyos registros ya se evaluaron, no se vuelva a repetir en otro bucle
+            const worker = await workerService.findByDNI(workno);
+            if (worker.ok) {
+              // Validamos la data con respecto al trabajador
+              await this.newMethodRegisterReport(
+                worker.content,
+                rowState,
+                dayString,
+                report,
+                day,
+                selectedMonth,
+                selectedYear
+              );
+            } else {
+              // Registramos al trabajador
+              const newWorker = {
+                full_name:
+                  row.employee.first_name + " " + row.employee.last_name, // Corrige el nombre completo concatenando first_name y last_name
+                dni: workno,
+                department: row.employee.department,
+                position: row.employee.job_title,
+              };
+
+              const responseNewWorker = await workerService.createNoHireDate(
+                newWorker
+              );
+
+              await scheduleService.createScheduleDefault(
+                responseNewWorker.content.id
+              );
+
+              await this.newMethodRegisterReport(
+                responseNewWorker.content,
+                rowState,
+                dayString,
+                report,
+                day,
+                selectedMonth,
+                selectedYear
+              );
+            }
+          })
+        );
+        // anterior --- eliminado
+        // const responseMap = workers.content.map(async (worker: any) => {
+        //   await this.filterAndRegisterForUser(
+        //     responseDataForDay.content,
+        //     worker,
+        //     dayString,
+        //     report,
+        //     day,
+        //     selectedMonth,
+        //     selectedYear
+        //   );
+        // });
 
         pos++;
       }
@@ -137,6 +202,445 @@ class DataService {
     } catch (error) {
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
+    }
+  }
+
+  async newMethodRegisterReport(
+    worker: any,
+    dataDayForWorker: any[],
+    dayString: string,
+    report: any,
+    dayI: number,
+    monthI: number,
+    yearI: number
+  ) {
+    try {
+      //- traemos el horario ====================================================
+      const responseSchedule = await scheduleService.findScheduleForWorker(
+        worker.id
+      );
+      const schedule = responseSchedule.content;
+      //- definimos las horas del horario ====================================================
+
+      // const [lunesStart, lunesEnd] = schedule.lunes.split("-");
+      // ! corregir esto
+      const [lunesStart, lunesEnd] = "09:00-18:00".split("-");
+
+      const [hourStart, minutesStart] = lunesStart.split(":");
+      const [hourEnd, minutesEnd] = lunesEnd.split(":");
+
+      const formatData: any = {
+        report_id: report.id,
+        tardanza: "no",
+        falta: "no",
+        dia: dayString,
+        // fecha_reporte: report.date_created.toISOString(),?
+        fecha_reporte: new Date(yearI, monthI - 1, dayI),
+        worker_status: worker.enabled,
+
+        dni: worker.dni,
+        nombre: worker.full_name,
+        supervisor: worker.supervisor,
+        sede: worker.department,
+        hora_entrada: "",
+        hora_inicio: "",
+        hora_inicio_refrigerio: "",
+        hora_fin_refrigerio: "",
+        hora_salida: "",
+        discount: 0,
+      };
+
+      //- creamos la fecha de reporte ====================================================
+
+      const dateI = new Date(yearI, monthI - 1, dayI);
+      formatData.fecha_reporte = dateI;
+
+      if (dataDayForWorker.length) {
+        //! formatData.sede=dataFiltered[0].device.name,
+        dataDayForWorker.map((item, index) => {
+          const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+
+          const [hour, minutes] = horaCompleta.split(":");
+
+          let newHour: number = Number(hour) - 5;
+
+          if (Number(hour) >= 0 && Number(hour) <= 4) {
+            newHour = 23 - 4 + Number(hour);
+          }
+
+          if (newHour <= 11) {
+            formatData.hora_inicio = newHour + ":" + minutes;
+            if (newHour > Number(hourStart)) {
+              formatData.tardanza = "si";
+              formatData.discount = 35;
+            } else {
+              if (newHour === 9) {
+                if (Number(minutes) <= 5) {
+                  formatData.tardanza = "no";
+                } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 5;
+                } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 10;
+                } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 20;
+                }
+              } else {
+                formatData.tardanza = "no";
+              }
+            }
+          } else if (newHour >= 12 && newHour <= 16) {
+            if (formatData.hora_inicio_refrigerio === "") {
+              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+            } else {
+              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+            }
+          } else {
+            if (newHour >= Number(hourEnd)) {
+              formatData.falta = "no";
+            } else {
+              formatData.falta = "si";
+              formatData.tardanza = "no";
+              formatData.discount = 35;
+            }
+            formatData.hora_salida = newHour + ":" + minutes;
+          }
+        });
+
+        // ========================================================= caso de vacaciones y permisos =============================================================
+      } else {
+        const dateYesterday = new Date();
+        dateYesterday.setDate(dateYesterday.getDate() - 1);
+
+        //- validamos si esta de vacaciones, permiso, licencia o descanso medico
+
+        // validamos las vacaciones
+
+        const vacationResponse = await prisma.vacation.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+        // validamos los permisos
+
+        const permissionResponse = await prisma.permissions.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos licencias
+
+        const licencesResponse = await prisma.licence.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos los descansos medicos
+
+        const medicalRestResponse = await prisma.medicalRest.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos incidencias
+
+        const incidentResponse = await prisma.incident.findMany({
+          where: {
+            date: dateYesterday,
+          },
+        });
+
+        if (
+          vacationResponse.length > 0 ||
+          permissionResponse.length > 0 ||
+          licencesResponse.length > 0 ||
+          medicalRestResponse.length > 0 ||
+          incidentResponse.length > 0
+        ) {
+          formatData.falta = "no";
+          formatData.tardanza = "no";
+          formatData.discount = 0;
+        } else {
+          formatData.falta = "si";
+          formatData.discount = 35;
+        }
+      }
+
+      await prisma.detailReport.create({ data: formatData });
+      await prisma.$disconnect();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async newMethodRegisterReportNoRegister(
+    worker: any,
+    dataDayForWorker: any[],
+    dayString: string,
+    report: any,
+    dayI: number,
+    monthI: number,
+    yearI: number
+  ) {
+    try {
+      //- traemos el horario ====================================================
+      const responseSchedule = await scheduleService.findScheduleForWorker(
+        worker.id
+      );
+      const schedule = responseSchedule.content;
+      //- definimos las horas del horario ====================================================
+
+      const [lunesStart, lunesEnd] = schedule.lunes.split("-");
+      const [hourStart, minutesStart] = lunesStart.split(":");
+      const [hourEnd, minutesEnd] = lunesEnd.split(":");
+
+      const formatData: any = {
+        report_id: report.id,
+        tardanza: "no",
+        falta: "no",
+        dia: dayString,
+        // fecha_reporte: report.date_created.toISOString(),?
+        fecha_reporte: new Date(yearI, monthI - 1, dayI),
+        worker_status: worker.enabled,
+
+        dni: worker.dni,
+        nombre: worker.full_name,
+        supervisor: worker.supervisor,
+        sede: worker.department,
+        hora_entrada: "",
+        hora_inicio: "",
+        hora_inicio_refrigerio: "",
+        hora_fin_refrigerio: "",
+        hora_salida: "",
+        discount: 0,
+      };
+
+      //- creamos la fecha de reporte ====================================================
+
+      const dateI = new Date(yearI, monthI - 1, dayI);
+      formatData.fecha_reporte = dateI;
+
+      if (dataDayForWorker.length) {
+        //! formatData.sede=dataFiltered[0].device.name,
+        dataDayForWorker.map((item, index) => {
+          const horaCompleta = item.checktime.split("T")[1].split("+")[0];
+
+          const [hour, minutes] = horaCompleta.split(":");
+
+          let newHour: number = Number(hour) - 5;
+
+          if (Number(hour) >= 0 && Number(hour) <= 4) {
+            newHour = 23 - 4 + Number(hour);
+          }
+
+          if (newHour <= 11) {
+            formatData.hora_inicio = newHour + ":" + minutes;
+            if (newHour > Number(hourStart)) {
+              formatData.tardanza = "si";
+              formatData.discount = 35;
+            } else {
+              if (newHour === 9) {
+                if (Number(minutes) <= 5) {
+                  formatData.tardanza = "no";
+                } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 5;
+                } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 10;
+                } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 20;
+                }
+              } else {
+                formatData.tardanza = "no";
+              }
+            }
+          } else if (newHour >= 12 && newHour <= 16) {
+            if (formatData.hora_inicio_refrigerio === "") {
+              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+            } else {
+              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+            }
+          } else {
+            if (newHour >= Number(hourEnd)) {
+              formatData.falta = "no";
+            } else {
+              formatData.falta = "si";
+              formatData.tardanza = "no";
+              formatData.discount = 35;
+            }
+            formatData.hora_salida = newHour + ":" + minutes;
+          }
+        });
+
+        // ========================================================= caso de vacaciones y permisos =============================================================
+      } else {
+        const dateYesterday = new Date();
+        dateYesterday.setDate(dateYesterday.getDate() - 1);
+
+        //- validamos si esta de vacaciones, permiso, licencia o descanso medico
+
+        // validamos las vacaciones
+
+        const vacationResponse = await prisma.vacation.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+        // validamos los permisos
+
+        const permissionResponse = await prisma.permissions.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos licencias
+
+        const licencesResponse = await prisma.licence.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos los descansos medicos
+
+        const medicalRestResponse = await prisma.medicalRest.findMany({
+          where: {
+            worker_id: worker.id,
+            AND: [
+              {
+                start_date: {
+                  lte: dateYesterday,
+                },
+              },
+              {
+                end_date: {
+                  gte: dateYesterday,
+                },
+              },
+            ],
+          },
+        });
+
+        // validamos incidencias
+
+        const incidentResponse = await prisma.incident.findMany({
+          where: {
+            date: dateYesterday,
+          },
+        });
+
+        if (
+          vacationResponse.length > 0 ||
+          permissionResponse.length > 0 ||
+          licencesResponse.length > 0 ||
+          medicalRestResponse.length > 0 ||
+          incidentResponse.length > 0
+        ) {
+          formatData.falta = "no";
+          formatData.tardanza = "no";
+          formatData.discount = 0;
+        } else {
+          formatData.falta = "si";
+          formatData.discount = 35;
+        }
+      }
+
+      return formatData;
+    } catch (error) {
+      await prisma.$disconnect();
+      console.log(error);
     }
   }
 
@@ -172,6 +676,7 @@ class DataService {
         dia: day,
         // fecha_reporte: report.date_created.toISOString(),?
         fecha_reporte: new Date(yearI, monthI - 1, dayI),
+        worker_status: worker.enabled,
 
         dni: worker.dni,
         nombre: worker.full_name,
@@ -196,10 +701,11 @@ class DataService {
         dataFiltered.map((item, index) => {
           const horaCompleta = item.checktime.split("T")[1].split("+")[0];
 
-          if (!horaCompleta) {
-            formatData.falta = "si";
-            formatData.discount = 35;
-          }
+          // if (!horaCompleta) {
+          //   formatData.falta = "si";
+          //   formatData.discount = 35;
+          // } quitamos porque no tiene sentido, las pueden haber horas vacias
+
           const [hour, minutes] = horaCompleta.split(":");
 
           let newHour: number = Number(hour) - 5;
@@ -208,53 +714,52 @@ class DataService {
             newHour = 23 - 4 + Number(hour);
           }
 
-          if (index === dataFiltered.length - 1) {
-            if (newHour < 16) {
+          // console.log(newHour);
+
+          // if (index === dataFiltered.length - 1) {
+          //   if (newHour < 16) {
+          //     formatData.falta = "si";
+          //     formatData.discount = 35;
+          //   }
+          // }
+          if (newHour <= 11) {
+            formatData.hora_inicio = newHour + ":" + minutes;
+            if (newHour > Number(hourStart)) {
+              formatData.tardanza = "si";
+              formatData.discount = 35;
+            } else {
+              if (newHour === 9) {
+                if (Number(minutes) <= 5) {
+                  formatData.tardanza = "no";
+                } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 5;
+                } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 10;
+                } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
+                  formatData.tardanza = "si";
+                  formatData.discount = 20;
+                }
+              } else {
+                formatData.tardanza = "no";
+              }
+            }
+          } else if (newHour >= 12 && newHour <= 16) {
+            if (formatData.hora_inicio_refrigerio === "") {
+              formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
+            } else {
+              formatData.hora_fin_refrigerio = newHour + ":" + minutes;
+            }
+          } else {
+            if (newHour >= Number(hourEnd)) {
+              formatData.falta = "no";
+            } else {
               formatData.falta = "si";
               formatData.tardanza = "no";
               formatData.discount = 35;
             }
-            formatData.inicio = newHour + ":" + minutes;
-          } else {
-            if (newHour <= 11) {
-              formatData.hora_inicio = newHour + ":" + minutes;
-              if (newHour > Number(hourStart)) {
-                formatData.tardanza = "si";
-                formatData.discount = 35;
-              } else {
-                if (newHour === 9) {
-                  if (Number(minutes) <= 5) {
-                    formatData.tardanza = "no";
-                  } else if (Number(minutes) > 5 && Number(minutes) <= 15) {
-                    formatData.tardanza = "si";
-                    formatData.discount = 5;
-                  } else if (Number(minutes) > 15 && Number(minutes) <= 30) {
-                    formatData.tardanza = "si";
-                    formatData.discount = 10;
-                  } else if (Number(minutes) > 30 && Number(minutes) <= 59) {
-                    formatData.tardanza = "si";
-                    formatData.discount = 20;
-                  }
-                } else {
-                  formatData.tardanza = "no";
-                }
-              }
-            } else if (newHour >= 12 && newHour <= 16) {
-              if (formatData.hora_inicio_refrigerio === "") {
-                formatData.hora_inicio_refrigerio = newHour + ":" + minutes;
-              } else {
-                formatData.hora_fin_refrigerio = newHour + ":" + minutes;
-              }
-            } else {
-              if (newHour >= Number(hourEnd)) {
-                formatData.falta = "no";
-              } else {
-                formatData.falta = "si";
-                formatData.tardanza = "no";
-                formatData.discount = 35;
-              }
-              formatData.hora_salida = newHour + ":" + minutes;
-            }
+            formatData.hora_salida = newHour + ":" + minutes;
           }
         });
 
@@ -425,6 +930,57 @@ class DataService {
           selectedYear
         );
 
+        // const processedWorknos = new Set<string>();
+
+        // const reportForDay = await Promise.all(
+        //   responseDataForDay.content.map(async (row: any) => {
+        //     const workno = row.employee.workno;
+
+        //     if (processedWorknos.has(workno)) {
+        //       return; // Si ya ha sido procesado, salta este ciclo
+        //     }
+
+        //     processedWorknos.add(workno);
+
+        //     const rowState = responseDataForDay.content.filter(
+        //       (item: any) => item.employee.workno === workno
+        //     );
+
+        //     const worker = await workerService.findByDNI(workno);
+
+        //     if (worker.ok) {
+        //       const response = await this.newMethodRegisterReportNoRegister(
+        //         worker.content,
+        //         rowState,
+        //         dayString,
+        //         "",
+        //         minDay,
+        //         selectedMonth,
+        //         selectedYear
+        //       );
+        //       return response;
+        //     } else {
+        //       const newWorker = {
+        //         dni: row.employee.workno,
+        //         full_name:
+        //           row.employee.first_name + " " + row.employee.last_name,
+        //         enabled: "si",
+        //         department: row.employee.department,
+        //       };
+        //       const response = await this.newMethodRegisterReportNoRegister(
+        //         newWorker,
+        //         rowState,
+        //         dayString,
+        //         "",
+        //         minDay,
+        //         selectedMonth,
+        //         selectedYear
+        //       );
+        //       return response;
+        //     }
+        //   })
+        // );
+
         const workers = await workerService.findAll();
 
         const reportForDay = await Promise.all(
@@ -492,6 +1048,7 @@ class DataService {
         hora_fin_refrigerio: "",
         hora_salida: "",
         discount: 35,
+        worker_status: worker.enabled,
       };
       if (dataFiltered.length) {
         const [lunesStart, lunesEnd] = schedule.lunes.split("-");

@@ -15,19 +15,33 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { CircleUserRound } from "lucide-react";
+import { AlignJustify, CircleUserRound } from "lucide-react";
+import { ChangeMenuStore } from "@/app/store/zustand";
 
 function Header() {
   const { data: session } = useSession();
+
+  const { setUpdatedAction, updatedAction } = ChangeMenuStore();
 
   function handleLogout() {
     signOut();
   }
 
+  function handleClickOpenMenu() {
+    setUpdatedAction();
+  }
+
   return (
     <header className="w-full bg-white py-2 px-2 min-h-16">
       <Dialog>
-        <nav className="w-full flex justify-end">
+        <nav className="w-full flex justify-between items-center">
+          <div className={`${!updatedAction && "ml-60"}`}>
+            <AlignJustify
+              className="md:hidden"
+              role="button"
+              onClick={handleClickOpenMenu}
+            />
+          </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <span>{session?.user.username}</span>

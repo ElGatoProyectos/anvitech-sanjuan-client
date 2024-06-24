@@ -23,9 +23,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  Spinner,
+  useDisclosure,
+} from "@nextui-org/react";
 
 function Dashboard() {
   const session = useSession();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const [date, setDate] = useState("");
 
@@ -42,9 +50,8 @@ function Dashboard() {
     <div className="grid grid-cols-2 gap-4 w-full">
       <div className="bg-white w-full col-span-2  p-2 rounded-lg flex gap-16 justify-end">
         <div className="flex gap-4">
+          <span>Filtrar por fecha semanal</span>
           <Input type="date" onChange={(e) => setDate(e.target.value)}></Input>
-
-          <Button>Filtrar por fecha</Button>
         </div>
         {/* <div className="flex gap-4">
             <Select>
@@ -140,6 +147,19 @@ function Dashboard() {
           </tbody>
         </table>
       </div>
+
+      <Modal isOpen={loading || isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Traendo la informacion, espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

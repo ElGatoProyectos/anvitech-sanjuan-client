@@ -27,3 +27,16 @@ export const useChangeInputStore = create<ChangeInputStore>((set) => ({
       updatedAction: !prevState.updatedAction,
     })),
 }));
+
+type ChangeMenuStore = {
+  updatedAction: boolean;
+  setUpdatedAction: () => void;
+};
+
+export const ChangeMenuStore = create<ChangeInputStore>((set) => ({
+  updatedAction: true,
+  setUpdatedAction: () =>
+    set((prevState) => ({
+      updatedAction: !prevState.updatedAction,
+    })),
+}));

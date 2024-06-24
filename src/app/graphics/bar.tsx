@@ -1,3 +1,10 @@
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  Spinner,
+  useDisclosure,
+} from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import {
   BarChart,

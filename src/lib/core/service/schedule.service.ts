@@ -47,6 +47,29 @@ class ScheduleService {
     }
   }
 
+  async createScheduleDefault(workerId: number) {
+    try {
+      const dataSet = {
+        worker_id: workerId,
+        lunes: "09:00-18:00",
+        martes: "09:00-18:00",
+        miercoles: "09:00-18:00",
+        jueves: "09:00-18:00",
+        viernes: "09:00-18:00",
+        sabado: "09:00-18:00",
+        domingo: "",
+        comments: "",
+      };
+
+      const created = await prisma.schedule.create({ data: dataSet });
+      await prisma.$disconnect();
+      return httpResponse.http201("Schedule created", created);
+    } catch (error) {
+      await prisma.$disconnect();
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async createScheduleForWorker(data: any) {
     try {
       const dataSet = {

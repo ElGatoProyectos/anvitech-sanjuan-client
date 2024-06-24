@@ -12,7 +12,7 @@ function Layout({
     <>
       <div className="min-h-screen flex flex-row bg-slate-100 text-gray-800">
         <Sidebar></Sidebar>
-        <main className="flex flex-col w-full  ml-60 ">
+        <main className="flex flex-col w-full  md:ml-60 ">
           <Header></Header>
           <div className="flex min-w-full px-8 py-8 ">{children}</div>
         </main>

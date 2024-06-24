@@ -120,6 +120,17 @@ class WorkerService {
     }
   }
 
+  async createNoHireDate(data: any) {
+    try {
+      const created = await prisma.worker.create({ data });
+      await prisma.$disconnect();
+      return httpResponse.http201("Worker created", created);
+    } catch (error) {
+      await prisma.$disconnect();
+      return errorService.handleErrorSchema(error);
+    }
+  }
+
   async findDepartmentDistinct() {
     try {
       const departments = await prisma.worker.findMany({
@@ -139,10 +150,11 @@ class WorkerService {
   async findByDNI(dni: string) {
     try {
       const worker = await prisma.worker.findFirst({
-        where: { dni },
+        where: { dni: dni },
       });
       await prisma.$disconnect();
-      return httpResponse.http200("Departments distinct", worker);
+      if (!worker) return httpResponse.http400("Worker not found");
+      return httpResponse.http200("Worker found", worker);
     } catch (error) {
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);

@@ -53,6 +53,7 @@ model DetailReport {
   daily_license          String?
   reason_license         String?
   discount               Float?
+  worker_status          String?
   report                 Report                 @relation(fields: [report_id], references: [id])
   DetailReportIncident   DetailReportIncident[]
   Incident               Incident?              @relation(fields: [incidentId], references: [id])
@@ -67,14 +68,14 @@ model Worker {
   type_dni      String?
   type_contract String?
   department    String
-  position      String
+  position      String?
   supervisor    String?
   coordinator   String?
   management    String?
   company       String?
   company_ruc   String?
 
-  hire_date        DateTime
+  hire_date        DateTime?
   termination_date DateTime?
   reason           String?
   enabled          String?       @default("si")
