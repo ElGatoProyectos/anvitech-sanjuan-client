@@ -113,8 +113,6 @@ function TableData() {
         session.data
       );
 
-      console.log(response.data);
-
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
@@ -174,7 +172,6 @@ function TableData() {
   }
 
   function handleSelectStatus(value: string) {
-    console.log(workers);
     if (value === "all") {
       setWorkersFiltered(workers);
     } else {

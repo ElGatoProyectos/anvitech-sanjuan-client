@@ -108,7 +108,6 @@ function TableData() {
   function handleSelectDepartment(value: string) {
     if (value === "all") {
       setWorkersFiltered(workers);
-      console.log(workers);
     } else {
       const filtered = workers.filter(
         (item) => item.worker.department === value
@@ -120,7 +119,6 @@ function TableData() {
 
   function handleChangeInput(e: ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
-    console.log(workers);
     if (value === "") {
       setWorkersFiltered(workers);
     } else {
@@ -156,15 +154,12 @@ function TableData() {
   }
 
   async function exportToExcel() {
-    console.log(workers);
-
     try {
       setLoading(true);
       downloadExcel(workers);
       setLoading(false);
       useToastDefault("Ok", "Reporte generado con exito");
     } catch (error) {
-      console.log(error);
       setLoading(false);
 
       useToastDestructive("Error", "Error al crear el archivo");

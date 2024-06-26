@@ -99,7 +99,6 @@ class WorkerService {
       await prisma.$disconnect();
       return httpResponse.http201("Workers created");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

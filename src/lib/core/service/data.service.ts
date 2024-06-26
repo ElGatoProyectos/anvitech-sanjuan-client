@@ -717,8 +717,6 @@ class DataService {
             newHour = 23 - 4 + Number(hour);
           }
 
-          // console.log(newHour);
-
           // if (index === dataFiltered.length - 1) {
           //   if (newHour < 16) {
           //     formatData.falta = "si";

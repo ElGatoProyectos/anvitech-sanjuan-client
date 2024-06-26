@@ -15,8 +15,6 @@ export async function PUT(
       Number(context.params.id)
     );
 
-    console.log(response);
-
     return NextResponse.json(response.content, {
       status: response.statusCode,
     });

@@ -44,7 +44,6 @@ function TableSchedule() {
     e.preventDefault();
     try {
       setLoading(true);
-      console.log(newSchedule);
       await post("schedule/type", newSchedule, session.data);
       setLoading(false);
       setNewFetch(!newFetch);
