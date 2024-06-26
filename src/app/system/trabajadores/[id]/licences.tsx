@@ -112,7 +112,7 @@ function LicencesWorker({ id }: { id: string }) {
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
-        <span className="font-semibold">Licencias del trabajador</span>
+        <span className="font-semibold">Licencias con gose</span>
       </div>
       <div className="mt-4 flex flex-col gap-4">
         <table cellPadding={8} className="text-sm w-full text-left border">
@@ -141,7 +141,7 @@ function LicencesWorker({ id }: { id: string }) {
         </table>
         <div className=" flex gap-4">
           <Button onClick={() => setOpenModalHistory(true)}>
-            Mostrar todas las permisos
+            Mostrar licencias
           </Button>
           {session.data?.user.role === "admin" ||
             (session.data?.user.role === "superadmin" && (
@@ -196,7 +196,7 @@ function LicencesWorker({ id }: { id: string }) {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleRegister}>Registrar permiso</Button>
+            <Button onClick={handleRegister}>Registrar licencia</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -237,9 +237,9 @@ function LicencesWorker({ id }: { id: string }) {
               </tbody>
             </table>
           </div>
-          <DialogFooter>
+          {/* <DialogFooter>
             <Button>Exportar Datos</Button>
-          </DialogFooter>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
     </div>

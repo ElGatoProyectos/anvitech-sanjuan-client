@@ -21,7 +21,10 @@ function FormIncidents() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      if (session.data?.user.role === "admin") {
+      if (
+        session.data?.user.role === "admin" ||
+        session.data?.user.role === "superadmin"
+      ) {
         setLoading(true);
         await post("terminations", termination, session.data);
         setUpdatedAction();

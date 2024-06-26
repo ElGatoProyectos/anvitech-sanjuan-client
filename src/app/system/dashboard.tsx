@@ -92,7 +92,7 @@ function Dashboard() {
                 <td>{item.worker.full_name}</td>
                 <td>{item.worker.dni}</td>
 
-                <td>
+                <td className="text-center">
                   {Number(item.lunes && item.lunes.falta === "si" ? 1 : 0) +
                     Number(item.martes && item.martes.falta === "si" ? 1 : 0) +
                     Number(
@@ -124,7 +124,7 @@ function Dashboard() {
               <tr key={idx}>
                 <td>{item.worker.full_name}</td>
                 <td>{item.worker.dni}</td>
-                <td>
+                <td className="text-center">
                   {Number(item.lunes && item.lunes.tardanza === "si" ? 1 : 0) +
                     Number(
                       item.martes && item.martes.tardanza === "si" ? 1 : 0

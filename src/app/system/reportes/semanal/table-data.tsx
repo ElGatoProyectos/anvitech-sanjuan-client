@@ -156,12 +156,15 @@ function TableData() {
   }
 
   async function exportToExcel() {
+    console.log(workers);
+
     try {
       setLoading(true);
       downloadExcel(workers);
       setLoading(false);
       useToastDefault("Ok", "Reporte generado con exito");
     } catch (error) {
+      console.log(error);
       setLoading(false);
 
       useToastDestructive("Error", "Error al crear el archivo");
@@ -183,14 +186,15 @@ function TableData() {
   return (
     <div>
       <div className=" flex flex-col ">
-        <div className="grid lg:grid-cols-3 grid-cols-1  gap-8  ">
+        <div className="flex flex-wrap justify-between  gap-8  ">
           <div className="flex gap-4 p-2 border rounded-lg">
             <Input
               placeholder="Buscar por DNI"
               onChange={handleChangeInput}
+              className="w-44"
             ></Input>
             <Select onValueChange={(e) => handleSelectDepartment(e)}>
-              <SelectTrigger className="min-w-[50%]">
+              <SelectTrigger className="w-96">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>
@@ -213,6 +217,7 @@ function TableData() {
             <div>
               <Input
                 type="date"
+                className="w-44"
                 onChange={(e) => setDate(e.target.value)}
               ></Input>
             </div>
@@ -386,12 +391,12 @@ function TableData() {
         </div>
       </div>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={loading} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
               <ModalBody className="flex justify-start py-8">
-                Traendo la informacion, espere un momento
+                Cargando, espere un momento
                 <Spinner />
               </ModalBody>
             </>

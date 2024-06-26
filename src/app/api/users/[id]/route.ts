@@ -45,3 +45,24 @@ export async function PUT(
     });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: number } }
+) {
+  try {
+    const responseAuth = await validationAuthV2(request, "admin");
+    if (responseAuth.status !== 200) return responseAuth;
+
+    const response = await userService.deleteUser(Number(context.params.id));
+
+    return NextResponse.json(response.content, {
+      status: response.statusCode,
+    });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(error, {
+      status: 500,
+    });
+  }
+}

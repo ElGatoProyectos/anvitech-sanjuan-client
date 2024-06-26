@@ -335,14 +335,15 @@ function TableData() {
   return (
     <div>
       <div className=" flex flex-col ">
-        <div className="grid xl:grid-cols-2 grid-cols-1   gap-4  w-full ">
+        <div className="flex flex-wrap justify-between   gap-4  w-full ">
           <div className="flex gap-4 p-2 border rounded-lg  w-full">
             <Input
               placeholder="Buscar por DNI"
               onChange={handleChangeInput}
+              className="w-44"
             ></Input>
             <Select onValueChange={(e) => handleSelectSupervisor(e)}>
-              <SelectTrigger className="">
+              <SelectTrigger className="w-1/3">
                 <SelectValue placeholder="Supervisor" />
               </SelectTrigger>
               <SelectContent>
@@ -362,7 +363,7 @@ function TableData() {
             </Select>
 
             <Select onValueChange={(e) => handleSelectDepartment(e)}>
-              <SelectTrigger className="">
+              <SelectTrigger className="w-1/3">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>
@@ -382,7 +383,7 @@ function TableData() {
             </Select>
 
             <Select onValueChange={(e) => handleSelectStatus(e)}>
-              <SelectTrigger className="">
+              <SelectTrigger className="w-1/3">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -412,7 +413,7 @@ function TableData() {
             </div>
             <div>
               <Button onClick={exportToExcel}>
-                Exportar reporte <FileSpreadsheet className="ml-2" size={20} />
+                Exportar <FileSpreadsheet className="ml-2" size={20} />
               </Button>
             </div>
           </div>
@@ -522,9 +523,7 @@ function TableData() {
                     }  ${item.discount === 35 && "bg-red-100"}`}
                   >
                     <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      {item.nombre}
-                    </td>
+                    <td className="pr-6 py-4 w-40">{item.nombre}</td>
 
                     <th className="py-3 pr-6">
                       {formatDate(item.fecha_reporte)}

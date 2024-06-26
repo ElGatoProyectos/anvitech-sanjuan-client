@@ -445,6 +445,17 @@ class WorkerService {
       return errorService.handleErrorSchema(error);
     }
   }
+
+  async deleteWorker(workerId: number) {
+    try {
+      const deleted = await prisma.worker.delete({ where: { id: workerId } });
+      await prisma.$disconnect();
+      return httpResponse.http200("Delete worker");
+    } catch (error) {
+      await prisma.$disconnect();
+      return errorService.handleErrorSchema(error);
+    }
+  }
 }
 
 export const workerService = new WorkerService();

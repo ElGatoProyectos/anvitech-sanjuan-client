@@ -25,7 +25,14 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Modal,
+  ModalBody,
+  ModalContent,
+  Spinner,
+} from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import React, { FormEvent, useEffect, useState } from "react";
 
@@ -499,6 +506,19 @@ function UpdateDataWorker({ id }: { id: string }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Modal isOpen={loading || session.status !== "authenticated"}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Cargando , espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

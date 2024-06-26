@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
 import { Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -270,6 +271,19 @@ function TableWorkers() {
           currentPage={currentPage}
         />
       </div>
+
+      <Modal isOpen={loading || session.status !== "authenticated"}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Cargando , espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -114,7 +114,7 @@ class UserService {
         where: { id: userId },
       });
       await prisma.$disconnect();
-      return httpResponse.http200("User deleted ok!", deleted);
+      return httpResponse.http200("User deleted ok!");
     } catch (error) {
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);

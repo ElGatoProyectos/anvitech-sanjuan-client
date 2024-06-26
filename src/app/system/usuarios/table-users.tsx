@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, putId } from "@/app/http/api.http";
+import { deleteId, get, putId } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,6 +28,7 @@ import { Label } from "@/components/ui/label";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useUpdatedStore } from "@/app/store/zustand";
+import { deleteCache } from "next/dist/server/lib/render-server";
 
 function TableUser() {
   const { updatedAction, setUpdatedAction } = useUpdatedStore();
@@ -68,6 +69,15 @@ function TableUser() {
       setUsers(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer la informacion");
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      const response = await deleteId("users", idSelected, session.data);
+      setUpdatedAction();
+    } catch (error) {
+      useToastDestructive("Error", "Error al eliminar usuario");
     }
   }
 
@@ -294,6 +304,11 @@ function TableUser() {
             </div>
           </div>
           <DialogFooter className="mt-4">
+            <DialogClose asChild>
+              <Button onClick={handleDelete} type="submit">
+                Eliminar
+              </Button>
+            </DialogClose>
             <DialogClose asChild>
               <Button onClick={handleUpdate} type="submit">
                 Modificar ahora

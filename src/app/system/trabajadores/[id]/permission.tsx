@@ -111,7 +111,7 @@ function PermissionsWorker({ id }: { id: string }) {
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
-        <span className="font-semibold">Permisos del trabajador</span>
+        <span className="font-semibold">Licencia sin gose</span>
       </div>
       <div className="mt-4 flex flex-col gap-4">
         <table cellPadding={8} className="text-sm w-full text-left border">
@@ -140,12 +140,12 @@ function PermissionsWorker({ id }: { id: string }) {
         </table>
         <div className=" flex gap-4">
           <Button onClick={() => setOpenModalHistory(true)}>
-            Mostrar todas las permisos
+            Mostrar licencias
           </Button>
           {session.data?.user.role === "admin" ||
             (session.data?.user.role === "superadmin" && (
               <Button onClick={() => setOpenModal(true)}>
-                Registrar permiso
+                Registrar licencia
               </Button>
             ))}
         </div>
@@ -154,7 +154,7 @@ function PermissionsWorker({ id }: { id: string }) {
       <Dialog open={openModal} onOpenChange={() => setOpenModal(!openModal)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Registro de permiso</DialogTitle>
+            <DialogTitle>Registro de licencia</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 w-full gap-4 mt-2 ">
             <div>
@@ -195,7 +195,7 @@ function PermissionsWorker({ id }: { id: string }) {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleRegister}>Registrar permiso</Button>
+            <Button onClick={handleRegister}>Registrar licencia</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -206,7 +206,7 @@ function PermissionsWorker({ id }: { id: string }) {
       >
         <DialogContent className="">
           <DialogHeader>
-            <DialogTitle>Historial de permisos</DialogTitle>
+            <DialogTitle>Historial de licencias</DialogTitle>
           </DialogHeader>
           <div className=" w-full gap-8 max-h-[500px] overflow-y-scroll">
             <table cellPadding={8} className="text-sm w-full text-left border">
@@ -236,9 +236,9 @@ function PermissionsWorker({ id }: { id: string }) {
               </tbody>
             </table>
           </div>
-          <DialogFooter>
+          {/* <DialogFooter>
             <Button>Exportar Datos</Button>
-          </DialogFooter>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
     </div>

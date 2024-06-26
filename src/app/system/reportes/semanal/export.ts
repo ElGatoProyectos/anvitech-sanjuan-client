@@ -51,51 +51,63 @@ export const downloadExcel = (data: any[]) => {
     const formatData = {
       DNI: item.worker.dni,
       NOMBRES: item.worker.full_name,
-      SABADO: !item.sabado
-        ? "-"
-        : item.sabado.tardanza === "si"
-        ? "T"
-        : item.sabado.falta === "si"
-        ? "F"
-        : "-",
-      LUNES: !item.lunes
-        ? "-"
-        : item.lunes.tardanza === "si"
-        ? "T"
-        : item.lunes.falta === "si"
-        ? "F"
-        : "-",
-      MARTES: !item.martes
-        ? "-"
-        : item.martes.tardanza === "si"
-        ? "T"
-        : item.martes.falta === "si"
-        ? "F"
-        : "-",
-      MIERCOLES: !item.miercoles
-        ? "-"
-        : item.miercoles.tardanza === "si"
-        ? "T"
-        : item.miercoles.falta === "si"
-        ? "F"
-        : "-",
-      JUEVES: !item.jueves
-        ? "-"
-        : item.jueves.tardanza === "si"
-        ? "T"
-        : item.jueves.falta === "si"
-        ? "F"
-        : "-",
-      VIERNES: !item.viernes
-        ? "-"
-        : item.viernes.tardanza === "si"
-        ? "T"
-        : item.viernes.falta === "si"
-        ? "F"
-        : "-",
+      // SABADO: !item.sabado
+      //   ? "-"
+      //   : item.sabado.tardanza === "si"
+      //   ? "T"
+      //   : item.sabado.falta === "si"
+      //   ? "F"
+      //   : "-",
+      // LUNES: !item.lunes
+      //   ? "-"
+      //   : item.lunes.tardanza === "si"
+      //   ? "T"
+      //   : item.lunes.falta === "si"
+      //   ? "F"
+      //   : "-",
+      // MARTES: !item.martes
+      //   ? "-"
+      //   : item.martes.tardanza === "si"
+      //   ? "T"
+      //   : item.martes.falta === "si"
+      //   ? "F"
+      //   : "-",
+      // MIERCOLES: !item.miercoles
+      //   ? "-"
+      //   : item.miercoles.tardanza === "si"
+      //   ? "T"
+      //   : item.miercoles.falta === "si"
+      //   ? "F"
+      //   : "-",
+      // JUEVES: !item.jueves
+      //   ? "-"
+      //   : item.jueves.tardanza === "si"
+      //   ? "T"
+      //   : item.jueves.falta === "si"
+      //   ? "F"
+      //   : "-",
+      // VIERNES: !item.viernes
+      //   ? "-"
+      //   : item.viernes.tardanza === "si"
+      //   ? "T"
+      //   : item.viernes.falta === "si"
+      //   ? "F"
+      //   : "-",
+      SABADO: !item.sabado ? "-" : item.sabado.discount,
+      LUNES: !item.lunes ? "-" : item.lunes.discount,
+      MARTES: !item.martes ? "-" : item.martes.discount,
+      MIERCOLES: !item.miercoles ? "-" : item.miercoles.discount,
+      JUEVES: !item.jueves ? "-" : item.jueves.discount,
+      VIERNES: !item.viernes ? "-" : item.viernes.discount,
       "TOTAL DE TARDANZA": totalTardanzas,
-
       "TOTAL DE FALTAS": totalFaltas,
+      "TOTAL DESCUENTO":
+        (item.lunes ? item.lunes.discount : 0) +
+        (item.martes ? item.martes.discount : 0) +
+        (item.miercoles ? item.miercoles.discount : 0) +
+        (item.jueves ? item.jueves.discount : 0) +
+        (item.viernes ? item.viernes.discount : 0) +
+        (item.sabado ? item.sabado.discount : 0),
     };
     return formatData;
   });
