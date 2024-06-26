@@ -7,13 +7,15 @@ export async function PUT(
   context: { params: { id: number } }
 ) {
   try {
-    const responseAuth = await validationAuthV2(request, "user");
+    const responseAuth = await validationAuthV2(request, "admin");
     if (responseAuth.status !== 200) return responseAuth;
     const data = await request.json();
     const response = await reportService.updateDetailReport(
       data,
       Number(context.params.id)
     );
+
+    console.log(response);
 
     return NextResponse.json(response.content, {
       status: response.statusCode,

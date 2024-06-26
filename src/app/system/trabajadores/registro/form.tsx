@@ -5,6 +5,7 @@ import { post } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import React, { FormEvent, useState } from "react";
 
@@ -119,6 +120,19 @@ function Form() {
             </div>
           </form>
         ))}
+
+      <Modal isOpen={loading || session.status !== "authenticated"}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Cargando , espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

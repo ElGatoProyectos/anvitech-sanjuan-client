@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
 import { Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -50,9 +51,12 @@ function TableIncidents() {
 
   async function handleUpdateIncident() {
     try {
+      setLoading(true);
       await putId("incidents", incidentSelected, incidentId, session.data);
       setUpdatedAction();
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       useToastDestructive("Error", "Error al modificar");
     }
   }
@@ -62,6 +66,8 @@ function TableIncidents() {
       setIncidents(response.data);
       setLoading(false);
     } catch (error) {
+      setLoading(false);
+
       useToastDestructive("Error", "Error al solicitar la informacion");
     }
   }
@@ -127,6 +133,19 @@ function TableIncidents() {
             )}
           </tbody>
         </table>
+
+        <Modal isOpen={loading || session.status !== "authenticated"}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalBody className="flex justify-start py-8">
+                  Cargando , espere un momento
+                  <Spinner />
+                </ModalBody>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
 
       <DialogContent className="sm:max-w-[425px]">

@@ -304,11 +304,17 @@ function TableUser() {
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button onClick={handleDelete} type="submit">
-                Eliminar
-              </Button>
-            </DialogClose>
+            {session.data?.user.role === "superadmin" &&
+            Number(session.data?.user.id) !== idSelected ? (
+              <DialogClose asChild>
+                <Button onClick={handleDelete} type="submit">
+                  Eliminar
+                </Button>
+              </DialogClose>
+            ) : (
+              ""
+            )}
+
             <DialogClose asChild>
               <Button onClick={handleUpdate} type="submit">
                 Modificar ahora

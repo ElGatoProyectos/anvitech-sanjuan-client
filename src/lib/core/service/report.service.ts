@@ -541,6 +541,7 @@ class ReportService {
       };
 
       // cuando el usuario tiene una hora de entrada
+
       if (
         dataTemporalHours.hora_inicio !== "" &&
         dataTemporalHours.hora_salida === ""
@@ -585,6 +586,7 @@ class ReportService {
           formatData.falta = "no";
         }
         formatData.falta = "si";
+        formatData.discount = 35;
       }
       // cuando el usuario tiene una hora de salida
       else if (
@@ -660,6 +662,14 @@ class ReportService {
         } else if (dataEndHour === scheduleEndHour) {
           formatData.falta = "no";
         }
+      }
+
+      if (
+        dataTemporalHours.hora_inicio_refrigerio === "" ||
+        dataTemporalHours.hora_fin_refrigerio === ""
+      ) {
+        formatData.falta = "si";
+        formatData.discount = 35;
       }
 
       const updated = await prisma.detailReport.update({
@@ -769,9 +779,9 @@ class ReportService {
                 }
               }
               formatData.falta = "no";
-            } else {
-              formatData.tardanza = "si";
             }
+            formatData.falta = "si";
+            formatData.discount = 35;
           }
           // cuando el usuario tiene una hora de salida
           else if (row.hora_inicio === "" && row.hora_salida !== "") {
@@ -833,6 +843,14 @@ class ReportService {
             } else {
               formatData.tardanza = "si";
             }
+          }
+
+          if (
+            row.hora_inicio_refrigerio === "" ||
+            row.hora_fin_refrigerio === ""
+          ) {
+            formatData.falta = "si";
+            formatData.discount = 35;
           }
 
           //- validamos si esta en un fecha donde tiene una escusa para no asistir
@@ -962,9 +980,9 @@ class ReportService {
                   }
                 }
                 formatData.falta = "no";
-              } else {
-                formatData.tardanza = "si";
               }
+              formatData.falta = "si";
+              formatData.discount = 35;
             }
             // cuando el usuario tiene una hora de salida
             else if (row.hora_inicio === "" && row.hora_salida !== "") {
@@ -1026,6 +1044,13 @@ class ReportService {
               } else {
                 formatData.tardanza = "si";
               }
+            }
+            if (
+              row.hora_inicio_refrigerio === "" ||
+              row.hora_fin_refrigerio === ""
+            ) {
+              formatData.falta = "si";
+              formatData.discount = 35;
             }
 
             //- validamos si esta en un fecha donde tiene una escusa para no asistir

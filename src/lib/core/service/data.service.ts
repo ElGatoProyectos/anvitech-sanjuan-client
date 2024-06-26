@@ -126,11 +126,11 @@ class DataService {
             const workno = row.employee.workno;
 
             // Verifica si el workno ya ha sido procesado
+
+            // Marca este workno como procesado
             if (processedWorknos.has(workno)) {
               return; // Si ya ha sido procesado, salta este ciclo
             }
-
-            // Marca este workno como procesado
             processedWorknos.add(workno);
 
             const rowState = responseDataForDay.content.filter(
@@ -167,7 +167,6 @@ class DataService {
               await scheduleService.createScheduleDefault(
                 responseNewWorker.content.id
               );
-
               await this.newMethodRegisterReport(
                 responseNewWorker.content,
                 rowState,
@@ -257,6 +256,7 @@ class DataService {
 
       if (dataDayForWorker.length) {
         //! formatData.sede=dataFiltered[0].device.name,
+
         dataDayForWorker.map((item, index) => {
           const horaCompleta = item.checktime.split("T")[1].split("+")[0];
 
@@ -413,10 +413,13 @@ class DataService {
           formatData.falta = "no";
           formatData.tardanza = "no";
           formatData.discount = 0;
-        } else {
-          formatData.falta = "si";
-          formatData.discount = 35;
         }
+      }
+
+      if (dataDayForWorker.length !== 4) {
+        formatData.falta = "si";
+        formatData.tardanza = "no";
+        formatData.discount = 35;
       }
 
       await prisma.detailReport.create({ data: formatData });
@@ -1057,6 +1060,7 @@ class DataService {
 
         if (dataFiltered.length) {
           //! formatData.sede=dataFiltered[0].device.name,
+
           dataFiltered.map((item, index) => {
             const horaCompleta = item.checktime.split("T")[1].split("+")[0];
             const [hour, minutes] = horaCompleta.split(":");
@@ -1220,6 +1224,13 @@ class DataService {
           formatData.discount = 35;
         }
       }
+
+      if (dataFiltered.length !== 4) {
+        formatData.falta = "si";
+        formatData.tardanza = "no";
+        formatData.discount = 35;
+      }
+
       await prisma.$disconnect();
       return formatData;
     } catch (error) {

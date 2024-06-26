@@ -13,10 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -35,8 +35,6 @@ function TableIncidents() {
 
   const [terminationId, setTerminationId] = useState(0);
 
-  const [password, setPassword] = useState("");
-
   function handleIncidentSelected(data: any) {
     setTerminationSelected({
       ...terminationSelected,
@@ -47,7 +45,12 @@ function TableIncidents() {
 
   async function handleUpdateTermination() {
     try {
-      if (session.data?.user.role === "admin") {
+      setLoading(true);
+
+      if (
+        session.data?.user.role === "admin" ||
+        session.data?.user.role === "superadmin"
+      ) {
         await putId(
           "terminations",
           terminationSelected,
@@ -56,7 +59,10 @@ function TableIncidents() {
         );
         setUpdatedAction();
       }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+
       useToastDestructive("Error", "Error al modificar");
     }
   }
@@ -66,6 +72,8 @@ function TableIncidents() {
       setTerminations(response.data);
       setLoading(false);
     } catch (error) {
+      setLoading(false);
+
       useToastDestructive("Error", "Error al solicitar la informacion");
     }
   }
@@ -120,7 +128,7 @@ function TableIncidents() {
                   <td className="pr-6 py-4 whitespace-nowrap ">{item.title}</td>
                   <td className="pr-6 py-4 whitespace-nowrap ">
                     <DialogTrigger asChild>
-                      {session.data?.user.role === "admin" && (
+                      {session.data?.user.role !== "user" && (
                         <Button
                           size={"sm"}
                           onClick={() => handleIncidentSelected(item)}
@@ -135,6 +143,19 @@ function TableIncidents() {
             )}
           </tbody>
         </table>
+
+        <Modal isOpen={loading || session.status !== "authenticated"}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalBody className="flex justify-start py-8">
+                  Cargando , espere un momento
+                  <Spinner />
+                </ModalBody>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
 
       <DialogContent className="sm:max-w-[425px]">

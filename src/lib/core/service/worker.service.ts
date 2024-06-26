@@ -13,9 +13,7 @@ import { reportService } from "./report.service";
 class WorkerService {
   async findAll() {
     try {
-      const workers = await prisma.worker.findMany({
-        where: { enabled: "si" },
-      });
+      const workers = await prisma.worker.findMany();
       await prisma.$disconnect();
       return httpResponse.http200("All workers", workers);
     } catch (error) {
@@ -88,17 +86,20 @@ class WorkerService {
       };
 
       const { content: workers } = await this.findAll();
-      workers.map(async (w: any) => {
-        const wFormat = {
-          ...formatSchedule,
-          worker_id: w.id,
-        };
-        await scheduleService.createScheduleMassive(wFormat);
-      });
+      await Promise.all(
+        workers.map(async (w: any) => {
+          const wFormat = {
+            ...formatSchedule,
+            worker_id: w.id,
+          };
+          await scheduleService.createScheduleMassive(wFormat);
+        })
+      );
 
       await prisma.$disconnect();
       return httpResponse.http201("Workers created");
     } catch (error) {
+      console.log(error);
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
     }

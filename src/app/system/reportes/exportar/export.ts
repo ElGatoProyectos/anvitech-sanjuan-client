@@ -21,7 +21,7 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
       CCOSTO: "",
       DDESCMED: calculateDaysInRange(row.descansos_medico, dateMin, dateMax),
       DFALTAS: faltas.length,
-      DIASTRAB: row.reportes - faltas.length,
+      DIASTRAB: row.reportes.length - faltas.length,
       DLICSGO: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
       DLICCGO: calculateDaysInRange(row.licencias, dateMin, dateMax),
       DSUBENF: "",

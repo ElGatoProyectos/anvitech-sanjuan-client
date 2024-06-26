@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
 import { Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
@@ -21,7 +22,7 @@ import { FormEvent, useEffect, useState } from "react";
 function TableSchedule() {
   const [typeSchedules, setTypeSchedules] = useState<any[]>([]);
   const [typeScheduleSelected, setTypeScheduleSelected] = useState<any>({});
-  const [newSchedule, setNewSchedule] = useState({
+  const [newSchedule, setNewSchedule] = useState<any>({
     name: "",
     lunes: "",
     martes: "",
@@ -43,19 +44,10 @@ function TableSchedule() {
     e.preventDefault();
     try {
       setLoading(true);
-
+      console.log(newSchedule);
       await post("schedule/type", newSchedule, session.data);
       setLoading(false);
       setNewFetch(!newFetch);
-      setNewSchedule({
-        name: "",
-        lunes: "",
-        martes: "",
-        miercoles: "",
-        jueves: "",
-        viernes: "",
-        sabado: "",
-      });
     } catch (error) {
       setLoading(false);
       useToastDestructive("Error", "Error al traer modificar horario");
@@ -64,7 +56,10 @@ function TableSchedule() {
 
   async function handleUpdate() {
     try {
-      if (session.data?.user.role === "admin") {
+      if (
+        session.data?.user.role === "admin" ||
+        session.data?.user.role === "superadmin"
+      ) {
         setLoading(true);
         const { id, ...dataSet } = typeScheduleSelected;
         await putId("schedule/type", dataSet, id, session.data);
@@ -73,7 +68,6 @@ function TableSchedule() {
       }
     } catch (error) {
       setLoading(false);
-
       useToastDestructive("Error", "Erro al traer modificar horario");
     }
   }
@@ -96,6 +90,26 @@ function TableSchedule() {
     }
   }
 
+  function handleScheduleChange(day: any, value: string) {
+    const [hour, minutes] = value.split(":");
+    if (newSchedule[day] === "") {
+      setNewSchedule({ ...newSchedule, [day]: hour + ":" + minutes });
+    } else {
+      const [start, end] = newSchedule[day].split("-");
+      if (end) {
+        setNewSchedule({
+          ...newSchedule,
+          [day]: start + "-" + hour + ":" + minutes,
+        });
+      } else {
+        setNewSchedule({
+          ...newSchedule,
+          [day]: newSchedule[day] + "-" + hour + ":" + minutes,
+        });
+      }
+    }
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       fetchTypesSchedules();
@@ -103,10 +117,10 @@ function TableSchedule() {
   }, [session.status, newFetch]);
 
   return (
-    <div className="grid grid-cols-4 gap-8 text-sm">
+    <div className="flex flex-col gap-8 text-sm">
       {/* form register */}
       <div className="col-span-1 border rounded-lg p-4">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-row flex-wrap gap-4">
           <div>
             <Label>Nombre del horario</Label>
             <Input
@@ -119,65 +133,115 @@ function TableSchedule() {
           </div>
           <div>
             <Label>Lunes</Label>
-            <Input
-              value={newSchedule.lunes}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, lunes: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) => handleScheduleChange("lunes", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) => handleScheduleChange("lunes", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
           <div>
             <Label>Martes</Label>
-            <Input
-              value={newSchedule.martes}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, martes: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) => handleScheduleChange("martes", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) => handleScheduleChange("martes", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
           <div>
             <Label>Miercoles</Label>
-            <Input
-              value={newSchedule.miercoles}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, miercoles: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) =>
+                  handleScheduleChange("miercoles", e.target.value)
+                }
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) =>
+                  handleScheduleChange("miercoles", e.target.value)
+                }
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
           <div>
             <Label>Jueves</Label>
-            <Input
-              value={newSchedule.jueves}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, jueves: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) => handleScheduleChange("jueves", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) => handleScheduleChange("jueves", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
           <div>
             <Label>Viernes</Label>
-            <Input
-              value={newSchedule.viernes}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, viernes: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) =>
+                  handleScheduleChange("viernes", e.target.value)
+                }
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) =>
+                  handleScheduleChange("viernes", e.target.value)
+                }
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
           <div>
             <Label>Sabado</Label>
-            <Input
-              value={newSchedule.sabado}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, sabado: e.target.value })
-              }
-              disabled={session.data?.user.role === "user"}
-            ></Input>
+            <div>
+              <Input
+                onChange={(e) => handleScheduleChange("sabado", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+              <Input
+                onChange={(e) => handleScheduleChange("sabado", e.target.value)}
+                type="time"
+                step={1}
+                disabled={session.data?.user.role === "user"}
+              ></Input>
+            </div>
           </div>
-          <div>
+          <div className="flex items-center">
             {session.data?.user.role === "admin" ||
               (session.data?.user.role === "superadmin" && (
                 <Button disabled={loading}>Registrar</Button>
@@ -250,7 +314,7 @@ function TableSchedule() {
                 ></Input>
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Lunes</Label>
+                <Label>Lunessss</Label>
                 <Input
                   defaultValue={typeScheduleSelected.lunes}
                   onChange={(e) =>
@@ -332,6 +396,18 @@ function TableSchedule() {
           </DialogContent>
         </Dialog>
       </div>
+      <Modal isOpen={loading || session.status !== "authenticated"}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                Cargando , espere un momento
+                <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

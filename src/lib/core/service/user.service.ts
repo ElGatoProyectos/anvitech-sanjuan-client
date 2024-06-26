@@ -89,17 +89,28 @@ class UserService {
 
   async updateUser(data: any, userId: number) {
     try {
-      updateUserDTO.parse(data);
+      // updateUserDTO.parse(data);
 
-      const formatData = {
-        ...data,
-        password: bcrypt.hashSync(data.password, 11),
-      };
+      let updatedUser;
 
-      const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: formatData,
-      });
+      if (data.password === "") {
+        const { passowrd, ...allData } = data;
+        updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: allData,
+        });
+      } else {
+        const formatData = {
+          ...data,
+          password: bcrypt.hashSync(data.password, 11),
+        };
+
+        updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: formatData,
+        });
+      }
+
       await prisma.$disconnect();
       return httpResponse.http200("User updated ok!", updatedUser);
     } catch (error) {
