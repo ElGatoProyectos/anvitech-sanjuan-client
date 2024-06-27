@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { AlignJustify, CircleUserRound } from "lucide-react";
 import { ChangeMenuStore } from "@/app/store/zustand";
+import { get } from "@/app/http/api.http";
 
 function Header() {
   const { data: session } = useSession();

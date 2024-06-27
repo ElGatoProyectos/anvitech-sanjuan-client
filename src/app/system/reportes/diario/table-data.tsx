@@ -247,12 +247,13 @@ function TableData() {
   async function handleUpdateHours() {
     try {
       setLoading(true);
-      await putId(
+      const res = await putId(
         "detail-report",
         { dataTemporalHours, dataDetail },
         dataDetail.id,
         session.data
       );
+      console.log(res);
       setLoading(false);
       setLoadingUpdateHours(!loadingUpdateHours);
     } catch (error) {
@@ -596,7 +597,7 @@ function TableData() {
           {(onClose) => (
             <>
               <ModalBody className="flex justify-start py-8">
-                Traendo la informacion, espere un momento
+                Cargando, espere un momento
                 <Spinner />
               </ModalBody>
             </>

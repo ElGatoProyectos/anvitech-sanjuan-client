@@ -153,7 +153,7 @@ function Dashboard() {
           {(onClose) => (
             <>
               <ModalBody className="flex justify-start py-8">
-                Traendo la informacion, espere un momento
+                Cargando, espere un momento
                 <Spinner />
               </ModalBody>
             </>

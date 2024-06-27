@@ -29,10 +29,13 @@ class DataService {
       /// obtener el token para hacer la peticion post
 
       const responseToken = await anvizService.getToken();
+
+      console.log(responseToken);
       if (!responseToken.ok) return responseToken;
 
       if (isReport) {
         const responseReport = await reportService.generateReport();
+        console.log(responseReport);
         if (!responseReport.ok) return responseReport;
 
         const responseDetail = await this.instanceDetailData(
@@ -48,7 +51,7 @@ class DataService {
 
         return httpResponse.http200(
           "Report generado satisfactoriamente",
-          responseDetail.content
+          responseDetail?.content
         );
       } else {
         const responseDetail = await this.instanceDetailDataNoRegister(
@@ -74,6 +77,136 @@ class DataService {
 
   /// falta otro metodo igual que no registre, solo que muestre
 
+  // async instanceDetailData(
+  //   token: string,
+  //   minDay: number,
+  //   maxDay: number,
+  //   selectedYear: number,
+  //   selectedMonth: number,
+  //   report: any
+  // ) {
+  //   try {
+  //     const days = [
+  //       "lunes",
+  //       "martes",
+  //       "miercoles",
+  //       "jueves",
+  //       "viernes",
+  //       "sabado",
+  //       "domingo",
+  //     ];
+
+  //     let pos = 0;
+
+  //     for (let day = minDay; day <= maxDay; day++) {
+  //       /// definimos el dia donde estamos para poder hacer el registro a la bd 📅
+  //       const dayString = this.functionCaptureDayFromNumber(
+  //         day,
+  //         selectedYear,
+  //         selectedMonth
+  //       );
+
+  //       ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
+  //       // todo todo ok
+  //       const responseDataForDay = await this.captureDataForDay(
+  //         token,
+  //         day,
+  //         selectedMonth,
+  //         selectedYear
+  //       );
+
+  //       /// filtrar la data para que se registre por usuario
+  //       const workers = await workerService.findAll();
+  //       await prisma.$disconnect();
+
+  //       /// iteración de trabajadores para obtener sus datos y analizar en base a eso
+  //       /// antes de pasar a esto deberia haber un filtro de validar si el registro.dni existe en la base de datos, si no existe, hacemos otro proceso que registre al trabajador en la bd y luego el reporte
+
+  //       const processedWorknos = new Set<string>();
+
+  //       await Promise.all(
+  //         responseDataForDay.content.map(async (row: any) => {
+  //           const workno = row.employee.workno;
+
+  //           // Verifica si el workno ya ha sido procesado
+
+  //           // Marca este workno como procesado
+  //           if (processedWorknos.has(workno)) {
+  //             return; // Si ya ha sido procesado, salta este ciclo
+  //           }
+  //           processedWorknos.add(workno);
+
+  //           const rowState = responseDataForDay.content.filter(
+  //             (item: any) => item.employee.workno === workno
+  //           );
+
+  //           // Validar que el trabajador cuyos registros ya se evaluaron, no se vuelva a repetir en otro bucle
+  //           const worker = await workerService.findByDNI(workno);
+  //           if (worker.ok) {
+  //             // Validamos la data con respecto al trabajador
+  //             await this.newMethodRegisterReport(
+  //               worker.content,
+  //               rowState,
+  //               dayString,
+  //               report,
+  //               day,
+  //               selectedMonth,
+  //               selectedYear
+  //             );
+  //           } else {
+  //             // Registramos al trabajador
+  //             const newWorker = {
+  //               full_name:
+  //                 row.employee.first_name + " " + row.employee.last_name, // Corrige el nombre completo concatenando first_name y last_name
+  //               dni: workno,
+  //               department: row.employee.department,
+  //               position: row.employee.job_title,
+  //             };
+
+  //             const responseNewWorker = await workerService.createNoHireDate(
+  //               newWorker
+  //             );
+
+  //             await scheduleService.createScheduleDefault(
+  //               responseNewWorker.content.id
+  //             );
+  //             await this.newMethodRegisterReport(
+  //               responseNewWorker.content,
+  //               rowState,
+  //               dayString,
+  //               report,
+  //               day,
+  //               selectedMonth,
+  //               selectedYear
+  //             );
+  //           }
+  //         })
+  //       );
+  //       // anterior --- eliminado
+  //       // const responseMap = workers.content.map(async (worker: any) => {
+  //       //   await this.filterAndRegisterForUser(
+  //       //     responseDataForDay.content,
+  //       //     worker,
+  //       //     dayString,
+  //       //     report,
+  //       //     day,
+  //       //     selectedMonth,
+  //       //     selectedYear
+  //       //   );
+  //       // });
+
+  //       pos++;
+  //     }
+
+  //     await prisma.$disconnect();
+
+  //     return httpResponse.http200("Report created", "Report created");
+  //   } catch (error) {
+  //     await prisma.$disconnect();
+  //     return errorService.handleErrorSchema(error);
+  //   }
+  // }
+
   async instanceDetailData(
     token: string,
     minDay: number,
@@ -89,115 +222,85 @@ class DataService {
         "miercoles",
         "jueves",
         "viernes",
-        "sabado",
+        "sabato",
         "domingo",
       ];
+      const promises = [];
 
-      let pos = 0;
+      const responseDataForDay = await this.captureDataForDay(
+        token,
+        minDay,
+        selectedMonth,
+        selectedYear
+      );
+
+      console.log(responseDataForDay);
 
       for (let day = minDay; day <= maxDay; day++) {
-        /// definimos el dia donde estamos para poder hacer el registro a la bd 📅
         const dayString = this.functionCaptureDayFromNumber(
           day,
           selectedYear,
           selectedMonth
         );
 
-        ///capturamos toda la data por dia de toda las paginas  [{},{},{}....{}]
-        // todo todo ok
-        const responseDataForDay = await this.captureDataForDay(
-          token,
-          day,
-          selectedMonth,
-          selectedYear
-        );
-
-        /// filtrar la data para que se registre por usuario
         const workers = await workerService.findAll();
         await prisma.$disconnect();
 
-        /// iteración de trabajadores para obtener sus datos y analizar en base a eso
-        /// antes de pasar a esto deberia haber un filtro de validar si el registro.dni existe en la base de datos, si no existe, hacemos otro proceso que registre al trabajador en la bd y luego el reporte
+        const processedWorknos = new Set();
 
-        const processedWorknos = new Set<string>();
+        const dayPromises = responseDataForDay.content.map(async (row: any) => {
+          const workno = row.employee.workno;
+          if (processedWorknos.has(workno)) {
+            return;
+          }
+          processedWorknos.add(workno);
 
-        await Promise.all(
-          responseDataForDay.content.map(async (row: any) => {
-            const workno = row.employee.workno;
+          const rowState = responseDataForDay.content.filter(
+            (item: any) => item.employee.workno === workno
+          );
 
-            // Verifica si el workno ya ha sido procesado
-
-            // Marca este workno como procesado
-            if (processedWorknos.has(workno)) {
-              return; // Si ya ha sido procesado, salta este ciclo
-            }
-            processedWorknos.add(workno);
-
-            const rowState = responseDataForDay.content.filter(
-              (item: any) => item.employee.workno === workno
+          const worker = await workerService.findByDNI(workno);
+          if (worker.ok) {
+            await this.newMethodRegisterReport(
+              worker.content,
+              rowState,
+              dayString,
+              report,
+              day,
+              selectedMonth,
+              selectedYear
             );
+          } else {
+            const newWorker = {
+              full_name: row.employee.first_name + " " + row.employee.last_name,
+              dni: workno,
+              department: row.employee.department,
+              position: row.employee.job_title,
+            };
+            const responseNewWorker = await workerService.createNoHireDate(
+              newWorker
+            );
+            await scheduleService.createScheduleDefault(
+              responseNewWorker.content.id
+            );
+            await this.newMethodRegisterReport(
+              responseNewWorker.content,
+              rowState,
+              dayString,
+              report,
+              day,
+              selectedMonth,
+              selectedYear
+            );
+          }
+        });
 
-            // Validar que el trabajador cuyos registros ya se evaluaron, no se vuelva a repetir en otro bucle
-            const worker = await workerService.findByDNI(workno);
-            if (worker.ok) {
-              // Validamos la data con respecto al trabajador
-              await this.newMethodRegisterReport(
-                worker.content,
-                rowState,
-                dayString,
-                report,
-                day,
-                selectedMonth,
-                selectedYear
-              );
-            } else {
-              // Registramos al trabajador
-              const newWorker = {
-                full_name:
-                  row.employee.first_name + " " + row.employee.last_name, // Corrige el nombre completo concatenando first_name y last_name
-                dni: workno,
-                department: row.employee.department,
-                position: row.employee.job_title,
-              };
-
-              const responseNewWorker = await workerService.createNoHireDate(
-                newWorker
-              );
-
-              await scheduleService.createScheduleDefault(
-                responseNewWorker.content.id
-              );
-              await this.newMethodRegisterReport(
-                responseNewWorker.content,
-                rowState,
-                dayString,
-                report,
-                day,
-                selectedMonth,
-                selectedYear
-              );
-            }
-          })
-        );
-        // anterior --- eliminado
-        // const responseMap = workers.content.map(async (worker: any) => {
-        //   await this.filterAndRegisterForUser(
-        //     responseDataForDay.content,
-        //     worker,
-        //     dayString,
-        //     report,
-        //     day,
-        //     selectedMonth,
-        //     selectedYear
-        //   );
-        // });
-
-        pos++;
+        promises.push(Promise.allSettled(dayPromises));
       }
 
-      await prisma.$disconnect();
-
-      return httpResponse.http200("Report created", "Report created");
+      Promise.allSettled(promises.flat()).then(() => {
+        return httpResponse.http200("report executed");
+      });
     } catch (error) {
       await prisma.$disconnect();
       return errorService.handleErrorSchema(error);
