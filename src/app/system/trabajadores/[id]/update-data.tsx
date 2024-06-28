@@ -91,11 +91,18 @@ function UpdateDataWorker({ id }: { id: string }) {
   async function handleUpdate(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      const formatData = {
-        ...worker,
-        company: worker.company.split("-")[0],
-        company_ruc: worker.company.split("-")[1],
-      };
+
+      let formatData;
+
+      if (worker.company) {
+        formatData = {
+          ...worker,
+          company: worker.company.split("-")[0],
+          company_ruc: worker.company.split("-")[1],
+        };
+      } else {
+        formatData = worker;
+      }
 
       if (
         session.data?.user.role === "admin" ||
@@ -106,6 +113,7 @@ function UpdateDataWorker({ id }: { id: string }) {
         useToastDefault("Ok", "Modificacion realizada con exito");
       }
     } catch (error) {
+      console.log(error);
       useToastDestructive("Error", "Error al modificar trabajador");
     }
   }

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWorkerWeek } from "../hooks/useWokersWeek";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -46,9 +46,55 @@ function Dashboard() {
     week,
   } = useWorkerWeek(date);
 
+  const [dateToday, setDateToday] = useState("");
+
+  useEffect(() => {
+    if (date === "") {
+      const newDate = new Date().toISOString().split("T")[0];
+      setDateToday(newDate);
+    } else {
+      const newDate = new Date(date).toISOString().split("T")[0];
+      setDateToday(newDate);
+    }
+  }, [date]);
+
+  const calculateFaltaSum = (item: any) => {
+    return (
+      Number(item.lunes && item.lunes.falta === "si" ? 1 : 0) +
+      Number(item.martes && item.martes.falta === "si" ? 1 : 0) +
+      Number(item.miercoles && item.miercoles.falta === "si" ? 1 : 0) +
+      Number(item.jueves && item.jueves.falta === "si" ? 1 : 0) +
+      Number(item.viernes && item.viernes.falta === "si" ? 1 : 0) +
+      Number(item.sabado && item.sabado.falta === "si" ? 1 : 0)
+    );
+  };
+
+  const calculateTardanzaSum = (item: any) => {
+    return (
+      Number(item.lunes && item.lunes.tardanza === "si" ? 1 : 0) +
+      Number(item.martes && item.martes.tardanza === "si" ? 1 : 0) +
+      Number(item.miercoles && item.miercoles.tardanza === "si" ? 1 : 0) +
+      Number(item.jueves && item.jueves.tardanza === "si" ? 1 : 0) +
+      Number(item.viernes && item.viernes.tardanza === "si" ? 1 : 0) +
+      Number(item.sabado && item.sabado.tardanza === "si" ? 1 : 0)
+    );
+  };
+
+  const sortedWeek = [...week].sort(
+    (a, b) => calculateFaltaSum(b) - calculateFaltaSum(a)
+  );
+
+  const sortedWeekT = [...week].sort(
+    (a, b) => calculateTardanzaSum(b) - calculateTardanzaSum(a)
+  );
+
   return (
     <div className="grid grid-cols-2 gap-4 w-full">
-      <div className="bg-white w-full col-span-2  p-2 rounded-lg flex gap-16 justify-end">
+      <div className="bg-white w-full col-span-2  py-2 px-4 rounded-lg flex gap-16 justify-between items-center">
+        <div>
+          <span className="font-semibold">Rango de fecha predefinida:</span>{" "}
+          <span>{dateToday}</span>
+        </div>
         <div className="flex gap-4">
           <span>Filtrar por fecha semanal</span>
           <Input type="date" onChange={(e) => setDate(e.target.value)}></Input>
@@ -87,7 +133,7 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {week.slice(0, 20).map((item: any, idx) => (
+            {sortedWeek.slice(0, 20).map((item: any, idx) => (
               <tr key={idx}>
                 <td>{item.worker.full_name}</td>
                 <td>{item.worker.dni}</td>
@@ -120,7 +166,7 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {week.slice(0, 20).map((item: any, idx) => (
+            {sortedWeekT.slice(0, 20).map((item: any, idx) => (
               <tr key={idx}>
                 <td>{item.worker.full_name}</td>
                 <td>{item.worker.dni}</td>
@@ -148,7 +194,7 @@ function Dashboard() {
         </table>
       </div>
 
-      <Modal isOpen={loading || isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={loading} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
