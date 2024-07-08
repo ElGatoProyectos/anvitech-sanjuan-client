@@ -412,19 +412,18 @@ function UpdateDataWorker({ id }: { id: string }) {
                 </Select>
               </div>
               <div className="flex gap-4">
-                {session.data?.user.role === "admin" ||
-                  (session.data?.user.role === "superadmin" && (
-                    <>
-                      <Button type="submit">Guardar cambios</Button>
-                      <Button
-                        type="button"
-                        onClick={() => setOpenModalTermination(true)}
-                        variant={"outline"}
-                      >
-                        Fecha de cese
-                      </Button>
-                    </>
-                  ))}
+                {session.data?.user.role !== "user" && (
+                  <>
+                    <Button type="submit">Guardar cambios</Button>
+                    <Button
+                      type="button"
+                      onClick={() => setOpenModalTermination(true)}
+                      variant={"outline"}
+                    >
+                      Fecha de cese
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </>

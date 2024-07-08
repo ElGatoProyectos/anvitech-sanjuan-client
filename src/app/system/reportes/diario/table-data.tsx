@@ -54,6 +54,7 @@ import {
   Spinner,
   useDisclosure,
 } from "@nextui-org/react";
+import axios from "axios";
 
 function TableData() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -326,6 +327,31 @@ function TableData() {
     }
   }, [session.status, loadingUpdateHours]);
 
+  const [openmodalReportDay, setOpenmodalReportDay] = useState(false);
+  const [daySelectedReport, setDaySelectedReport] = useState("");
+
+  async function handleCreateReportday() {
+    try {
+      setLoading(true);
+      const response = await post(
+        "reports/generate/day",
+        { daySelectedReport },
+        session.data
+      );
+      useToastDefault(
+        "Ok",
+        "Reporte generado correctamente, refreque el navegador"
+      );
+      setOpenmodalReportDay(false);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+
+      setOpenmodalReportDay(false);
+      useToastDestructive("Error", "Error al generar reporte");
+    }
+  }
+
   useEffect(() => {
     fetchIncidentsForDetail();
   }, [openModalEdit, actionActive]);
@@ -414,6 +440,15 @@ function TableData() {
                 Exportar <FileSpreadsheet className="ml-2" size={20} />
               </Button>
             </div>
+
+            {session.data?.user.role !== "user" && (
+              <div>
+                <Button onClick={() => setOpenmodalReportDay(true)}>
+                  Generar reporte diario{" "}
+                  <FileSpreadsheet className="ml-2" size={20} />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         <div className="p-2">
@@ -599,6 +634,36 @@ function TableData() {
               <ModalBody className="flex justify-start py-8">
                 Cargando, espere un momento
                 <Spinner />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={openmodalReportDay}
+        onOpenChange={() => setOpenmodalReportDay(false)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalBody className="flex justify-start py-8">
+                <div className="flex flex-col gap-4">
+                  <Input
+                    type="date"
+                    onChange={(e) => setDaySelectedReport(e.target.value)}
+                  />
+                  <p className="text-slate-600 ">
+                    <span className="text-red-500 font-bold">Alerta</span>
+                    <br />
+                    Este reporte tiene que realizarse a partir de las 8AM si en
+                    caso no se haya generado el reporte diario automaticamente.
+                    Tome en cuenta que esta accion agrega nuevos registros.
+                  </p>
+                  <Button onClick={handleCreateReportday}>
+                    Ingresar el dia del reporte a generar
+                  </Button>
+                </div>
               </ModalBody>
             </>
           )}
