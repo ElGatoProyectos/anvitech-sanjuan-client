@@ -20,8 +20,6 @@ export async function POST(request: NextRequest) {
       yearBody
     );
 
-    // deberia hbaer un metodo el cual  al pasarle un fecha, la reciba y devuelva de sabado a viernes y eso deberia ser el allDays
-
     const responseData = await reportService.generateReportForWeek(allDays);
 
     return NextResponse.json(responseData.content, {

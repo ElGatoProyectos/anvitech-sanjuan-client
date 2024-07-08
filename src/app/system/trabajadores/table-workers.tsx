@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Modal, ModalBody, ModalContent, Spinner } from "@nextui-org/react";
+import axios from "axios";
 import { Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -69,8 +70,10 @@ function TableWorkers() {
     try {
       const response = await get("workers/departments", session.data);
 
+      console.log(response.data);
       setDepartments(response.data);
     } catch (error) {
+      console.log(error);
       useToastDestructive("Error", "Hubo un error al traer la información");
     }
   }

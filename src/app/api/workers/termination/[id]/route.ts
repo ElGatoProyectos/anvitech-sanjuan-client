@@ -12,11 +12,6 @@ export async function PUT(
 
     const body = await request.json();
 
-    // {
-    //   termination_date,
-    //   reason
-    // }
-
     const response = await workerService.updateTerminationDate(
       body,
       Number(context.params.id)
