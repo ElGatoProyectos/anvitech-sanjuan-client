@@ -30,12 +30,10 @@ class DataService {
 
       const responseToken = await anvizService.getToken();
 
-      console.log(responseToken);
       if (!responseToken.ok) return responseToken;
 
       if (isReport) {
         const responseReport = await reportService.generateReport();
-        console.log(responseReport);
         if (!responseReport.ok) return responseReport;
 
         const responseDetail = await this.instanceDetailData(
@@ -233,8 +231,6 @@ class DataService {
         selectedMonth,
         selectedYear
       );
-
-      console.log(responseDataForDay);
 
       for (let day = minDay; day <= maxDay; day++) {
         const dayString = this.functionCaptureDayFromNumber(

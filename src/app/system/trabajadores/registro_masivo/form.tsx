@@ -22,7 +22,7 @@ function FormRegisterWorkersMassive() {
       const formData = new FormData();
       formData.append("file", file);
 
-      await postImage("workers/file", formData, session.data);
+      const response = await postImage("workers/file", formData, session.data);
       useToastDefault("Ok", "Carga realizada con exito");
       setLoading(false);
     } catch (error) {

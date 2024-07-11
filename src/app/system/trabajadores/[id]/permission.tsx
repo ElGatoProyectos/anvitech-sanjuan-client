@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { getId, post } from "@/app/http/api.http";
+import { deleteId, getId, post, putId } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
+import { Settings, Trash } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -108,6 +109,45 @@ function PermissionsWorker({ id }: { id: string }) {
     if (openModalHistory) fetchAllPermissions();
   }, [openModalHistory]);
 
+  // add function handle change date
+
+  const [isDeleteRowSelected, setIsDeleteRowSelected] = useState(false);
+  const [rowSelected, setRowSelected] = useState({
+    start_date: "",
+    end_date: "",
+    reason: "",
+    id: "",
+  });
+
+  async function handleSelectRow(data: any, type: string) {
+    try {
+      if (type === "delete") {
+        await deleteId("permissions", data.id, session.data);
+        useToastDefault("Ok", "Accion realizada correctamente");
+      } else if (type === "edit-selected") {
+        setIsDeleteRowSelected(true);
+        setRowSelected({
+          ...rowSelected,
+          start_date: data.start_date.split("T")[0],
+          end_date: data.end_date.split("T")[0],
+          reason: data.reason,
+          id: data.id,
+        });
+      } else if (type === "edit") {
+        const { id, ...restData } = rowSelected;
+        await putId(
+          "permissions",
+          restData,
+          Number(rowSelected.id),
+          session.data
+        );
+        useToastDefault("Ok", "Accion realizada correctamente");
+      }
+    } catch (error) {
+      useToastDestructive("Error", "Error al ejecutar la accion");
+    }
+  }
+
   return (
     <div className="bg-white p-8 rounded-lg">
       <div>
@@ -130,7 +170,7 @@ function PermissionsWorker({ id }: { id: string }) {
                   {formatDate(item.start_date)} a {formatDate(item.end_date)}
                 </td>
                 <td>
-                  {calculateDateDifference(item.start_date, item.end_date)}
+                  {calculateDateDifference(item.start_date, item.end_date) + 1}
                 </td>
                 <td>{formatDate(item.start_date)}</td>
                 <td>{formatDate(item.end_date)}</td>
@@ -204,37 +244,105 @@ function PermissionsWorker({ id }: { id: string }) {
         open={openModalHistory}
         onOpenChange={() => setOpenModalHistory(!openModalHistory)}
       >
-        <DialogContent className="">
+        <DialogContent className="min-w-[60rem]">
           <DialogHeader>
             <DialogTitle>Historial de licencias</DialogTitle>
           </DialogHeader>
-          <div className=" w-full gap-8 max-h-[500px] overflow-y-scroll">
-            <table cellPadding={8} className="text-sm w-full text-left border">
-              <thead>
-                <tr className="border-y">
-                  <th>Periodo</th>
-                  <th>Dias</th>
-                  <th>Fecha Inicio</th>
-                  <th>Fecha Fin</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dataPermissionAll.map((item, idx) => (
-                  <tr className="border-y " key={idx}>
-                    <td>
-                      {formatDate(item.start_date)} a{" "}
-                      {formatDate(item.end_date)}
-                    </td>
-                    <td>
-                      {calculateDateDifference(item.start_date, item.end_date) +
-                        1}
-                    </td>
-                    <td>{formatDate(item.start_date)}</td>
-                    <td>{formatDate(item.end_date)}</td>
+          <div className=" w-full gap-8 max-h-[500px]  flex justify-between ">
+            <div className="overflow-y-scroll">
+              <table
+                cellPadding={12}
+                className="text-sm min-w-full text-left border  "
+              >
+                <thead>
+                  <tr className="border-y">
+                    <th>Periodo</th>
+                    <th>Dias</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {dataPermissionAll.map((item, idx) => (
+                    <tr className="border-y " key={idx}>
+                      <td>
+                        {formatDate(item.start_date)} a{" "}
+                        {formatDate(item.end_date)}
+                      </td>
+                      <td>
+                        {calculateDateDifference(
+                          item.start_date,
+                          item.end_date
+                        ) + 1}
+                      </td>
+                      <td>{formatDate(item.start_date)}</td>
+                      <td>{formatDate(item.end_date)}</td>
+                      <td>
+                        <Trash
+                          onClick={() => handleSelectRow(item, "delete")}
+                          role="button"
+                          color="red"
+                          width={18}
+                        />
+                      </td>
+                      <td>
+                        <Settings
+                          onClick={() => handleSelectRow(item, "edit-selected")}
+                          role="button"
+                          color="black"
+                          width={20}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="relative min-w-40  ">
+              {isDeleteRowSelected ? (
+                <div className=" mr-8 flex flex-col gap-4">
+                  <Input
+                    className="min-w-48"
+                    type="date"
+                    value={rowSelected.start_date}
+                    onChange={(e) =>
+                      setRowSelected({
+                        ...rowSelected,
+                        start_date: e.target.value,
+                      })
+                    }
+                  ></Input>
+                  <Input
+                    className="w-full"
+                    type="date"
+                    value={rowSelected.end_date}
+                    onChange={(e) =>
+                      setRowSelected({
+                        ...rowSelected,
+                        end_date: e.target.value,
+                      })
+                    }
+                  ></Input>
+                  <Textarea
+                    value={rowSelected.reason}
+                    onChange={(e) =>
+                      setRowSelected({ ...rowSelected, reason: e.target.value })
+                    }
+                  ></Textarea>
+
+                  <Button onClick={() => handleSelectRow(rowSelected, "edit")}>
+                    Modificar
+                  </Button>
+                </div>
+              ) : (
+                <div className=" mr-8 flex flex-col gap-4">
+                  <span>Seleccione una fila para editar</span>
+                </div>
+              )}
+            </div>
           </div>
           {/* <DialogFooter>
             <Button>Exportar Datos</Button>

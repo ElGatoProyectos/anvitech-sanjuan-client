@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 
 export const downloadExcel = (data: any[]) => {
+  console.log(data);
   const date = new Date();
 
   const dataGeneral = data.map((item: any) => {
@@ -48,51 +49,9 @@ export const downloadExcel = (data: any[]) => {
       }
     });
 
-    const formatData = {
+    const formatData: any = {
       DNI: item.worker.dni,
       NOMBRES: item.worker.full_name,
-      // SABADO: !item.sabado
-      //   ? "-"
-      //   : item.sabado.tardanza === "si"
-      //   ? "T"
-      //   : item.sabado.falta === "si"
-      //   ? "F"
-      //   : "-",
-      // LUNES: !item.lunes
-      //   ? "-"
-      //   : item.lunes.tardanza === "si"
-      //   ? "T"
-      //   : item.lunes.falta === "si"
-      //   ? "F"
-      //   : "-",
-      // MARTES: !item.martes
-      //   ? "-"
-      //   : item.martes.tardanza === "si"
-      //   ? "T"
-      //   : item.martes.falta === "si"
-      //   ? "F"
-      //   : "-",
-      // MIERCOLES: !item.miercoles
-      //   ? "-"
-      //   : item.miercoles.tardanza === "si"
-      //   ? "T"
-      //   : item.miercoles.falta === "si"
-      //   ? "F"
-      //   : "-",
-      // JUEVES: !item.jueves
-      //   ? "-"
-      //   : item.jueves.tardanza === "si"
-      //   ? "T"
-      //   : item.jueves.falta === "si"
-      //   ? "F"
-      //   : "-",
-      // VIERNES: !item.viernes
-      //   ? "-"
-      //   : item.viernes.tardanza === "si"
-      //   ? "T"
-      //   : item.viernes.falta === "si"
-      //   ? "F"
-      //   : "-",
       SABADO: !item.sabado ? "-" : item.sabado.discount,
       LUNES: !item.lunes ? "-" : item.lunes.discount,
       MARTES: !item.martes ? "-" : item.martes.discount,
@@ -109,6 +68,37 @@ export const downloadExcel = (data: any[]) => {
         (item.viernes ? item.viernes.discount : 0) +
         (item.sabado ? item.sabado.discount : 0),
     };
+
+    formatData[
+      `SABADO - ${item.sabado ? item.sabado.fecha_reporte.split("T")[0] : ""}`
+    ] = formatData.SABADO;
+    formatData[
+      `LUNES - ${item.lunes ? item.lunes.fecha_reporte.split("T")[0] : ""}`
+    ] = formatData.LUNES;
+    formatData[
+      `MARTES - ${item.martes ? item.martes.fecha_reporte.split("T")[0] : ""}`
+    ] = formatData.MARTES;
+    formatData[
+      `MIERCOLES - ${
+        item.miercoles ? item.miercoles.fecha_reporte.split("T")[0] : ""
+      }`
+    ] = formatData.MIERCOLES;
+    formatData[
+      `JUEVES - ${item.jueves ? item.jueves.fecha_reporte.split("T")[0] : ""}`
+    ] = formatData.JUEVES;
+    formatData[
+      `VIERNES - ${
+        item.viernes ? item.viernes.fecha_reporte.split("T")[0] : ""
+      }`
+    ] = formatData.VIERNES;
+
+    delete formatData.SABADO;
+    delete formatData.LUNES;
+    delete formatData.MARTES;
+    delete formatData.MIERCOLES;
+    delete formatData.JUEVES;
+    delete formatData.VIERNES;
+
     return formatData;
   });
 
@@ -117,8 +107,8 @@ export const downloadExcel = (data: any[]) => {
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
   XLSX.writeFile(
     workbook,
-    `Reporte${date.getFullYear()} - ${
+    `Reporte-${date.getFullYear()}-${
       date.getMonth() + 1
-    } - ${date.getDay()}.xlsx`
+    }-${date.getDate()}.xlsx`
   );
 };

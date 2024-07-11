@@ -6,9 +6,7 @@ export async function GET() {
     const date = new Date();
     // date.getDate() - 1,
     //   date.getDate() - 1,
-    console.log("in method api");
     const response = await dataService.instanceDataInit(20, 20, 2024, 6);
-    console.log(response);
     return NextResponse.json(response.content, {
       status: response.statusCode,
     });

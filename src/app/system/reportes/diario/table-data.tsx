@@ -254,7 +254,6 @@ function TableData() {
         dataDetail.id,
         session.data
       );
-      console.log(res);
       setLoading(false);
       setLoadingUpdateHours(!loadingUpdateHours);
     } catch (error) {

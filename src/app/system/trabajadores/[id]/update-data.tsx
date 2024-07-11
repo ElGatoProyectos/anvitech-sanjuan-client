@@ -113,7 +113,6 @@ function UpdateDataWorker({ id }: { id: string }) {
         useToastDefault("Ok", "Modificacion realizada con exito");
       }
     } catch (error) {
-      console.log(error);
       useToastDestructive("Error", "Error al modificar trabajador");
     }
   }
