@@ -43,7 +43,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { format } from "date-fns";
 import { headers } from "next/headers";
-import { downloadExcel } from "./export";
+import { downloadExcel, downloadReportWorker } from "./export";
 import { Label } from "@/components/ui/label";
 import {
   Modal,
@@ -146,6 +146,7 @@ function TableData() {
   async function fetchSupervisors() {
     try {
       const response = await get("workers/supervisor", session.data);
+      console.log(response.data);
       setSupervisors(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer los supervisores");
@@ -303,6 +304,8 @@ function TableData() {
     }
   }
 
+  const [openFilterForWorker, setOpenFilterForWorker] = useState(false);
+
   async function handleDeleteDetailIncident(detailIncidentId: number) {
     try {
       await deleteId("reports/incident", detailIncidentId, session.data);
@@ -349,6 +352,49 @@ function TableData() {
       setOpenmodalReportDay(false);
       useToastDestructive("Error", "Error al generar reporte");
     }
+  }
+
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const formattedYesterday = yesterday.toISOString().split("T")[0];
+
+  const [dateSelectedFilter, setDateSelectedFilter] = useState({
+    start: "",
+    end: "",
+  });
+
+  const [dniWrited, setDniWrited] = useState("");
+
+  const [datareportForWorker, setDatareportForWorker] = useState([]);
+
+  async function fetchReportForWorker() {
+    if (
+      dateSelectedFilter.end === "" ||
+      dateSelectedFilter.start === "" ||
+      dniWrited === ""
+    ) {
+      useToastDestructive("Error", "Por favor complete todos los campos");
+    } else {
+      const response = await post(
+        "reports/worker/" + dniWrited,
+        dateSelectedFilter,
+        session.data
+      );
+
+      setDatareportForWorker(response.data);
+
+      useToastDefault("Ok", "Informacion recuperada correctamente");
+    }
+  }
+
+  function handleCloseModalReportWorker() {
+    setOpenFilterForWorker(false);
+    setDatareportForWorker([]);
+  }
+
+  function handleGenerateWorkerReport() {
+    downloadReportWorker(datareportForWorker);
   }
 
   useEffect(() => {
@@ -449,6 +495,19 @@ function TableData() {
               </div>
             )}
           </div>
+          {/* nueva opcion */}
+          <div className="flex justify-between gap-4 p-2 border rounded-lg ">
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                className="mt-0"
+                onClick={() => setOpenFilterForWorker(true)}
+              >
+                Reporte por trabajador
+              </Button>
+            </div>
+          </div>
+          {/*  */}
         </div>
         <div className="p-2">
           <table className="w-full table-auto text-xs text-left ">
@@ -606,6 +665,142 @@ function TableData() {
             currentPage={currentPage}
           />
         </div>
+
+        {/* modal for report worker individual ============================================ */}
+        <Modal
+          size="4xl"
+          isOpen={openFilterForWorker}
+          onClose={handleCloseModalReportWorker}
+        >
+          <ModalContent>
+            <ModalHeader className="flex justify-start py-4">
+              Reporte por trabajador
+            </ModalHeader>
+            <ModalBody className="flex flex-col ">
+              <div className="flex gap-4">
+                <Input
+                  placeholder="DNI"
+                  onChange={(e) => setDniWrited(e.target.value)}
+                ></Input>
+                <Input
+                  type="date"
+                  max={formattedYesterday}
+                  onChange={(e) =>
+                    setDateSelectedFilter({
+                      ...dateSelectedFilter,
+                      start: e.target.value,
+                    })
+                  }
+                ></Input>
+                <Input
+                  type="date"
+                  max={formattedYesterday}
+                  onChange={(e) =>
+                    setDateSelectedFilter({
+                      ...dateSelectedFilter,
+                      end: e.target.value,
+                    })
+                  }
+                ></Input>
+                <Button onClick={fetchReportForWorker}>Generar reporte</Button>
+              </div>
+              <div className="overflow-y-scroll max-h-[40rem]">
+                <table className="w-full text-left" cellPadding={4}>
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th>DNI</th>
+                      <th>Fecha</th>
+                      <th>Hora incio</th>
+                      <th>Inicio refrigerio</th>
+                      <th>Fin refrigerio</th>
+                      <th>Salida</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                    {datareportForWorker.map((item: any, index) => (
+                      <tr key={index}>
+                        <td>{item.dni}</td>
+                        <td>{item.fecha_reporte.split("T")[0]}</td>
+                        <td>{item.hora_inicio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_inicio_refrigerio}</td>
+                        <td>{item.hora_salida}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <Button
+                  onClick={handleGenerateWorkerReport}
+                  disabled={datareportForWorker.length === 0}
+                >
+                  Generar excel
+                </Button>
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </div>
 
       <Dialog

@@ -113,6 +113,7 @@ function TableWorkers() {
       setWorkersFiltered(workers);
       setCurrentPage(1);
     } else {
+      console.log(workers);
       const filtered = workers.filter((item) => item.type_contract === value);
       setWorkersFiltered(filtered);
       setCurrentPage(1);
@@ -128,6 +129,14 @@ function TableWorkers() {
 
   return (
     <div className=" w-full flex flex-col mt-4">
+      <div className="mb-4 flex gap-2">
+        <span className="bg-green-400 rounded-md px-2">
+          Activos {workers.filter((item) => item.enabled === "si").length}
+        </span>
+        <span className="bg-red-400 rounded-md px-2">
+          Inactivos {workers.filter((item) => item.enabled === "no").length}
+        </span>
+      </div>
       <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-4">
         <Input
           placeholder="Buscar por DNI"
@@ -250,7 +259,9 @@ function TableWorkers() {
                   <td className="pr-6 py-4 whitespace-nowrap">
                     {item.type_contract}
                   </td>
-                  <td> {item.enabled ? "HABILITADO" : "DESHABILITADO"}</td>
+                  <td>
+                    {item.enabled === "si" ? "HABILITADO" : "DESHABILITADO"}
+                  </td>
 
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Link

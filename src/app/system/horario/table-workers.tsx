@@ -84,7 +84,9 @@ function TableWorkers() {
     if (value === "") {
       setWorkersFiltered(workers);
     } else {
-      const filtered = workers.filter((item) => item.dni.includes(value));
+      const filtered = workers.filter((item) =>
+        item.worker.dni.includes(value)
+      );
       setWorkersFiltered(filtered);
     }
     setCurrentPage(1);
@@ -192,7 +194,7 @@ function TableWorkers() {
                   <td className="pr-6 py-4 whitespace-nowrap">
                     <Link
                       className="bg-black rounded-md  outline-none "
-                      href={`/system/horario/` + item.id}
+                      href={`/system/horario/` + item.worker.id}
                     >
                       <Settings size={20} />
                     </Link>

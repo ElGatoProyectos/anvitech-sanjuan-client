@@ -1,7 +1,7 @@
 "use client";
 
 import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
-import { get, getId, post, putId } from "@/app/http/api.http";
+import { deleteId, get, getId, post, putId } from "@/app/http/api.http";
 import { useUpdatedStore } from "@/app/store/zustand";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,7 @@ import {
   Spinner,
 } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 
 const companies = [
@@ -60,6 +61,7 @@ const companies = [
 ];
 
 function UpdateDataWorker({ id }: { id: string }) {
+  const router = useRouter();
   // todo  define states
   const { updatedAction, setUpdatedAction } = useUpdatedStore();
 
@@ -74,6 +76,10 @@ function UpdateDataWorker({ id }: { id: string }) {
     termination_date: "",
     reason: "",
   });
+
+  const [openDeleted, setOpenDeleted] = useState(false);
+
+  const [dniWrite, setDniWrite] = useState("");
 
   const [openModalTermination, setOpenModalTermination] = useState(false);
 
@@ -179,6 +185,25 @@ function UpdateDataWorker({ id }: { id: string }) {
       setSupervisors(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer los supervisores");
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      if (dniWrite !== worker.dni) {
+        setOpenDeleted(false);
+        useToastDestructive(
+          "Error",
+          "El dni no coincide con el del trabajador seleccionado"
+        );
+      } else {
+        // aqui viene lo bueno, eliminar horarios, detalle de reportes, trabajador
+        await deleteId("workers", worker.id, session.data);
+        useToastDefault("Ok", "Trabajador eliminado correctamente");
+        router.push("/system/trabajadores");
+      }
+    } catch (error) {
+      useToastDestructive("Error", "Error al eliminar trabajador");
     }
   }
 
@@ -424,6 +449,16 @@ function UpdateDataWorker({ id }: { id: string }) {
                   </>
                 )}
               </div>
+
+              <hr />
+
+              {session.data?.user.role !== "user" && (
+                <div>
+                  <Button type="button" onClick={() => setOpenDeleted(true)}>
+                    Eliminar trabajador
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -523,6 +558,27 @@ function UpdateDataWorker({ id }: { id: string }) {
               </ModalBody>
             </>
           )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={openDeleted} onClose={() => setOpenDeleted(false)}>
+        <ModalContent>
+          <ModalBody className="flex justify-start py-8">
+            <p className="font-semibold">
+              Estas seguro de eliminar al trabajador?
+            </p>
+            <p className="text-gray-500">
+              Recuerde que el eliminar el trabajador se borraran reportes y
+              horario con respecto a este trabajador
+            </p>
+            <p>
+              Si es asi por favor digite{" "}
+              <span className="font-semibold">{worker.dni}</span>{" "}
+              correspondiente al trabajador a eliminar.
+            </p>
+            <Input onChange={(e) => setDniWrite(e.target.value)}></Input>
+            <Button onClick={handleDelete}>Confirmar Eliminación</Button>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </div>

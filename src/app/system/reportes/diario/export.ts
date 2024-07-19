@@ -27,3 +27,32 @@ export const downloadExcel = (data: any) => {
     } - ${date.getDay()}.xlsx`
   );
 };
+
+export const downloadReportWorker = (data: any) => {
+  const date = new Date();
+
+  const dataGeneral = data.map((item: any) => {
+    const formatData = {
+      DNI: item.dni,
+      FECHA: item.fecha_reporte,
+      "HORA INICIO": item.hora_inicio,
+      "HORA INICIO REFRIGERIO": item.hora_inicio_refrigerio,
+      "HORA FIN REFRIGERIO": item.hora_fin_refrigerio,
+      "HORA SALIDA": item.hora_salida,
+      FALTA: item.falta === "si" ? "F" : "-",
+      TARDANZA: item.tardanza === "si" ? "T" : "-",
+      DESCUENTO: item.discount,
+    };
+    return formatData;
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(dataGeneral);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  XLSX.writeFile(
+    workbook,
+    `reporte-trabajador - ${date.getFullYear()} - ${
+      date.getMonth() + 1
+    } - ${date.getDay()}.xlsx`
+  );
+};
