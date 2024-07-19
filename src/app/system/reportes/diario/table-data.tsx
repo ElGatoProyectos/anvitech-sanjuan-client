@@ -395,7 +395,7 @@ function TableData() {
   }
 
   function handleGenerateWorkerReport() {
-    downloadReportWorker(datareportForWorker);
+    downloadReportWorker(datareportForWorker, workerSelectedReport);
   }
 
   useEffect(() => {

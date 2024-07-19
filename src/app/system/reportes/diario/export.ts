@@ -28,12 +28,13 @@ export const downloadExcel = (data: any) => {
   );
 };
 
-export const downloadReportWorker = (data: any) => {
+export const downloadReportWorker = (data: any, worker: any) => {
   const date = new Date();
 
   const dataGeneral = data.map((item: any) => {
     const formatData = {
       DNI: item.dni,
+      NOMBRES: worker.full_name,
       FECHA: item.fecha_reporte,
       "HORA INICIO": item.hora_inicio,
       "HORA INICIO REFRIGERIO": item.hora_inicio_refrigerio,
