@@ -367,6 +367,7 @@ function TableData() {
   const [dniWrited, setDniWrited] = useState("");
 
   const [datareportForWorker, setDatareportForWorker] = useState([]);
+  const [workerSelectedReport, setWorkerSelectedReport] = useState<any>({});
 
   async function fetchReportForWorker() {
     if (
@@ -381,8 +382,8 @@ function TableData() {
         dateSelectedFilter,
         session.data
       );
-
-      setDatareportForWorker(response.data);
+      setDatareportForWorker(response.data.report);
+      setWorkerSelectedReport(response.data.worker);
 
       useToastDefault("Ok", "Informacion recuperada correctamente");
     }
@@ -668,7 +669,7 @@ function TableData() {
 
         {/* modal for report worker individual ============================================ */}
         <Modal
-          size="4xl"
+          size="5xl"
           isOpen={openFilterForWorker}
           onClose={handleCloseModalReportWorker}
         >
@@ -705,9 +706,10 @@ function TableData() {
                 <Button onClick={fetchReportForWorker}>Generar reporte</Button>
               </div>
               <div className="overflow-y-scroll max-h-[30rem]">
-                <table className="w-full text-left" cellPadding={4}>
+                <table className="w-full text-left text-sm" cellPadding={4}>
                   <thead className="bg-gray-200">
                     <tr>
+                      <th>Nombres</th>
                       <th>DNI</th>
                       <th>Fecha</th>
                       <th>Hora incio</th>
@@ -719,6 +721,7 @@ function TableData() {
                   <tbody>
                     {datareportForWorker.map((item: any, index) => (
                       <tr key={index}>
+                        <td>{workerSelectedReport.full_name}</td>
                         <td>{item.dni}</td>
                         <td>{item.fecha_reporte.split("T")[0]}</td>
                         <td>{item.hora_inicio}</td>
