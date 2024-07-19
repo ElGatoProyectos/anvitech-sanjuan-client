@@ -672,7 +672,7 @@ function TableData() {
           isOpen={openFilterForWorker}
           onClose={handleCloseModalReportWorker}
         >
-          <ModalContent>
+          <ModalContent className="">
             <ModalHeader className="flex justify-start py-4">
               Reporte por trabajador
             </ModalHeader>
@@ -704,7 +704,7 @@ function TableData() {
                 ></Input>
                 <Button onClick={fetchReportForWorker}>Generar reporte</Button>
               </div>
-              <div className="overflow-y-scroll max-h-[40rem]">
+              <div className="overflow-y-scroll max-h-[30rem]">
                 <table className="w-full text-left" cellPadding={4}>
                   <thead className="bg-gray-200">
                     <tr>
@@ -717,66 +717,6 @@ function TableData() {
                     </tr>
                   </thead>
                   <tbody>
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
-                    {datareportForWorker.map((item: any, index) => (
-                      <tr key={index}>
-                        <td>{item.dni}</td>
-                        <td>{item.fecha_reporte.split("T")[0]}</td>
-                        <td>{item.hora_inicio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_inicio_refrigerio}</td>
-                        <td>{item.hora_salida}</td>
-                      </tr>
-                    ))}
                     {datareportForWorker.map((item: any, index) => (
                       <tr key={index}>
                         <td>{item.dni}</td>
