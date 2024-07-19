@@ -3,17 +3,22 @@ import * as XLSX from "xlsx";
 
 //- esta funcion se filtra por mes, debemos recibir el numero del mes donde estamos
 export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
-  const {
-    worker,
-    reportes,
-    vacaciones,
-    descansos_medico,
-    licencias,
-    permisos,
-  } = content;
+  const { dataGeneral, incidents } = content;
 
-  const dataGeneral = content.map((row: any) => {
+  const response = dataGeneral.map((row: any) => {
     const faltas = row.reportes.filter((r: any) => r.falta === "si");
+    // se podria hacer lo mismo para las licencias, colocarle un nombre,pero habria una gestion de licencias
+    const incidentsFeriado = incidents.filter(
+      (item: any) => item.title === "FERIADO"
+    );
+
+    let minutosTardanza = 0;
+
+    const rowsT = row.reportes.filter((r: any) => r.tardanza === "si");
+
+    rowsT.map((i: any) => {
+      minutosTardanza = Number(i.hora_inicio.split(":")[1]);
+    });
 
     const formatData = {
       CODTRABA: row.worker.dni,
@@ -21,17 +26,27 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
       CCOSTO: "",
       DDESCMED: calculateDaysInRange(row.descansos_medico, dateMin, dateMax),
       DFALTAS: faltas.length,
+      DFERI: incidentsFeriado.length,
       DIASTRAB: row.reportes.length - faltas.length,
+      DIFHORAS: "CAMBIO DE LOGICA",
       DLICSGO: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
       DLICCGO: calculateDaysInRange(row.licencias, dateMin, dateMax),
-      DSUBENF: "",
-      DSUBMAT: "",
+      DSUBENF: "-",
+      DSUBMAT: "-",
+      DSUBPATE: "-",
+      HE100: "CAMBIO DE LOGICA",
+      HE25: "CAMBIO DE LOGICA",
+      HE35: "CAMBIO DE LOGICA",
+      HLACTANC: "CAMBIO DE LOGICA",
+      HORASTRA: (row.reportes.length - faltas.length) * 8,
+      MAYO1ERO: "",
+      MTAR: minutosTardanza,
       DVAC: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
     };
     return formatData;
   });
 
-  const worksheet = XLSX.utils.json_to_sheet(dataGeneral);
+  const worksheet = XLSX.utils.json_to_sheet(response);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
   XLSX.writeFile(workbook, "reporte-startsoft.xlsx");

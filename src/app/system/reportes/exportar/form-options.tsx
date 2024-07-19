@@ -100,10 +100,12 @@ function FormOptions() {
       setOpenFirst(true);
       if (monthSelected !== "") {
         const response = await post(
-          "reports/export/starsoft",
+          "reports/export/new-starsoft",
           { month: monthSelected },
           session.data
         );
+
+        // response.data.dataGeneral && response.data.incidents or feriados
 
         const newYear = new Date().getFullYear();
         const month = parseInt(monthSelected, 10) - 1; // Restar 1 porque los meses en JavaScript son de 0 a 11
@@ -114,6 +116,7 @@ function FormOptions() {
         // Fecha final del mes
         const endOfMonth = new Date(newYear, month + 1, 0);
 
+        // console.log(response.data);
         exportStartSoft(response.data, startOfMonth, endOfMonth);
         setOpenFirst(false);
 
