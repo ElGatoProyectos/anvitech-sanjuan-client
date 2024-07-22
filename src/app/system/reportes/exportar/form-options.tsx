@@ -116,7 +116,7 @@ function FormOptions() {
         // Fecha final del mes
         const endOfMonth = new Date(newYear, month + 1, 0);
 
-        // console.log(response.data);
+        console.log(response.data);
         exportStartSoft(response.data, startOfMonth, endOfMonth);
         setOpenFirst(false);
 
@@ -124,6 +124,7 @@ function FormOptions() {
       }
       setOpenFirst(false);
     } catch (error) {
+      console.log(error);
       setOpenFirst(false);
 
       useToastDestructive("Error", "Error al generar excel");
