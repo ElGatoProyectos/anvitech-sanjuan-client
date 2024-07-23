@@ -1,7 +1,7 @@
 "use client";
 
-import { useToastDestructive } from "@/app/hooks/toast.hook";
-import { get } from "@/app/http/api.http";
+import { useToastDefault, useToastDestructive } from "@/app/hooks/toast.hook";
+import { get, post } from "@/app/http/api.http";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +23,7 @@ import {
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { reportNewSchema, reportStartSoftForWorker } from "./export-new";
 
 function NewFormExport() {
   const session = useSession();
@@ -49,11 +50,38 @@ function NewFormExport() {
     setWorkerSelected(worker);
   }
 
-  function handleGenerateFisrtReport() {
+  async function handleGenerateFisrtReport() {
     try {
-      console.log(workerSelected);
-      console.log(firstRangeDate);
-    } catch (error) {}
+      const response = await post(
+        "reports/export/new-report-worker",
+        { workerSelected, dateSelected: firstRangeDate },
+        session.data
+      );
+
+      reportStartSoftForWorker(response.data, workerSelected);
+
+      useToastDefault("Ok", "Reporte generado correctamente");
+    } catch (error) {
+      useToastDestructive("Error", "Ocurrio un error al generar reporte");
+    }
+  }
+
+  //  ===============================================
+
+  const [dateTwo, setDateTwo] = useState("");
+
+  async function handleGenerateReportNewWeek() {
+    try {
+      const response = await post(
+        "/reports/export/new-model-report",
+        { dateSelected: dateTwo },
+        session.data
+      );
+      reportNewSchema(response.data);
+      useToastDefault("Ok", "Reporte generado correctamente");
+    } catch (error) {
+      useToastDestructive("Error", "Error al generar reporte");
+    }
   }
 
   useEffect(() => {
@@ -113,12 +141,14 @@ function NewFormExport() {
           <div className="flex flex-col gap-4 mt-4">
             <Label>Formato control de asistencia</Label>
             <div className="flex flex-col gap-4 justify-between">
-              <Input type="date"></Input>
-              <Input type="date"></Input>
+              <Input
+                type="date"
+                onChange={(e) => setDateTwo(e.target.value)}
+              ></Input>
             </div>
           </div>
 
-          <Button onClick={handleGenerateFisrtReport}>
+          <Button onClick={handleGenerateReportNewWeek}>
             Descargar formato básico
           </Button>
         </div>
