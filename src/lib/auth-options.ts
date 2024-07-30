@@ -22,6 +22,8 @@ export const authOptions: AuthOptions = {
           password: credentials.password,
         });
 
+        console.log(user)
+
         return user;
       },
     }),
