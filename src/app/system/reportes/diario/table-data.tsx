@@ -124,6 +124,23 @@ function TableData() {
     }
   }
 
+  const [schedules, setSchedules] = useState<any[]>([]);
+
+  async function fetchSchedules() {
+    try {
+      const response = await get("workers/schedule", session.data);
+      setSchedules(response.data);
+    } catch (error) {
+      setLoading(false);
+      useToastDestructive("Error", "Error al traer el reporte");
+    }
+  }
+
+  function captureSchedule(dni: string): string {
+    const schedule = schedules.find((i) => i.worker.dni === dni);
+    return schedule.lunes;
+  }
+
   async function fetDepartments() {
     try {
       const response = await get("workers/departments", session.data);
@@ -326,6 +343,7 @@ function TableData() {
       fetDepartments();
       fetchIncidents();
       fetchSupervisors();
+      fetchSchedules();
     }
   }, [session.status, loadingUpdateHours]);
 
@@ -396,6 +414,57 @@ function TableData() {
 
   function handleGenerateWorkerReport() {
     downloadReportWorker(datareportForWorker, workerSelectedReport);
+  }
+
+  function calculateMinutesDelay(
+    hora_inicio: string,
+    delay: string,
+    dni: string
+  ) {
+    const schedule = captureSchedule(dni);
+    const [i, e] = schedule.split("-");
+    const [start, minutes] = i.split(":").map(Number);
+    console.log(i, e);
+    if (hora_inicio === "") {
+      return "";
+    } else {
+      const [hour, minute] = hora_inicio.split(":").map(Number);
+      if (delay === "si") {
+        if (start === hour) {
+          return minute - minutes;
+        }
+      } else {
+        return "0";
+      }
+    }
+  }
+
+  function calculateHoursWorker(
+    hora_inicio: string,
+    hora_salida: string
+  ): string {
+    if (hora_inicio === "" || hora_salida === "") return "-";
+
+    let [i1, i2] = hora_inicio.split(":").map(Number);
+    let [f1, f2] = hora_salida.split(":").map(Number);
+
+    let diffMin = f2 - i2;
+    let diffHour = f1 - i1;
+
+    if (diffMin < 0) {
+      diffMin += 60;
+      diffHour -= 1;
+    }
+
+    let hoursDiff = diffHour;
+    let minutesDiff = diffMin;
+
+    // Formatear el resultado para que los minutos siempre tengan dos dígitos
+    let formattedMinutes =
+      minutesDiff < 10 ? `0${minutesDiff}` : minutesDiff.toString();
+    let result = `${hoursDiff}:${formattedMinutes}`;
+
+    return result;
   }
 
   useEffect(() => {
@@ -511,7 +580,7 @@ function TableData() {
           {/*  */}
         </div>
         <div className="p-2">
-          <table className="w-full table-auto text-xs text-left ">
+          <table className="w-full table-auto text-xs text-center ">
             <thead className="text-gray-600 font-medium border-b">
               <tr>
                 <th className="py-3 pr-6">DNI</th>
@@ -523,7 +592,7 @@ function TableData() {
                 <th className="py-3 pr-6">Hora salida</th>
                 <th className="py-3 pr-6">Tardanza</th>
                 <th className="py-3 pr-6">Falta</th>
-                <th className="py-3 pr-6">Descuento</th>
+                <th className="py-3 pr-6">Horas trabajadas</th>
 
                 <th className="py-3 pr-6">Acción</th>
               </tr>
@@ -567,52 +636,16 @@ function TableData() {
                       <Skeleton></Skeleton>
                     </td>
                   </tr>
-                  <tr>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-                    <td className="pr-6 py-4 whitespace-nowrap">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </td>
-                    <th className="py-3 pr-6">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-                    <th className="py-3 pr-6" align="center">
-                      <Skeleton className=" h-18"></Skeleton>
-                    </th>
-
-                    <td className=" whitespace-nowrap">
-                      <Skeleton></Skeleton>
-                    </td>
-                  </tr>
                 </>
               ) : (
                 currentWorkers.map((item: any, idx) => (
                   <tr
                     key={idx}
-                    className={`${item.discount === 0 && "bg-green-100"} ${
-                      item.discount === 5 && "bg-orange-100"
-                    } ${item.discount === 10 && "bg-orange-100"} ${
-                      item.discount === 20 && "bg-orange-100"
-                    }  ${item.discount === 35 && "bg-red-100"}`}
+                    // className={`${item.discount === 0 && "bg-green-100"} ${
+                    //   item.discount === 5 && "bg-orange-100"
+                    // } ${item.discount === 10 && "bg-orange-100"} ${
+                    //   item.discount === 20 && "bg-orange-100"
+                    // }  ${item.discount === 35 && "bg-red-100"}`}
                   >
                     <td className="pr-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="pr-6 py-4 w-40">{item.nombre}</td>
@@ -620,27 +653,34 @@ function TableData() {
                     <th className="py-3 pr-6">
                       {formatDate(item.fecha_reporte)}
                     </th>
-                    <th className="py-3 pr-6" align="center">
+                    <th className="py-3 pr-6 border " align="center">
                       {item.hora_inicio}
                     </th>
-                    <th className="py-3 pr-6" align="center">
+                    <th className="py-3 pr-6 border" align="center">
                       {item.hora_inicio_refrigerio}
                     </th>
-                    <th className="py-3 pr-6" align="center">
+                    <th className="py-3 pr-6 border" align="center">
                       {item.hora_fin_refrigerio}
                     </th>
-                    <th className="py-3 pr-6" align="center">
+                    <th className="py-3 pr-6 border" align="center">
                       {item.hora_salida}
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      {item.tardanza === "si" ? "T" : "-"}
+                      {calculateMinutesDelay(
+                        item.hora_inicio,
+                        item.tardanza,
+                        item.dni
+                      )}{" "}
+                      min
+                      {/* {item.tardanza === "si" ? "T" : "-"} */}
                     </th>
                     <th className="py-3 pr-6" align="center">
-                      {item.falta === "si" ? "F" : "-"}
+                      {item.falta === "si" ? "F" : "A"}
                     </th>
 
                     <th className="py-3 pr-6" align="center">
-                      {item.discount}
+                      {calculateHoursWorker(item.hora_inicio, item.hora_salida)}
+                      {/* {item.discount} */}
                     </th>
 
                     <td className=" whitespace-nowrap">

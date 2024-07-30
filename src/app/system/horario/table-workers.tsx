@@ -53,6 +53,7 @@ function TableWorkers() {
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
+      console.log(response.data);
     } catch (error) {
       useToastDestructive("Error", "Hubo un error al traer la información");
       setLoading(false);

@@ -89,7 +89,7 @@ function GraphicBar({ week }: { week: any }) {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis type="number" domain={[1000, 1500]} />
+          <YAxis type="number" domain={[0, 100]} />
           <Tooltip />
 
           <Bar dataKey="faltas" stackId="a" fill="#8884d8" />

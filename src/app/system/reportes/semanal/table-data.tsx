@@ -27,7 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, FileSpreadsheet, Settings } from "lucide-react";
+import {
+  CalendarIcon,
+  CloudCog,
+  FileSpreadsheet,
+  Settings,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -73,6 +78,44 @@ function TableData() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   // fetchs principales ================================================================
+
+  const [dateFormattedMinMax, setDateFormattedMinMax] = useState({
+    min: "",
+    max: "",
+  });
+  function calculateMinAndMaxDayInWeek(dateString: string) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const inputDate = new Date(Date.UTC(year, month - 1, day));
+
+    const dayOfWeek = inputDate.getUTCDay();
+
+    let saturday: Date;
+    let friday: Date;
+
+    if (dayOfWeek === 6) {
+      saturday = new Date(inputDate);
+      friday = new Date(inputDate);
+      friday.setUTCDate(friday.getUTCDate() + 6);
+    } else if (dayOfWeek === 5) {
+      // Si es viernes
+      friday = new Date(inputDate);
+      saturday = new Date(inputDate);
+      saturday.setUTCDate(saturday.getUTCDate() - 6);
+    } else {
+      saturday = new Date(inputDate);
+      saturday.setUTCDate(saturday.getUTCDate() - ((dayOfWeek + 1) % 7));
+      friday = new Date(inputDate);
+      friday.setUTCDate(friday.getUTCDate() + ((5 - dayOfWeek + 7) % 7));
+    }
+
+    const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
+    setDateFormattedMinMax({
+      min: formatDate(saturday),
+      max: formatDate(friday),
+    });
+  }
+
   async function fetchReport() {
     try {
       const day = new Date().getDate();
@@ -87,6 +130,8 @@ function TableData() {
       setWorkers(response.data);
       setWorkersFiltered(response.data);
       setLoading(false);
+      const formatDateString = year + "-" + month + "-" + day;
+      calculateMinAndMaxDayInWeek(formatDateString);
     } catch (error) {
       setLoading(false);
 
@@ -145,6 +190,10 @@ function TableData() {
 
       setWorkers(response.data);
       setWorkersFiltered(response.data);
+
+      const formatDateString = year + "-" + month + "-" + day;
+      calculateMinAndMaxDayInWeek(formatDateString);
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -188,7 +237,7 @@ function TableData() {
               onChange={handleChangeInput}
               className="w-44"
             ></Input>
-            <Select onValueChange={(e) => handleSelectDepartment(e)}>
+            <Select onValueChange={(e: any) => handleSelectDepartment(e)}>
               <SelectTrigger className="w-96">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
@@ -215,6 +264,14 @@ function TableData() {
                 className="w-44"
                 onChange={(e) => setDate(e.target.value)}
               ></Input>
+            </div>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="bg-gray-200 p-1 rounded-md">
+                {dateFormattedMinMax.min}
+              </span>
+              <span className="bg-gray-200 p-1 rounded-md">
+                {dateFormattedMinMax.max}
+              </span>
             </div>
             <Button
               className="mt-0"
@@ -245,7 +302,7 @@ function TableData() {
                 <th className="py-3 pr-6">Jueves</th>
                 <th className="py-3 pr-6">Viernes</th>
 
-                <th className="py-3 pr-6">Descuento</th>
+                <th className="py-3 pr-6">Asistencias</th>
 
                 {/* <th className="py-3 pr-6">Acción</th> */}
               </tr>
@@ -300,7 +357,7 @@ function TableData() {
                         ? "T"
                         : item.sabado.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
                     <th className="pr-6 py-4 ">-</th>
 
@@ -311,7 +368,7 @@ function TableData() {
                         ? "T"
                         : item.lunes.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.martes
@@ -320,7 +377,7 @@ function TableData() {
                         ? "T"
                         : item.martes.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.miercoles
@@ -329,7 +386,7 @@ function TableData() {
                         ? "T"
                         : item.miercoles.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
                     <th className="py-3 pr-6" align="center">
                       {!item.jueves
@@ -338,7 +395,7 @@ function TableData() {
                         ? "T"
                         : item.jueves.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
 
                     <th className="py-3 pr-6" align="center">
@@ -348,7 +405,7 @@ function TableData() {
                         ? "T"
                         : item.viernes.falta === "si"
                         ? "F"
-                        : "OK"}
+                        : "A"}
                     </th>
 
                     <th className="py-3 pr-6" align="center">
@@ -359,10 +416,17 @@ function TableData() {
                         "miercoles",
                         "jueves",
                         "viernes",
+                        "domingo",
                       ]
-                        .map((day) => (item[day] ? item[day].discount : 0))
-                        .reduce((total, discount) => total + discount, 0)}
+                        .map((day) =>
+                          item[day] && item[day].falta === "no" ? 1 : 0
+                        )
+                        .reduce(
+                          (total: any, attendance) => total + attendance,
+                          0
+                        )}
                     </th>
+
                     {/* <td className=" whitespace-nowrap">
                       <Button
                         variant="secondary"
