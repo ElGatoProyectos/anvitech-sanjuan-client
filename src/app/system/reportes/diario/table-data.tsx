@@ -423,15 +423,26 @@ function TableData() {
   ) {
     const schedule = captureSchedule(dni);
     const [i, e] = schedule.split("-");
-    const [start, minutes] = i.split(":").map(Number);
+    const [startSchedule, minutesSchedule] = i.split(":").map(Number);
     console.log(i, e);
     if (hora_inicio === "") {
-      return "";
+      return "0";
     } else {
       const [hour, minute] = hora_inicio.split(":").map(Number);
       if (delay === "si") {
-        if (start === hour) {
-          return minute - minutes;
+        if (startSchedule === hour) {
+          if (minute >= minutesSchedule) {
+            return `${minute - minutesSchedule}`;
+          }
+        } else if (hour > startSchedule) {
+          if (hour - startSchedule === 1) {
+            const minutes = 60 - minutesSchedule + minute;
+
+            return minutes;
+          } else {
+            const minutes = 60 - minutesSchedule + (hour - startSchedule) * 60;
+            return minutes;
+          }
         }
       } else {
         return "0";
