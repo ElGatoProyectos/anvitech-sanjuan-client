@@ -132,6 +132,7 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
   XLSX.writeFile(workbook, "reporte-startsoft.xlsx");
 }
 
+
 function isDateInRange(dateToCheck: any, startDate: any, endDate: any) {
   return (
     new Date(dateToCheck) >= new Date(startDate) &&

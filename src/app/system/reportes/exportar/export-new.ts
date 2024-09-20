@@ -5,6 +5,26 @@ export function reportStartSoftForWorker(data: any, worker: any) {
   const schedule = data.schedule;
 
   const dataGeneral = data.reportes.map((row: any) => {
+    let minutosAcumulados = 0;
+
+    const hora_inicio = row.hora_inicio; // 7:34
+    try {
+      if (hora_inicio && hora_inicio !== "00:00") {
+        const [hora, minutos] = hora_inicio.split(":").map(Number);
+        const minutosInicio = hora * 60 + minutos;
+        const minutosReferencia = 7 * 60 + 30; // 7:30 en minutos
+
+        if (minutosInicio > minutosReferencia) {
+          const minutosTardanza = minutosInicio - minutosReferencia;
+          minutosAcumulados += minutosTardanza;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // tardanza
+
     const totalFaltas = data.reportes.filter((i: any) => i.falta === "si");
     const totalTardanzas = data.reportes.filter(
       (i: any) => i.tardanza === "si"
@@ -71,7 +91,7 @@ export function reportStartSoftForWorker(data: any, worker: any) {
         SALIDA: "INASISTENCIA",
         "SUMA DE HORAS TRABAJADAS": "",
         "TOTAL REFRIGERIO": "",
-        "LA SUMA DE TARDANZAS": "",
+        "LA SUMA DE TARDANZAS": minutosAcumulados,
         FALTAS: "SI",
         "HORAS EXTRAS 25%": "",
         "HORAS EXTRAS 35%": "",
@@ -117,7 +137,7 @@ export function reportStartSoftForWorker(data: any, worker: any) {
         "SUMA DE HORAS TRABAJADAS":
           horas_trabajadas.hours + ":" + horas_trabajadas.minutes,
         "TOTAL REFRIGERIO": tiempoRefrigerio,
-        "LA SUMA DE TARDANZAS": totalTardanzas.length,
+        "LA SUMA DE TARDANZAS": minutosAcumulados,
         FALTAS: "",
         "HORAS EXTRAS 25%": horasExtras.first,
         "HORAS EXTRAS 35%": horasExtras.second,

@@ -163,7 +163,7 @@ function TableData() {
   async function fetchSupervisors() {
     try {
       const response = await get("workers/supervisor", session.data);
-      console.log(response.data);
+
       setSupervisors(response.data);
     } catch (error) {
       useToastDestructive("Error", "Error al traer los supervisores");
@@ -424,7 +424,7 @@ function TableData() {
     const schedule = captureSchedule(dni);
     const [i, e] = schedule.split("-");
     const [startSchedule, minutesSchedule] = i.split(":").map(Number);
-    console.log(i, e);
+
     if (hora_inicio === "") {
       return "0";
     } else {
