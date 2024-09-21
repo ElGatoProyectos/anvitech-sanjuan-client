@@ -10,6 +10,8 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
     const schedule = row.schedule;
     const worker = row.worker;
 
+    console.log(row);
+
     const faltas = row.reportes.filter((r: any) => r.falta === "si");
     // se podria hacer lo mismo para las licencias, colocarle un nombre,pero habria una gestion de licencias
     const incidentsFeriado = incidents.filter(
@@ -17,11 +19,8 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
     );
 
     // calculo de minutos de tardanza
-    let minutosTardanza = 0;
-    const rowsT = row.reportes.filter((r: any) => r.tardanza === "si");
-    rowsT.map((i: any) => {
-      minutosTardanza = Number(i.hora_inicio.split(":")[1]);
-    });
+
+    let minutosAcumulados = 0;
 
     // calculo de horas por 25% 35%
 
@@ -30,6 +29,22 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
       second: 0,
     };
     row.reportes.map((r: any) => {
+      const hora_inicio = r.hora_inicio; // 7:34
+      try {
+        if (hora_inicio && hora_inicio !== "00:00") {
+          const [hora, minutos] = hora_inicio.split(":").map(Number);
+          const minutosInicio = hora * 60 + minutos;
+          const minutosReferencia = 7 * 60 + 30; // 7:30 en minutos
+
+          if (minutosInicio > minutosReferencia) {
+            const minutosTardanza = minutosInicio - minutosReferencia;
+            minutosAcumulados += minutosTardanza;
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
       const [horaSalidaMarcacion, minutoSalidaMarcacion] = r.hora_salida
         .split(":")
         .map(Number);
@@ -104,13 +119,14 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
       CODTRABA: row.worker.dni,
       NOMBRES: row.worker.full_name,
       CCOSTO: "",
-      DDESCMED: calculateDaysInRange(row.descansos_medico, dateMin, dateMax)-1,
+      DDESCMED:
+        calculateDaysInRange(row.descansos_medico, dateMin, dateMax) - 1,
       DFALTAS: faltas.length,
       DFERI: incidentsFeriado.length,
       DIASTRAB: row.reportes.length - faltas.length,
       DIFHORAS: "-",
-      DLICSGO: calculateDaysInRange(row.vacaciones, dateMin, dateMax)-1,
-      DLICCGO: calculateDaysInRange(row.licencias, dateMin, dateMax)-1,
+      DLICSGO: calculateDaysInRange(row.vacaciones, dateMin, dateMax) - 1,
+      DLICCGO: calculateDaysInRange(row.licencias, dateMin, dateMax) - 1,
       DSUBENF: "-",
       DSUBMAT: "-",
       DSUBPATE: "-",
@@ -120,7 +136,7 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
       HLACTANC: "",
       HORASTRA: (row.reportes.length - faltas.length) * 8,
       MAYO1ERO: "",
-      MTAR: minutosTardanza,
+      MTAR: minutosAcumulados,
       DVAC: calculateDaysInRange(row.vacaciones, dateMin, dateMax),
     };
     return formatData;
@@ -131,7 +147,6 @@ export function exportStartSoft(content: any, dateMin: Date, dateMax: Date) {
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
   XLSX.writeFile(workbook, "reporte-startsoft.xlsx");
 }
-
 
 function isDateInRange(dateToCheck: any, startDate: any, endDate: any) {
   return (
